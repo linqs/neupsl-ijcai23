@@ -1,0 +1,116 @@
+{
+  "options": {
+    "runtime.db.intids": true,
+    "runtime.log.level": "TRACE"
+  },
+  "rules": [
+    "1.0: Neural(Paper, Label) = MirrorCat(Paper, Label) ^2",
+    "1.0: 0 * Paper(Paper1) + 0 * Paper(Paper2) + 0 * Link(Paper1, Paper2) + MirrorCat(Paper1, Label) = MirrorCat(Paper2, Label) ^2",
+    "MirrorCat(Paper, +Label) = 1 .",
+    "MirrorCat(Paper, Label) = HasCat(Paper, Label) ."
+  ],
+  "predicates": {
+    "Link/2": {
+      "observations": {
+        "learn": [
+          "../data/cora/0/edges.txt"
+        ],
+        "infer": [
+          "../data/cora/0/edges.txt"
+        ]
+      }
+    },
+    "Neural/2": {
+      "observations": {
+        "learn": [
+          "../data/cora/0/networks/uncertainty_labels_train.txt",
+          "../data/cora/0/networks/uncertainty_labels_test.txt",
+          "../data/cora/0/networks/uncertainty_labels_valid.txt",
+          "../data/cora/0/networks/uncertainty_labels_latent.txt"
+        ],
+        "infer": [
+          "../data/cora/0/networks/uncertainty_labels_train.txt",
+          "../data/cora/0/networks/uncertainty_labels_test.txt",
+          "../data/cora/0/networks/uncertainty_labels_valid.txt",
+          "../data/cora/0/networks/uncertainty_labels_latent.txt"
+        ]
+      }
+    },
+    "Paper/1": {
+      "observations": {
+        "learn": [
+          "../data/cora/0/ids_train.txt",
+          "../data/cora/0/ids_test.txt",
+          "../data/cora/0/ids_valid.txt",
+          "../data/cora/0/ids_latent.txt"
+        ],
+        "infer": [
+          "../data/cora/0/ids_train.txt",
+          "../data/cora/0/ids_test.txt",
+          "../data/cora/0/ids_valid.txt",
+          "../data/cora/0/ids_latent.txt"
+        ]
+      }
+    },
+    "MirrorCat/2": {
+      "observations": {
+        "learn": [
+          "../data/cora/0/networks/uncertainty_observations_test.txt",
+          "../data/cora/0/networks/uncertainty_observations_valid.txt",
+          "../data/cora/0/networks/uncertainty_observations_latent.txt"
+        ],
+        "infer": [
+          "../data/cora/0/id_labels_full_train.txt",
+          "../data/cora/0/networks/uncertainty_observations_test.txt",
+          "../data/cora/0/networks/uncertainty_observations_valid.txt",
+          "../data/cora/0/networks/uncertainty_observations_latent.txt"
+        ]
+      },
+      "targets": {
+        "learn": [
+          "../data/cora/0/targets_train.txt",
+          "../data/cora/0/networks/uncertainty_target_test.txt",
+          "../data/cora/0/networks/uncertainty_target_valid.txt",
+          "../data/cora/0/networks/uncertainty_target_latent.txt"
+        ],
+        "infer": [
+          "../data/cora/0/networks/uncertainty_target_test.txt",
+          "../data/cora/0/networks/uncertainty_target_valid.txt",
+          "../data/cora/0/networks/uncertainty_target_latent.txt"
+        ]
+      }
+    },
+    "HasCat/2": {
+      "evaluations": [
+        {
+          "evaluator": "CategoricalEvaluator",
+          "options": {
+            "categoricalevaluator.categoryindexes": 1,
+            "eval.includeobs": true
+          }
+        }
+      ],
+      "targets": {
+        "learn": [
+          "../data/cora/0/targets_train.txt",
+          "../data/cora/0/targets_valid.txt",
+          "../data/cora/0/targets_test.txt",
+          "../data/cora/0/targets_latent.txt"
+        ],
+        "infer": [
+          "../data/cora/0/targets_valid.txt",
+          "../data/cora/0/targets_test.txt",
+          "../data/cora/0/targets_latent.txt"
+        ]
+      },
+      "truth": {
+        "learn": [
+          "../data/cora/0/id_labels_full_train.txt"
+        ],
+        "infer": [
+          "../data/cora/0/id_labels_full_test.txt"
+        ]
+      }
+    }
+  }
+}

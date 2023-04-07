@@ -22,27 +22,26 @@ util = importlib.import_module("util")
 
 DATASET_CITESEER = 'citeseer'
 DATASET_CORA = 'cora'
-
 DATASETS = [DATASET_CITESEER]
 
 DATASET_CONFIG = {
     DATASET_CITESEER: {
         "name": DATASET_CITESEER,
-        "class_size": 6,
-        "train_size": 165,
-        "valid_size": 165,
-        "test_size": 1000,
-        "num_splits": 1,
-        "num_sgc_layers": 2,
+        "class-size": 6,
+        "train-size": 165,
+        "valid-size": 165,
+        "test-size": 1000,
+        "num-splits": 1,
+        "num-sgc-layers": 2,
     },
     DATASET_CORA: {
         "name": DATASET_CORA,
-        "class_size": 7,
-        "train_size": 135,
-        "valid_size": 135,
-        "test_size": 1000,
-        "num_splits": 1,
-        "num_sgc_layers": 2,
+        "class-size": 7,
+        "train-size": 135,
+        "valid-size": 135,
+        "test-size": 1000,
+        "num-splits": 1,
+        "num-sgc-layers": 2,
     },
 }
 
@@ -55,19 +54,19 @@ def _generate_partitions(graph, device, class_size, train_count, test_count, val
     """
     found_sample = False
     while not found_sample:
-        graph.ndata["train_mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
-        graph.ndata["test_mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
-        graph.ndata["valid_mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
-        graph.ndata["latent_mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
+        graph.ndata["train-mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
+        graph.ndata["test-mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
+        graph.ndata["valid-mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
+        graph.ndata["latent-mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
 
         permutation = torch.randperm(graph.num_nodes(), device=device)
 
-        graph.ndata["train_mask"][permutation[:train_count]] = True
-        graph.ndata["test_mask"][permutation[train_count:train_count + valid_count]] = True
-        graph.ndata["valid_mask"][permutation[train_count + valid_count:train_count + valid_count + test_count]] = True
-        graph.ndata["latent_mask"][permutation[train_count + valid_count + test_count:]] = True
+        graph.ndata["train-mask"][permutation[:train_count]] = True
+        graph.ndata["test-mask"][permutation[train_count:train_count + valid_count]] = True
+        graph.ndata["valid-mask"][permutation[train_count + valid_count:train_count + valid_count + test_count]] = True
+        graph.ndata["latent-mask"][permutation[train_count + valid_count + test_count:]] = True
 
-        for mask_name in ["train_mask", "test_mask", "valid_mask"]:
+        for mask_name in ["train-mask", "test-mask", "valid-mask"]:
             found_sample = found_sample or len(torch.unique(graph.ndata["label"][graph.ndata[mask_name]])) == class_size
 
     return graph
@@ -94,30 +93,30 @@ def fetch_data(config):
 
     graph = dgl.add_self_loop(dgl.remove_self_loop(graph)).to(device)
 
-    graph = _generate_partitions(graph, device, config['class_size'], config['train_size'],
-                                 config['test_size'], config['valid_size'])
+    graph = _generate_partitions(graph, device, config['class-size'], config['train-size'],
+                                 config['test-size'], config['valid-size'])
 
     # GCN baseline.
     symmetric_graph = dgl.to_simple(dgl.add_reverse_edges(graph).to('cpu')).to(device)
 
     sgconv_layer = dgl.nn.pytorch.conv.SGConv(symmetric_graph.ndata['feat'].shape[1],
                                               symmetric_graph.ndata['feat'].shape[1],
-                                              k=config['num_sgc_layers']).to(device)
+                                              k=config['num-sgc-layers']).to(device)
     torch.nn.init.eye_(sgconv_layer.fc.weight)
     smoothed_features = sgconv_layer(symmetric_graph, symmetric_graph.ndata['feat']).detach().cpu().numpy()
 
     graph = dgl.remove_self_loop(graph)
     data = {}
     for (partition, indexes) in (
-            [('train', graph.nodes()[graph.ndata["train_mask"]]),
-             ('test', graph.nodes()[graph.ndata["test_mask"]]),
-             ('valid', graph.nodes()[graph.ndata["valid_mask"]]),
-             ('latent', graph.nodes()[graph.ndata["latent_mask"]])]):
+            [('train', graph.nodes()[graph.ndata["train-mask"]]),
+             ('test', graph.nodes()[graph.ndata["test-mask"]]),
+             ('valid', graph.nodes()[graph.ndata["valid-mask"]]),
+             ('latent', graph.nodes()[graph.ndata["latent-mask"]])]):
         data[partition] = {
-            'entity_ids': [int(index) for index in indexes],
+            'entity-ids': [int(index) for index in indexes],
             'labels': [int(graph.ndata['label'][index]) for index in indexes],
-            'features': [graph.ndata['feat'][index].tolist() for index in indexes],
-            'smoothed_features': [smoothed_features[index].tolist() for index in indexes],
+            'features-simple': [graph.ndata['feat'][index].tolist() for index in indexes],
+            'features-smoothed': [smoothed_features[index].tolist() for index in indexes],
         }
 
     edges = graph.cpu().edges()
@@ -135,13 +134,13 @@ def write_data(config, out_dir, graph, data, edges):
     for key in data:
         category_targets = []
         category_truth = []
-        for entity_index in range(len(data[key]['entity_ids'])):
-            entity = data[key]['entity_ids'][entity_index]
+        for entity_index in range(len(data[key]['entity-ids'])):
+            entity = data[key]['entity-ids'][entity_index]
 
-            entity_data_map.append([entity] + data[key]['features'][entity_index] + [data[key]['labels'][entity_index]])
-            entity_data_smoothed_map.append([entity] + data[key]['smoothed_features'][entity_index] + [data[key]['labels'][entity_index]])
+            entity_data_map.append([entity] + data[key]['features-simple'][entity_index] + [data[key]['labels'][entity_index]])
+            entity_data_smoothed_map.append([entity] + data[key]['features-smoothed'][entity_index] + [data[key]['labels'][entity_index]])
 
-            for label_index in range(config['class_size']):
+            for label_index in range(config['class-size']):
                 label = "0" if label_index != data[key]['labels'][entity_index] else "1"
 
                 category_targets.append([entity, str(label_index)])
@@ -154,9 +153,9 @@ def write_data(config, out_dir, graph, data, edges):
 
     util.write_psl_file(os.path.join(out_dir, "entity-data-map.txt"), entity_data_map)
     util.write_psl_file(os.path.join(out_dir, "entity-data-smoothed-map.txt"), entity_data_smoothed_map)
-    util.write_json_file(os.path.join(out_dir, "deep-data.json"), data)
+    util.write_json_file(os.path.join(out_dir, "deep-data.json"), data, indent=0)
 
-    dgl.save_graphs(os.path.join(out_dir, 'dgl_graph.bin'), [graph])
+    dgl.save_graphs(os.path.join(out_dir, 'dgl-graph.bin'), [graph])
 
     util.write_json_file(os.path.join(out_dir, CONFIG_FILENAME), config)
 
@@ -164,7 +163,7 @@ def write_data(config, out_dir, graph, data, edges):
 def main():
     for dataset_id in DATASETS:
         config = DATASET_CONFIG[dataset_id]
-        for split in range(config['num_splits']):
+        for split in range(config['num-splits']):
             config['seed'] = split
 
             split_dir = os.path.join(THIS_DIR, '..', 'data', config['name'], str(config['seed']))

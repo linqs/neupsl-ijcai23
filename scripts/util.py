@@ -1,5 +1,7 @@
 import json
 
+import numpy
+
 
 def write_json_file(path, data, indent=4):
     with open(path, "w") as file:
@@ -46,7 +48,7 @@ def load_psl_file(path, dtype=str):
 
 def enumerate_hyperparameters(hyperparameters_dict, current_hyperparameters={}):
     for key in sorted(hyperparameters_dict):
-        hyperparameters_list = []
+        hyperparameters = []
         for value in hyperparameters_dict[key]:
             next_hyperparameters = current_hyperparameters.copy()
             next_hyperparameters[key] = value
@@ -55,13 +57,25 @@ def enumerate_hyperparameters(hyperparameters_dict, current_hyperparameters={}):
             remaining_hyperparameters.pop(key)
 
             if remaining_hyperparameters:
-                hyperparameters_list = hyperparameters_list + enumerate_hyperparameters(remaining_hyperparameters, next_hyperparameters)
+                hyperparameters = hyperparameters + enumerate_hyperparameters(remaining_hyperparameters, next_hyperparameters)
             else:
-                hyperparameters_list.append(next_hyperparameters)
-        return hyperparameters_list
+                hyperparameters.append(next_hyperparameters)
+        return hyperparameters
 
 
-def one_hot_encoding(label, num_labels):
-    encoding = [0] * num_labels
-    encoding[label] = 1
-    return encoding
+def calculate_metrics(y_pred, y_truth, metrics):
+    results = {}
+    for metric in metrics:
+        if metric == 'categorical_accuracy':
+            results['categorical_accuracy'] = _categorical_accuracy(y_pred, y_truth)
+        else:
+            raise ValueError('Unknown metric: {}'.format(metric))
+    return results
+
+
+def _categorical_accuracy(y_pred, y_truth):
+    correct = 0
+    for i in range(len(y_truth)):
+        if numpy.argmax(y_pred[i]) == numpy.argmax(y_truth[i]):
+            correct += 1
+    return correct / len(y_truth)

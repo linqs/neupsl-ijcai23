@@ -29,3 +29,4 @@ out*.txt
 out*.err
 inferred-predicates/
 results/
+data/

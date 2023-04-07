@@ -1,17 +1,17 @@
 import json
 
 
-def write_json(data, path, indent=4):
+def write_json_file(path, data, indent=4):
     with open(path, "w") as file:
         json.dump(data, file, indent=indent)
 
 
-def load_json(path):
+def load_json_file(path):
     with open(path, "r") as file:
         return json.load(file)
 
 
-def load_fake_json(path, size=None):
+def load_fake_json_file(path, size=None):
     with open(path, "r") as file:
         data = []
         current_line = 0

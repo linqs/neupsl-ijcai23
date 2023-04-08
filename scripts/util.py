@@ -63,6 +63,12 @@ def enumerate_hyperparameters(hyperparameters_dict, current_hyperparameters={}):
         return hyperparameters
 
 
+def one_hot_encoding(label, num_labels):
+    encoding = [0] * num_labels
+    encoding[label] = 1
+    return encoding
+
+
 def calculate_metrics(y_pred, y_truth, metrics):
     results = {}
     for metric in metrics:

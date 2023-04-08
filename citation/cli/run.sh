@@ -10,10 +10,10 @@ readonly PSL_VERSION='3.0.0-SNAPSHOT'
 readonly JAR_PATH="${THIS_DIR}/psl-cli-${PSL_VERSION}.jar"
 readonly RUN_SCRIPT_VERSION='2.0.0'
 
-readonly BASE_NAME='cora'
+readonly BASE_NAME='citeseer'
 readonly OUTPUT_DIRECTORY="${THIS_DIR}/inferred-predicates"
 
-readonly ADDITIONAL_PSL_OPTIONS='-D log4j.threshold=TRACE'
+readonly ADDITIONAL_PSL_OPTIONS=''
 
 function main() {
     trap exit SIGINT
@@ -37,7 +37,7 @@ function run_psl() {
         ${ADDITIONAL_PSL_OPTIONS} "$@"
 
     if [[ "$?" -ne 0 ]]; then
-        echo 'ERROR: Failed to run infernce.'
+        echo 'ERROR: Failed to run inference.'
         exit 70
     fi
 }

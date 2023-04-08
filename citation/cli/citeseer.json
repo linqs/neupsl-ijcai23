@@ -1,82 +1,55 @@
 {
   "options": {
     "runtime.db.intids": true,
-    "runtime.log.level": "TRACE"
+    "runtime.log.level": "TRACE",
+    "categoricalevaluator.categoryindexes": 1,
+    "categoricalevaluator.defaultpredicate": "HasCat",
+    "admmreasoner.computeperiod": 100,
+    "admmreasoner.epsilonabs": 1.0e-6,
+    "admmreasoner.epsilonrel": 1.0e-4,
+    "admmreasoner.maxiterations": 100,
+    "admmreasoner.stepsize": 1.0,
+    "gradientdescent.numsteps": 2500,
+    "gradientdescent.runfulliterations": true,
+    "gradientdescent.stepsize": 1.0e-8
   },
   "rules": [
-    "1.0: Neural(Paper, Label) = MirrorCat(Paper, Label) ^2",
-    "1.0: 0 * Paper(Paper1) + 0 * Paper(Paper2) + 0 * Link(Paper1, Paper2) + MirrorCat(Paper1, Label) = MirrorCat(Paper2, Label) ^2",
-    "MirrorCat(Paper, +Label) = 1 .",
-    "MirrorCat(Paper, Label) = HasCat(Paper, Label) ."
+    "1.0: Neural(Paper, Label) = HasCat(Paper, Label) ^2",
+    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, Label) = HasCat(Paper2, Label) ^2",
+    "HasCat(Paper, +Label) = 1 ."
   ],
   "predicates": {
-    "Link/2": {
-      "observations": {
-        "learn": [
-          "../data/cora/0/edges.txt"
-        ],
-        "infer": [
-          "../data/cora/0/edges.txt"
-        ]
-      }
-    },
     "Neural/2": {
-      "observations": {
-        "learn": [
-          "../data/cora/0/networks/uncertainty_labels_train.txt",
-          "../data/cora/0/networks/uncertainty_labels_test.txt",
-          "../data/cora/0/networks/uncertainty_labels_valid.txt",
-          "../data/cora/0/networks/uncertainty_labels_latent.txt"
-        ],
-        "infer": [
-          "../data/cora/0/networks/uncertainty_labels_train.txt",
-          "../data/cora/0/networks/uncertainty_labels_test.txt",
-          "../data/cora/0/networks/uncertainty_labels_valid.txt",
-          "../data/cora/0/networks/uncertainty_labels_latent.txt"
-        ]
-      }
-    },
-    "Paper/1": {
-      "observations": {
-        "learn": [
-          "../data/cora/0/ids_train.txt",
-          "../data/cora/0/ids_test.txt",
-          "../data/cora/0/ids_valid.txt",
-          "../data/cora/0/ids_latent.txt"
-        ],
-        "infer": [
-          "../data/cora/0/ids_train.txt",
-          "../data/cora/0/ids_test.txt",
-          "../data/cora/0/ids_valid.txt",
-          "../data/cora/0/ids_latent.txt"
-        ]
-      }
-    },
-    "MirrorCat/2": {
-      "observations": {
-        "learn": [
-          "../data/cora/0/networks/uncertainty_observations_test.txt",
-          "../data/cora/0/networks/uncertainty_observations_valid.txt",
-          "../data/cora/0/networks/uncertainty_observations_latent.txt"
-        ],
-        "infer": [
-          "../data/cora/0/id_labels_full_train.txt",
-          "../data/cora/0/networks/uncertainty_observations_test.txt",
-          "../data/cora/0/networks/uncertainty_observations_valid.txt",
-          "../data/cora/0/networks/uncertainty_observations_latent.txt"
-        ]
+      "type": "DeepPredicate",
+      "options": {
+        "model-path": "../scripts/neupsl-model.py::CitationModel",
+        "entity-data-map-path": "../data/citeseer/0/entity-data-map.txt",
+        "entity-argument-indexes": "0",
+        "class-size": 6,
+        "load-path": "../data/citeseer/0/saved-networks/simple/pre-trained-tf",
+        "save-path": "../data/citeseer/0/saved-networks/simple/nesy-trained-tf"
       },
       "targets": {
         "learn": [
-          "../data/cora/0/targets_train.txt",
-          "../data/cora/0/networks/uncertainty_target_test.txt",
-          "../data/cora/0/networks/uncertainty_target_valid.txt",
-          "../data/cora/0/networks/uncertainty_target_latent.txt"
+          "../data/citeseer/0/category-target-train.txt",
+          "../data/citeseer/0/category-target-test.txt",
+          "../data/citeseer/0/category-target-valid.txt",
+          "../data/citeseer/0/category-target-latent.txt"
         ],
         "infer": [
-          "../data/cora/0/networks/uncertainty_target_test.txt",
-          "../data/cora/0/networks/uncertainty_target_valid.txt",
-          "../data/cora/0/networks/uncertainty_target_latent.txt"
+          "../data/citeseer/0/category-target-test.txt",
+          "../data/citeseer/0/category-target-valid.txt",
+          "../data/citeseer/0/category-target-latent.txt"
+        ]
+      }
+    },
+    "Link/2": {
+      "observations": {
+        "learn": [
+          "../data/citeseer/0/edges.txt"
+        ],
+        "infer": [
+          "../data/citeseer/0/edges.txt"
         ]
       }
     },
@@ -90,26 +63,31 @@
           }
         }
       ],
+      "observations": {
+        "infer": [
+          "../data/citeseer/0/category-truth-train.txt"
+        ]
+      },
       "targets": {
         "learn": [
-          "../data/cora/0/targets_train.txt",
-          "../data/cora/0/targets_valid.txt",
-          "../data/cora/0/targets_test.txt",
-          "../data/cora/0/targets_latent.txt"
+          "../data/citeseer/0/category-target-train.txt",
+          "../data/citeseer/0/category-target-test.txt",
+          "../data/citeseer/0/category-target-valid.txt",
+          "../data/citeseer/0/category-target-latent.txt"
         ],
         "infer": [
-          "../data/cora/0/targets_valid.txt",
-          "../data/cora/0/targets_test.txt",
-          "../data/cora/0/targets_latent.txt"
+          "../data/citeseer/0/category-target-test.txt",
+          "../data/citeseer/0/category-target-valid.txt",
+          "../data/citeseer/0/category-target-latent.txt"
         ]
       },
       "truth": {
-        "learn": [
-          "../data/cora/0/id_labels_full_train.txt"
-        ],
-        "infer": [
-          "../data/cora/0/id_labels_full_test.txt"
-        ]
+          "learn": [
+          "../data/citeseer/0/category-truth-train.txt"
+          ],
+          "infer": [
+          "../data/citeseer/0/category-truth-test.txt"
+          ]
       }
     }
   }

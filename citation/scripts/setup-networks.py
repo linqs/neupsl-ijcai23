@@ -190,7 +190,7 @@ def build_model(data, config, out_dir, hyperparameters, tuning_hyperparameters):
         util.write_psl_file(os.path.join(out_dir, "deep-predictions-%s.txt" % partition), deep_predictions_data)
         util.write_psl_file(os.path.join(out_dir, "deep-probabilities-%s.txt" % partition), deep_probaility_data)
 
-    max_model.save(os.path.join(out_dir, "citation-trained-tf"), save_format='tf')
+    max_model.save(os.path.join(out_dir, "pre-trained-tf"), save_format='tf')
 
     write_config = hyperparameters.copy()
     write_config['loss'] = str(hyperparameters['loss'])

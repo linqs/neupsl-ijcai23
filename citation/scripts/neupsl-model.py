@@ -22,12 +22,12 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
 
 
     def internal_init_model(self, options={}):
-        self._model = tensorflow.keras.models.load_model(options['load_path'])
+        self._model = tensorflow.keras.models.load_model(options['load-path'])
         return {}
 
 
     def internal_fit(self, data, gradients, options={}):
-        self._prepare_data(data)
+        self._prepare_data(data, options=options)
 
         history = []
         for epoch in range(int(options['epochs'])):
@@ -68,18 +68,18 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
 
 
     def internal_predict(self, data, options = {}):
-        self._prepare_data(data)
+        self._prepare_data(data, options=options)
 
         predictions = self._model.predict(self._features, verbose=0)
         return predictions, {}
 
 
     def internal_eval(self, data, options = {}):
-        self._prepare_data(data)
+        self._prepare_data(data, options=options)
 
         predictions, _ = self.internal_predict(data, options=options)
-        results = {'loss': self._model.compiled_loss(predictions, self._features),
-                   'metrics': self._model.evaluate(predictions, self._labels)}
+        results = {'loss': self._model.compiled_loss(tensorflow.constant(predictions, dtype=tensorflow.float32), self._labels),
+                   'metrics': util.calculate_metrics(predictions, self._labels.numpy(), ['categorical_accuracy'])}
 
         return results
 
@@ -89,6 +89,6 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         return {}
 
 
-    def _prepare_data(self, data):
+    def _prepare_data(self, data, options = {}):
         self._features = tensorflow.constant(numpy.asarray(data[:,:-1]), dtype=tensorflow.float32)
-        self._labels = tensorflow.constant(numpy.asarray([[1, 0] if label == 0 else [0, 1] for label in data[:,-1]]), dtype=tensorflow.float32)
+        self._labels = tensorflow.constant(numpy.asarray([util.one_hot_encoding(int(label), int(options['class-size'])) for label in data[:,-1]]), dtype=tensorflow.float32)

@@ -19,23 +19,25 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         self._model = None
         self._features = None
         self._labels = None
+        self._training = True
 
 
-    def internal_init_model(self, options={}):
-        self._model = tensorflow.keras.models.load_model(options['load-path'])
+    def internal_init_model(self, application, options={}):
+        if application == 'learning':
+            load_path = options['load-path']
+            self._training = False
+        else:
+            load_path = options['save-path']
+
+        print("Loading deep model from: {}".format(load_path))
+        self._model = tensorflow.keras.models.load_model(load_path)
         return {}
 
 
     def internal_fit(self, data, gradients, options={}):
         self._prepare_data(data, options=options)
 
-        history = []
-        for epoch in range(int(options['epochs'])):
-            history.append(self._single_epoch_fit(gradients))
-
-        return {
-            'history': history
-        }
+        return self._single_epoch_fit(gradients, options=options)
 
     def _single_epoch_fit(self, structured_gradients, options={}):
         structured_gradients = tensorflow.constant(structured_gradients)
@@ -46,7 +48,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
             total_loss = tensorflow.add_n([main_loss] + self._model.losses)
 
         neural_gradients = tape.gradient(total_loss, output)
-        output_gradients = (1.0 - options['alpha']) * neural_gradients + options['alpha'] * structured_gradients
+        output_gradients = (1.0 - float(options['alpha'])) * neural_gradients + float(options['alpha']) * structured_gradients
 
         gradients = tape.gradient(output, self._model.trainable_weights, output_gradients=output_gradients)
         self._model.optimizer.apply_gradients(zip(gradients, self._model.trainable_weights))
@@ -78,7 +80,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         self._prepare_data(data, options=options)
 
         predictions, _ = self.internal_predict(data, options=options)
-        results = {'loss': self._model.compiled_loss(tensorflow.constant(predictions, dtype=tensorflow.float32), self._labels),
+        results = {'loss': float(self._model.compiled_loss(tensorflow.constant(predictions, dtype=tensorflow.float32), self._labels).numpy()),
                    'metrics': util.calculate_metrics(predictions, self._labels.numpy(), ['categorical_accuracy'])}
 
         return results

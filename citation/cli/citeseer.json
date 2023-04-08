@@ -9,9 +9,9 @@
     "admmreasoner.epsilonrel": 1.0e-4,
     "admmreasoner.maxiterations": 100,
     "admmreasoner.stepsize": 1.0,
-    "gradientdescent.numsteps": 2500,
+    "gradientdescent.numsteps": 1,
     "gradientdescent.runfulliterations": true,
-    "gradientdescent.stepsize": 1.0e-8
+    "gradientdescent.stepsize": 1.0e-3
   },
   "rules": [
     "1.0: Neural(Paper, Label) = HasCat(Paper, Label) ^2",
@@ -27,7 +27,8 @@
         "entity-argument-indexes": "0",
         "class-size": 6,
         "load-path": "../data/citeseer/0/saved-networks/simple/pre-trained-tf",
-        "save-path": "../data/citeseer/0/saved-networks/simple/nesy-trained-tf"
+        "save-path": "../data/citeseer/0/saved-networks/simple/nesy-trained-tf",
+        "alpha": 0.5
       },
       "targets": {
         "learn": [
@@ -37,6 +38,7 @@
           "../data/citeseer/0/category-target-latent.txt"
         ],
         "infer": [
+          "../data/citeseer/0/category-target-train.txt",
           "../data/citeseer/0/category-target-test.txt",
           "../data/citeseer/0/category-target-valid.txt",
           "../data/citeseer/0/category-target-latent.txt"
@@ -65,7 +67,8 @@
       ],
       "observations": {
         "infer": [
-          "../data/citeseer/0/category-truth-train.txt"
+          "../data/citeseer/0/category-truth-train.txt",
+          "../data/citeseer/0/category-truth-valid.txt"
         ]
       },
       "targets": {
@@ -77,7 +80,6 @@
         ],
         "infer": [
           "../data/citeseer/0/category-target-test.txt",
-          "../data/citeseer/0/category-target-valid.txt",
           "../data/citeseer/0/category-target-latent.txt"
         ]
       },

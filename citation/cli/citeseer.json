@@ -1,7 +1,7 @@
 {
   "options": {
     "runtime.db.intids": true,
-    "runtime.log.level": "TRACE",
+    "runtime.log.level": "DEBUG",
     "categoricalevaluator.categoryindexes": 1,
     "categoricalevaluator.defaultpredicate": "HasCat",
     "admmreasoner.computeperiod": 100,
@@ -9,7 +9,7 @@
     "admmreasoner.epsilonrel": 1.0e-4,
     "admmreasoner.maxiterations": 100,
     "admmreasoner.stepsize": 1.0,
-    "gradientdescent.numsteps": 1,
+    "gradientdescent.numsteps": 50,
     "gradientdescent.runfulliterations": true,
     "gradientdescent.stepsize": 1.0e-3
   },
@@ -28,7 +28,8 @@
         "class-size": 6,
         "load-path": "../data/citeseer/0/saved-networks/simple/pre-trained-tf",
         "save-path": "../data/citeseer/0/saved-networks/simple/nesy-trained-tf",
-        "alpha": 0.5
+        "alpha": 0.5,
+        "learning-rate": 1.0
       },
       "targets": {
         "learn": [
@@ -38,9 +39,7 @@
           "../data/citeseer/0/category-target-latent.txt"
         ],
         "infer": [
-          "../data/citeseer/0/category-target-train.txt",
           "../data/citeseer/0/category-target-test.txt",
-          "../data/citeseer/0/category-target-valid.txt",
           "../data/citeseer/0/category-target-latent.txt"
         ]
       }

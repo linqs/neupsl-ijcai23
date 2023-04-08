@@ -32,8 +32,7 @@ MODELS = [MODEL_SIMPLE]
 
 HYPERPARAMETERS = {
     'hidden-units': [0, 16, 32, 64],
-    'deep-learning-rate': [1.0e-0, 1.5e-0],
-    'nesy-learning-rate': [1.0e-4, 1.0e-5],
+    'learning-rate': [1.0e-0, 1.5e-0],
     'weight-regularizer': [5.0e-5, 1.0e-6],
     'epochs': [250],
     'batch': [1024],
@@ -44,18 +43,16 @@ HYPERPARAMETERS = {
 DEFAULT_PARAMETERS = {
     (DATASET_CITESEER, MODEL_SIMPLE): {
         'hidden-units': 0,
-        'deep-learning-rate': 1.0e-0,
-        'nesy-learning-rate': 1.0e-4,
+        'learning-rate': 1.0e-0,
         'weight-regularizer': 1.0e-6,
-        'epochs': 250,
+        'epochs': 1,
         'batch': 1024,
         'loss': tensorflow.keras.losses.KLDivergence(),
         'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
     },
     (DATASET_CITESEER, MODEL_SIMPLE): {
         'hidden-units': 0,
-        'deep-learning-rate': 1.5e-0,
-        'nesy-learning-rate': 1.0e-4,
+        'learning-rate': 1.5e-0,
         'weight-regularizer': 5.0e-5,
         'epochs': 250,
         'batch': 1024,
@@ -99,7 +96,7 @@ def build_network(config, hyperparameters):
     model = tensorflow.keras.Sequential(layers=layers)
 
     model.compile(
-        optimizer=tensorflow.keras.optimizers.Adam(learning_rate=hyperparameters['deep-learning-rate']),
+        optimizer=tensorflow.keras.optimizers.Adam(learning_rate=hyperparameters['learning-rate']),
         loss=hyperparameters['loss'],
         metrics=hyperparameters['metrics'],
     )
@@ -125,8 +122,6 @@ def fit_model(model, data, config, hyperparameters):
         verbose=VERBOSE,
         callbacks=early_stop
     )
-
-    tensorflow.keras.backend.set_value(model.optimizer.learning_rate, hyperparameters['nesy-learning-rate'])
 
     test_start_time = time.time()
     _, test_acc = model.evaluate(x_test, y_test, verbose=VERBOSE)

@@ -19,18 +19,20 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         self._model = None
         self._features = None
         self._labels = None
-        self._training = True
 
 
     def internal_init_model(self, application, options={}):
+        load_path = options['save-path']
+
+        print('Application: ' + application)
         if application == 'learning':
             load_path = options['load-path']
-            self._training = False
-        else:
-            load_path = options['save-path']
 
-        print("Loading deep model from: {}".format(load_path))
         self._model = tensorflow.keras.models.load_model(load_path)
+
+        # Set the learning rate to a different value then the pretrained model.
+        tensorflow.keras.backend.set_value(self._model.optimizer.learning_rate, float(options['learning-rate']))
+
         return {}
 
 
@@ -59,9 +61,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         self._model.compiled_metrics.reset_state()
         self._model.compiled_metrics.update_state(self._labels, new_output)
 
-        results = {
-            'loss': float(total_loss.numpy()),
-        }
+        results = {'loss': float(total_loss.numpy())}
 
         for metric in self._model.compiled_metrics.metrics:
             results[metric.name] = float(metric.result().numpy())

@@ -22,13 +22,10 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
 
 
     def internal_init_model(self, application, options={}):
-        load_path = options['save-path']
-
-        print('Application: ' + application)
         if application == 'learning':
-            load_path = options['load-path']
-
-        self._model = tensorflow.keras.models.load_model(load_path)
+            self._model = tensorflow.keras.models.load_model(options['load-path'])
+        elif application == 'inference':
+            self._model = tensorflow.keras.models.load_model(options['save-path'])
 
         # Set the learning rate to a different value then the pretrained model.
         tensorflow.keras.backend.set_value(self._model.optimizer.learning_rate, float(options['learning-rate']))
@@ -39,10 +36,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
     def internal_fit(self, data, gradients, options={}):
         self._prepare_data(data, options=options)
 
-        return self._single_epoch_fit(gradients, options=options)
-
-    def _single_epoch_fit(self, structured_gradients, options={}):
-        structured_gradients = tensorflow.constant(structured_gradients)
+        structured_gradients = tensorflow.constant(gradients, dtype=tensorflow.float32)
 
         with tensorflow.GradientTape(persistent=True) as tape:
             output = self._model(self._features, training=True)
@@ -92,5 +86,8 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
 
 
     def _prepare_data(self, data, options = {}):
+        if self._features is not None and self._labels is not None:
+            return
+
         self._features = tensorflow.constant(numpy.asarray(data[:,:-1]), dtype=tensorflow.float32)
         self._labels = tensorflow.constant(numpy.asarray([util.one_hot_encoding(int(label), int(options['class-size'])) for label in data[:,-1]]), dtype=tensorflow.float32)

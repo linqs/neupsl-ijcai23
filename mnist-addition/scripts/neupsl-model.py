@@ -13,12 +13,13 @@ THIS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(os.path.join(THIS_DIR, '..', '..', 'scripts'))
 util = importlib.import_module("util")
 
-class CitationModel(pslpython.deeppsl.model.DeepModel):
+class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
     def __init__(self):
         super().__init__()
         self._model = None
         self._features = None
         self._labels = None
+        self._digit_labels = None
 
     def internal_init_model(self, application, options={}):
         if application == 'learning':
@@ -36,7 +37,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
 
         with tensorflow.GradientTape(persistent=True) as tape:
             output = self._model(self._features, training=True)
-            main_loss = tensorflow.reduce_mean(self._model.compiled_loss(self._labels, output))
+            main_loss = tensorflow.reduce_mean(self._model.compiled_loss(output, output))
             total_loss = tensorflow.add_n([main_loss] + self._model.losses)
 
         neural_gradients = tape.gradient(total_loss, output)
@@ -70,8 +71,8 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         self._prepare_data(data, options=options)
 
         predictions, _ = self.internal_predict(data, options=options)
-        results = {'loss': float(self._model.compiled_loss(tensorflow.constant(predictions, dtype=tensorflow.float32), self._labels).numpy()),
-                   'metrics': util.calculate_metrics(predictions, self._labels.numpy(), ['categorical_accuracy'])}
+        results = {'loss': float(self._model.compiled_loss(tensorflow.constant(predictions, dtype=tensorflow.float32), self._digit_labels).numpy()),
+                   'metrics': util.calculate_metrics(predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
 
         return results
 
@@ -85,8 +86,8 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
     # See https://arxiv.org/pdf/1907.08194.pdf#page=30
     def _create_model(self, options={}):
         layers = [
-            tensorflow.keras.layers.Input(shape=int(options['input-size'])),
-            tensorflow.keras.layers.Reshape((28, 28, 1), input_shape=(int(options['input-size']))),
+            tensorflow.keras.layers.Input(shape=784),
+            tensorflow.keras.layers.Reshape((28, 28, 1), input_shape=(784,)),
             tensorflow.keras.layers.Conv2D(filters=6, kernel_size=5, data_format='channels_last'),
             tensorflow.keras.layers.MaxPool2D(pool_size=(2, 2), data_format='channels_last'),
             tensorflow.keras.layers.Activation('relu'),
@@ -115,4 +116,5 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
             return
 
         self._features = tensorflow.constant(numpy.asarray(data[:,:-1]), dtype=tensorflow.float32)
-        self._labels = tensorflow.constant(numpy.asarray([util.one_hot_encoding(int(label), int(options['class-size'])) for label in data[:,-1]]), dtype=tensorflow.float32)
+        self._digit_labels = tensorflow.constant(numpy.asarray([util.one_hot_encoding(int(label), int(options['class-size'])) for label in data[:,-1]]), dtype=tensorflow.float32)
+        self._labels = tensorflow.constant([0] * len(data), dtype=tensorflow.float32)

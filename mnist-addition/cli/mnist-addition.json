@@ -1,0 +1,108 @@
+{
+  "options": {
+    "runtime.db.intids": true,
+    "runtime.log.level": "TRACE",
+    "categoricalevaluator.categoryindexes": 2,
+    "categoricalevaluator.defaultpredicate": "ImageSum",
+    "admmreasoner.computeperiod": 100,
+    "admmreasoner.epsilonabs": 1.0e-6,
+    "admmreasoner.epsilonrel": 1.0e-4,
+    "admmreasoner.maxiterations": 100,
+    "admmreasoner.stepsize": 1.0,
+    "gradientdescent.numsteps": 1,
+    "gradientdescent.runfulliterations": true,
+    "gradientdescent.stepsize": 1.0e-14
+  },
+  "rules": [
+    "1.0: NeuralClassifier(ImageId1, X) & NeuralClassifier(ImageId2, Y) & NumberSum(X, Y, Z) & ImageSumTargetBlock(ImageId1, ImageId2) -> ImageSum(ImageId1, ImageId2, Z) ^2",
+    "1.0: ImageSum(ImageId1, ImageId2, Z) & NeuralClassifier(ImageId1, X) & NumberSum(X, Y, Z) & ImageSumTargetBlock(ImageId1, ImageId2) -> NeuralClassifier(ImageId2, Y) ^2",
+    "1.0: ImageSum(ImageId1, ImageId2, Z) & NeuralClassifier(ImageId2, Y) & NumberSum(X, Y, Z) & ImageSumTargetBlock(ImageId1, ImageId2) -> NeuralClassifier(ImageId1, X) ^2",
+
+    "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2) + NeuralClassifier(ImageId1, +X) >= ImageSum(ImageId1, ImageId2, Z) ^2 {X: PossibleDigits(X, Z)}",
+    "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2) + NeuralClassifier(ImageId2, +X) >= ImageSum(ImageId1, ImageId2, Z) ^2 {X: PossibleDigits(X, Z)}",
+
+    "ImageSum(ImageId1, ImageId2, +Number) = 1 .",
+
+    "0.1: NeuralClassifier(+ImageId, X) / |ImageId| =  0.1 ^2"
+
+  ],
+  "predicates": {
+    "NeuralClassifier/2": {
+      "type": "DeepPredicate",
+      "options": {
+        "model-path": "../scripts/neupsl-model.py::MNISTAdditionModel",
+        "entity-data-map-path": "../data/mnist-1/0/80/1.0/entity-data-map.txt",
+        "entity-argument-indexes": "0",
+        "class-size": 10,
+        "save-path": "../data/mnist-1/0/80/1.0/saved-networks/nesy-trained-tf",
+        "alpha": 1.00,
+        "learning-rate": 1.0e-3
+      },
+      "targets": {
+        "learn": [
+          "../data/mnist-1/0/80/1.0/neural-target-train.txt"
+        ],
+        "infer": [
+          "../data/mnist-1/0/80/1.0/neural-target-test.txt"
+        ]
+      }
+    },
+    "ImageSum/3": {
+      "evaluations": [
+        {
+          "evaluator": "CategoricalEvaluator",
+          "options": {
+            "categoricalevaluator.categoryindexes": 2,
+            "eval.includeobs": true
+          }
+        }
+      ],
+      "targets": {
+        "learn": [
+          "../data/mnist-1/0/80/1.0/image-sum-target-train.txt"
+        ],
+        "infer": [
+          "../data/mnist-1/0/80/1.0/image-sum-target-test.txt"
+        ]
+      },
+      "truth": {
+        "learn": [
+          "../data/mnist-1/0/80/1.0/image-sum-truth-train.txt"
+        ],
+        "infer": [
+          "../data/mnist-1/0/80/1.0/image-sum-truth-test.txt"
+        ]
+      }
+    },
+    "ImageSumTargetBlock/2": {
+      "observations": {
+        "learn": [
+          "../data/mnist-1/0/80/1.0/image-sum-target-block-train.txt"
+        ],
+        "infer": [
+          "../data/mnist-1/0/80/1.0/image-sum-target-block-test.txt"
+        ]
+      }
+    },
+    "NumberSum/3": {
+      "observations": {
+        "learn": [
+          "../data/mnist-1/number-sum.txt"
+        ],
+        "infer": [
+          "../data/mnist-1/number-sum.txt"
+        ]
+      }
+    },
+    "PossibleDigits/2": {
+      "observations": {
+        "learn": [
+          "../data/mnist-1/possible-digits.txt"
+        ],
+        "infer": [
+          "../data/mnist-1/possible-digits.txt"
+        ]
+      }
+    }
+  }
+}

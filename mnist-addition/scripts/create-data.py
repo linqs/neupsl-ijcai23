@@ -191,7 +191,7 @@ def main():
             print("Mnist 2 data generation is not yet supported.")
             continue
 
-        shared_out_dir = os.path.join(THIS_DIR, "..", "data", dataset_id)
+        shared_out_dir = os.path.join(THIS_DIR, "..", "data", "experiment::" + dataset_id)
         os.makedirs(shared_out_dir, exist_ok=True)
         if os.path.isfile(os.path.join(shared_out_dir, CONFIG_FILENAME)):
             print("Shared data already exists for %s. Skipping generation." % dataset_id)
@@ -205,8 +205,7 @@ def main():
                 config['train-size'] = train_size
                 for overlap in config['overlaps']:
                     config['overlap'] = overlap
-
-                    out_dir = os.path.join(shared_out_dir, str(split), str(train_size), str(overlap))
+                    out_dir = os.path.join(shared_out_dir, "split::%01d" % split, "train-size::%04d" % train_size, "overlap::%.2f" % overlap)
                     os.makedirs(out_dir, exist_ok=True)
 
                     if os.path.isfile(os.path.join(out_dir, CONFIG_FILENAME)):

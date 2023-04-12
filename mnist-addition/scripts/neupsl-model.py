@@ -25,6 +25,7 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         if application == 'learning':
             self._model = self._create_model(options=options)
         elif application == 'inference':
+            print('Loading model from: {}'.format(options['save-path']))
             self._model = tensorflow.keras.models.load_model(options['save-path'])
 
         return {}
@@ -34,6 +35,7 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         self._prepare_data(data, options=options)
 
         structured_gradients = tensorflow.constant(gradients, dtype=tensorflow.float32)
+        print('Structured gradients: {}'.format(structured_gradients))
 
         with tensorflow.GradientTape(persistent=True) as tape:
             output = self._model(self._features, training=True)
@@ -50,7 +52,7 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         new_output = self._model(self._features)
 
         self._model.compiled_metrics.reset_state()
-        self._model.compiled_metrics.update_state(self._labels, new_output)
+        self._model.compiled_metrics.update_state(self._digit_labels, new_output)
 
         results = {'loss': float(total_loss.numpy())}
 
@@ -112,9 +114,6 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
 
 
     def _prepare_data(self, data, options = {}):
-        if self._features is not None and self._labels is not None:
-            return
-
         self._features = tensorflow.constant(numpy.asarray(data[:,:-1]), dtype=tensorflow.float32)
         self._digit_labels = tensorflow.constant(numpy.asarray([util.one_hot_encoding(int(label), int(options['class-size'])) for label in data[:,-1]]), dtype=tensorflow.float32)
         self._labels = tensorflow.constant([0] * len(data), dtype=tensorflow.float32)

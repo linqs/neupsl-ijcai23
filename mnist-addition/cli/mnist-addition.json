@@ -1,7 +1,7 @@
 {
   "options": {
     "runtime.db.intids": true,
-    "runtime.log.level": "TRACE",
+    "runtime.log.level": "DEBUG",
     "categoricalevaluator.categoryindexes": 2,
     "categoricalevaluator.defaultpredicate": "ImageSum",
     "admmreasoner.computeperiod": 100,
@@ -31,19 +31,19 @@
       "type": "DeepPredicate",
       "options": {
         "model-path": "../scripts/neupsl-model.py::MNISTAdditionModel",
-        "entity-data-map-path": "../data/mnist-1/0/80/1.0/entity-data-map.txt",
+        "entity-data-map-path": "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/entity-data-map.txt",
         "entity-argument-indexes": "0",
         "class-size": 10,
-        "save-path": "../data/mnist-1/0/80/1.0/saved-networks/nesy-trained-tf",
+        "save-path": "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/saved-networks/nesy-trained-tf",
         "alpha": 1.00,
         "learning-rate": 1.0e-3
       },
       "targets": {
         "learn": [
-          "../data/mnist-1/0/80/1.0/image-target-train.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-target-train.txt"
         ],
         "infer": [
-          "../data/mnist-1/0/80/1.0/image-target-test.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-target-test.txt"
         ]
       }
     },
@@ -59,48 +59,48 @@
       ],
       "targets": {
         "learn": [
-          "../data/mnist-1/0/80/1.0/image-sum-target-train.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-target-train.txt"
         ],
         "infer": [
-          "../data/mnist-1/0/80/1.0/image-sum-target-test.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-target-test.txt"
         ]
       },
       "truth": {
         "learn": [
-          "../data/mnist-1/0/80/1.0/image-sum-truth-train.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-truth-train.txt"
         ],
         "infer": [
-          "../data/mnist-1/0/80/1.0/image-sum-truth-test.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-truth-test.txt"
         ]
       }
     },
     "ImageSumBlock/2": {
       "observations": {
         "learn": [
-          "../data/mnist-1/0/80/1.0/image-sum-block-train.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-block-train.txt"
         ],
         "infer": [
-          "../data/mnist-1/0/80/1.0/image-sum-block-test.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-block-test.txt"
         ]
       }
     },
     "NumberSum/3": {
       "observations": {
         "learn": [
-          "../data/mnist-1/number-sum.txt"
+          "../data/experiment::mnist-1/number-sum.txt"
         ],
         "infer": [
-          "../data/mnist-1/number-sum.txt"
+          "../data/experiment::mnist-1/number-sum.txt"
         ]
       }
     },
     "PossibleDigits/2": {
       "observations": {
         "learn": [
-          "../data/mnist-1/possible-digits.txt"
+          "../data/experiment::mnist-1/possible-digits.txt"
         ],
         "infer": [
-          "../data/mnist-1/possible-digits.txt"
+          "../data/experiment::mnist-1/possible-digits.txt"
         ]
       }
     }

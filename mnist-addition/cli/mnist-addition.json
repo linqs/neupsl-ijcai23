@@ -9,17 +9,17 @@
     "admmreasoner.epsilonrel": 1.0e-4,
     "admmreasoner.maxiterations": 100,
     "admmreasoner.stepsize": 1.0,
-    "gradientdescent.numsteps": 1,
+    "gradientdescent.numsteps": 100,
     "gradientdescent.runfulliterations": true,
     "gradientdescent.stepsize": 1.0e-14
   },
   "rules": [
-    "1.0: NeuralClassifier(ImageId1, X) & NeuralClassifier(ImageId2, Y) & NumberSum(X, Y, Z) & ImageSumTargetBlock(ImageId1, ImageId2) -> ImageSum(ImageId1, ImageId2, Z) ^2",
-    "1.0: ImageSum(ImageId1, ImageId2, Z) & NeuralClassifier(ImageId1, X) & NumberSum(X, Y, Z) & ImageSumTargetBlock(ImageId1, ImageId2) -> NeuralClassifier(ImageId2, Y) ^2",
-    "1.0: ImageSum(ImageId1, ImageId2, Z) & NeuralClassifier(ImageId2, Y) & NumberSum(X, Y, Z) & ImageSumTargetBlock(ImageId1, ImageId2) -> NeuralClassifier(ImageId1, X) ^2",
+    "1.0: NeuralClassifier(ImageId1, X) & NeuralClassifier(ImageId2, Y) & NumberSum(X, Y, Z) & ImageSumBlock(ImageId1, ImageId2) -> ImageSum(ImageId1, ImageId2, Z) ^2",
+    "1.0: ImageSum(ImageId1, ImageId2, Z) & NeuralClassifier(ImageId1, X) & NumberSum(X, Y, Z) & ImageSumBlock(ImageId1, ImageId2) -> NeuralClassifier(ImageId2, Y) ^2",
+    "1.0: ImageSum(ImageId1, ImageId2, Z) & NeuralClassifier(ImageId2, Y) & NumberSum(X, Y, Z) & ImageSumBlock(ImageId1, ImageId2) -> NeuralClassifier(ImageId1, X) ^2",
 
-    "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2) + NeuralClassifier(ImageId1, +X) >= ImageSum(ImageId1, ImageId2, Z) ^2 {X: PossibleDigits(X, Z)}",
-    "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2) + NeuralClassifier(ImageId2, +X) >= ImageSum(ImageId1, ImageId2, Z) ^2 {X: PossibleDigits(X, Z)}",
+    "1.0: 0 * ImageSumBlock(ImageId1, ImageId2) + NeuralClassifier(ImageId1, +X) >= ImageSum(ImageId1, ImageId2, Z) ^2 {X: PossibleDigits(X, Z)}",
+    "1.0: 0 * ImageSumBlock(ImageId1, ImageId2) + NeuralClassifier(ImageId2, +X) >= ImageSum(ImageId1, ImageId2, Z) ^2 {X: PossibleDigits(X, Z)}",
 
     "ImageSum(ImageId1, ImageId2, +Number) = 1 .",
 
@@ -40,10 +40,10 @@
       },
       "targets": {
         "learn": [
-          "../data/mnist-1/0/80/1.0/neural-target-train.txt"
+          "../data/mnist-1/0/80/1.0/image-target-train.txt"
         ],
         "infer": [
-          "../data/mnist-1/0/80/1.0/neural-target-test.txt"
+          "../data/mnist-1/0/80/1.0/image-target-test.txt"
         ]
       }
     },
@@ -74,13 +74,13 @@
         ]
       }
     },
-    "ImageSumTargetBlock/2": {
+    "ImageSumBlock/2": {
       "observations": {
         "learn": [
-          "../data/mnist-1/0/80/1.0/image-sum-target-block-train.txt"
+          "../data/mnist-1/0/80/1.0/image-sum-block-train.txt"
         ],
         "infer": [
-          "../data/mnist-1/0/80/1.0/image-sum-target-block-test.txt"
+          "../data/mnist-1/0/80/1.0/image-sum-block-test.txt"
         ]
       }
     },

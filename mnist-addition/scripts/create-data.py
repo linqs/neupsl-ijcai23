@@ -100,71 +100,59 @@ def generate_split(config, features, labels, start_index, end_index):
     return  indexes, sum_labels
 
 
-def create_entity_data_map(data, entities_train, entities_valid, entities_test):
-    digit_entities_train = numpy.unique(entities_train.reshape(-1))
-    digit_entities_valid = numpy.unique(entities_valid.reshape(-1))
-    digit_entities_test = numpy.unique(entities_test.reshape(-1))
+def create_entity_data_map(features, labels, entities):
+    features = normalize_images(features)[entities]
+    labels = labels[entities].reshape(-1, 1)
+    entities = entities.reshape(-1, 1)
 
-    entities = numpy.concatenate((digit_entities_train, digit_entities_valid, digit_entities_test))
-    features = normalize_images(numpy.concatenate((data[0][0], data[1][0])))[entities]
-    labels = numpy.concatenate((data[0][1], data[1][1]))[entities]
-
-    entity_data_map = numpy.concatenate((entities.reshape(-1, 1), features, labels.reshape(-1, 1)), axis=1).tolist()
+    entity_data_map = numpy.concatenate((entities, features, labels), axis=1).tolist()
     return [[int(row[0])] + row[1:] for row in entity_data_map]
 
 
-def create_image_sum_data(config, entities, sum_labels):
+def create_image_sum_data(config, sum_entities, sum_labels):
     image_sum_target = []
     image_sum_truth = []
-    for index_i in range(len(entities)):
+    for index_i in range(len(sum_entities)):
         for index_j in range(config['max-sum'] + 1):
-            image_sum_target.append(list(entities[index_i]) + [index_j])
-            image_sum_truth.append(list(entities[index_i]) + [index_j] + [1 if index_j == sum_labels[index_i] else 0])
+            image_sum_target.append(list(sum_entities[index_i]) + [index_j])
+        image_sum_truth.append(list(sum_entities[index_i]) + [sum_labels[index_i]])
 
     return image_sum_target, image_sum_truth
 
 
-def create_neural_data(config, entities):
-    neural_data = []
+def create_image_data(config, entities):
+    image_target = []
     for index_i in range(len(entities)):
         for index_j in range(config['class-size']):
-            neural_data.append(list(entities[index_i]) + [index_j])
+            image_target.append(list(entities[index_i]) + [index_j])
 
-    return neural_data
+    return image_target
 
 
-def write_specific_data(config, out_dir, data):
-    entities_train, sum_train = generate_split(config, data[0][0], data[0][1], 0, config['train-size'])
-    entities_valid, sum_valid = generate_split(config, data[0][0], data[0][1], config['train-size'], config['train-size'] + config['valid-size'])
-    entities_test, sum_test = generate_split(config, data[1][0], data[1][1], 0, config['test-size'])
+def write_specific_data(config, out_dir, features, labels):
+    total_image_entities = numpy.array([], dtype=numpy.int32)
+    indexes = {
+        'train': [0, config['train-size']],
+        'valid': [config['train-size'], config['train-size'] + config['valid-size']],
+        'test': [config['train-size'] + config['valid-size'], config['train-size'] + config['valid-size'] + config['test-size']]
+    }
 
-    util.write_psl_file(os.path.join(out_dir, 'image-sum-target-block-train.txt'), entities_train)
-    util.write_psl_file(os.path.join(out_dir, 'image-sum-target-block-valid.txt'), entities_valid)
-    util.write_psl_file(os.path.join(out_dir, 'image-sum-target-block-test.txt'), entities_test)
+    for partition in ['train', 'valid', 'test']:
+        image_sum_entities, image_sum_labels = generate_split(config, features, labels, indexes[partition][0], indexes[partition][1])
+        image_sum_target, image_sum_truth = create_image_sum_data(config, image_sum_entities, image_sum_labels)
 
-    entity_data_map = create_entity_data_map(data, entities_train, entities_valid, entities_test)
+        image_entities = numpy.unique(image_sum_entities.reshape(-1)).reshape(-1, 1)
+        image_target = create_image_data(config, image_entities)
+
+        total_image_entities = numpy.append(total_image_entities, image_entities)
+
+        util.write_psl_file(os.path.join(out_dir, f'image-sum-block-{partition}.txt'), image_sum_entities)
+        util.write_psl_file(os.path.join(out_dir, f'image-sum-target-{partition}.txt'), image_sum_target)
+        util.write_psl_file(os.path.join(out_dir, f'image-sum-truth-{partition}.txt'), image_sum_truth)
+        util.write_psl_file(os.path.join(out_dir, f'image-target-{partition}.txt'), image_target)
+
+    entity_data_map = create_entity_data_map(features, labels, total_image_entities)
     util.write_psl_file(os.path.join(out_dir, 'entity-data-map.txt'), entity_data_map)
-
-    image_sum_target, image_sum_truth = create_image_sum_data(config, entities_train, sum_train)
-    util.write_psl_file(os.path.join(out_dir, 'image-sum-target-train.txt'), image_sum_target)
-    util.write_psl_file(os.path.join(out_dir, 'image-sum-truth-train.txt'), image_sum_truth)
-
-    image_sum_target, image_sum_truth = create_image_sum_data(config, entities_valid, sum_valid)
-    util.write_psl_file(os.path.join(out_dir, 'image-sum-target-valid.txt'), image_sum_target)
-    util.write_psl_file(os.path.join(out_dir, 'image-sum-truth-valid.txt'), image_sum_truth)
-
-    image_sum_target, image_sum_truth = create_image_sum_data(config, entities_test, sum_test)
-    util.write_psl_file(os.path.join(out_dir, 'image-sum-target-test.txt'), image_sum_target)
-    util.write_psl_file(os.path.join(out_dir, 'image-sum-truth-test.txt'), image_sum_truth)
-
-    neural_target_train = create_neural_data(config, numpy.unique(entities_train.reshape(-1)).reshape(-1, 1))
-    util.write_psl_file(os.path.join(out_dir, 'neural-target-train.txt'), neural_target_train)
-
-    neural_target_valid = create_neural_data(config, numpy.unique(entities_valid.reshape(-1)).reshape(-1, 1))
-    util.write_psl_file(os.path.join(out_dir, 'neural-target-valid.txt'), neural_target_valid)
-
-    neural_target_test = create_neural_data(config, numpy.unique(entities_test.reshape(-1)).reshape(-1, 1))
-    util.write_psl_file(os.path.join(out_dir, 'neural-target-test.txt'), neural_target_test)
 
     util.write_json_file(os.path.join(out_dir, CONFIG_FILENAME), config)
 
@@ -187,8 +175,11 @@ def write_shared_data(config, out_dir):
     util.write_json_file(os.path.join(out_dir, CONFIG_FILENAME), config)
 
 
-def fetch_data(config):
-    return tensorflow.keras.datasets.mnist.load_data("mnist.npz")
+def fetch_data():
+    (x_train, y_train), (x_test, y_test) = tensorflow.keras.datasets.mnist.load_data("mnist.npz")
+
+    # TODO(Connor): Currently concatenating the train and test partitions, and random sample.
+    return numpy.concatenate((x_train, x_test)), numpy.concatenate((y_train, y_test))
 
 
 def main():
@@ -223,8 +214,8 @@ def main():
                         continue
 
                     print("Generating data for %s." % out_dir)
-                    data = fetch_data(config)
-                    write_specific_data(config, out_dir, data)
+                    features, labels = fetch_data()
+                    write_specific_data(config, out_dir, features, labels)
 
 
 if __name__ == '__main__':

@@ -126,8 +126,6 @@ def fetch_data(config):
 
 
 def write_data(config, out_dir, graph, data, edges):
-    os.makedirs(out_dir, exist_ok=True)
-
     entity_data_map = []
     entity_data_smoothed_map = []
 
@@ -167,6 +165,8 @@ def main():
             config['seed'] = split
 
             out_dir = os.path.join(THIS_DIR, '..', 'data', dataset_id, str(split))
+            os.makedirs(out_dir, exist_ok=True)
+
             if os.path.isfile(os.path.join(out_dir, CONFIG_FILENAME)):
                 print("Data already exists for %s. Skipping generation." % out_dir)
                 continue

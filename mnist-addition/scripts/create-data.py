@@ -5,55 +5,54 @@
 # if it exists generation is skipped.
 
 import datetime
+import importlib
 import json
 import os
-import random
+import sys
 
-import numpy as np
-import pandas as pd
-import pslpython.neupsl
-import tensorflow as tf
+import numpy
+import pandas
+import tensorflow
 
 from typing import Iterable
 from itertools import product
 
 THIS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 
-# In this path, include the format string for the subpath.
-# The subpath itself may have more subs, but only one will occur for each child.
-DATA_PATH = os.path.abspath(os.path.join(THIS_DIR, "../data/mnist-addition"))
+sys.path.append(os.path.join(THIS_DIR, '..', '..', 'scripts'))
+util = importlib.import_module("util")
 
-EVAL_DIRNAME = 'eval'
-LEARN_DIRNAME = 'learn'
+DATASET_MNIST_1 = 'mnist-1'
+DATASET_MNIST_2 = 'mnist-2'
+DATASETS = [DATASET_MNIST_1, DATASET_MNIST_2]
 
-UNTRAINED_MODEL_H5_FILE_NAME = 'neuralclassifier_model_untrained.h5'
-UNTRAINED_MODEL_TF_FILE_NAME = 'neuralclassifier_model_untrained_tf'
-
-# This is also the order of the labels in the output layer.
-LABELS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+DATASET_CONFIG = {
+    DATASET_MNIST_1: {
+        "name": DATASET_MNIST_1,
+        "class-size": 10,
+        "train-sizes": [40, 60, 80],
+        "valid-size": 1000,
+        "test-size": 1000,
+        "num-splits": 1,
+        "num-digits": 1,
+        "max-sum": 18,
+        "overlaps": [0.0, 0.5, 1.0],
+    },
+    DATASET_MNIST_2: {
+        "name": DATASET_MNIST_2,
+        "class-size": 10,
+        "train-sizes": [40, 60, 80],
+        "valid-size": 1000,
+        "test-size": 1000,
+        "num-splits": 1,
+        "num-digits": 2,
+        "max-sum": 198,
+        "overlaps": [0.0, 0.5, 1.0],
+    },
+}
 
 SIGNIFICANT_DIGITS = 4
-
-EPOCHS = 0
-LEARNING_RATES = [1e-2, 1e-3, 1e-4]
-
-N_FOLDS = 10
-TRAINING_SIZES = [40, 60, 75, 80, 150, 300, 600, 6000, 50000]
-FULL_TRAINING_SET_SIZE = 60000
-VALIDATION_SET_SIZE = 1000
-TEST_SET_SIZE = 1000
-OVERLAP_RESAMPLE_PROPORTIONS = [0.0, 0.5, 1.0, 2.0]
-
-N_DIGITS = [1, 2]
-
-# MNIST images are 28 x 28 = 784.
-MNIST_DIMENSION = 28
-INPUT_SIZE = MNIST_DIMENSION * MNIST_DIMENSION
-
-# We will keep cycling through the seeds if there are not enough.
-# None means we make a new seed (which may be determined by the previous seed).
-SEEDS = [None]
-
+CONFIG_FILENAME = "config.json"
 
 def normalize_images(images):
     (numImages, width, height) = images.shape
@@ -69,50 +68,6 @@ def normalize_images(images):
 
     return images
 
-
-def load_features(path):
-    dataframe = pd.read_csv(path, header=None, sep='\t', index_col=0)
-    dataframe.iloc[0, :] = dataframe.iloc[0, :].astype('int')
-    return dataframe.values
-
-
-def load_truth(path):
-    dataframe = pd.read_csv(path, header=None, sep='\t', index_col=0)
-    dataframe.iloc[0, :] = dataframe.iloc[0, :].astype('int')
-    truth_data = dataframe.values
-
-    y = np.array([np.zeros(10) for _ in truth_data])
-    for i, label in enumerate(truth_data):
-        y[i][label] = 1
-    return y
-
-
-def write_file(path, data):
-    with open(path, 'w') as file:
-        for row in data:
-            file.write('\t'.join([str(item) for item in row]) + "\n")
-
-
-def evaluate(model, images, labels, verbose=1):
-    loss, accuracy = model.evaluate(images, labels, verbose=verbose)
-    return loss, accuracy
-
-
-def train(model_wrapper, raw_train_features, raw_train_labels, epochs=EPOCHS):
-    assert(len(raw_train_features) == len(raw_train_labels))
-
-    indexes = list(range(len(raw_train_features)))
-
-    for epoch in range(epochs):
-        random.shuffle(indexes)
-
-        labels = np.array([raw_train_labels[index] for index in indexes])
-        images = np.array([raw_train_features[index] for index in indexes])
-
-        model_wrapper.model.fit(images, labels)
-
-        loss, accuracy = evaluate(model_wrapper.model, images, labels, verbose=0)
-        print("Epoch %d - Loss: %f, Accuracy: %f" % (epoch + 1, loss, accuracy))
 
 def addition_to_json(features, labels):
     """
@@ -139,42 +94,41 @@ def digits_to_sum(digits: Iterable[int], n_digits: int) -> int:
     return digits_to_number(digits[: n_digits]) + digits_to_number(digits[n_digits:])
 
 
-def write_data(out_dir: str, n_digits, overlap_resample_proportion, labels, train_size, validation_size, seed):
-    # Load MNIST dataset.
-    (digit_features, digit_labels), (digit_features_test, digit_labels_test) = tf.keras.datasets.mnist.load_data("mnist.npz")
+def write_data(config, out_dir, data):
+    numpy.random.seed(config['seed'])
 
-    # Sample training and validation digits.
-    indices = np.array(range(len(digit_features)))
-    unique_test_indices = np.array(range(len(digit_features_test)))
-    if seed != -1:
-        print("Shuffling")
-        np.random.seed(seed)
-        np.random.shuffle(indices)
+    train_partition_indices = numpy.array(range(len(data[0][0])))
+    numpy.random.shuffle(train_partition_indices)
 
-    unique_train_digit_indices = indices[: (2 * n_digits) * train_size]
-    train_digit_indices = indices[: (2 * n_digits) * train_size]
-    if seed != -1:
-        for _ in range((2 * n_digits) * int(overlap_resample_proportion * train_size)):
-            sample_index = np.random.randint(0, (2 * n_digits) * train_size)
-            train_digit_indices = np.append(train_digit_indices, train_digit_indices[sample_index])
-        np.random.shuffle(train_digit_indices)
+    test_partition_indices = numpy.array(range(len(data[1][0])))
+    numpy.random.shuffle(test_partition_indices)
 
-    unique_validation_digit_indices = indices[(2 * n_digits) * train_size: (2 * n_digits) * train_size + (2 * n_digits) * validation_size]
-    validation_digit_indices = indices[(2 * n_digits) * train_size: (2 * n_digits) * train_size + (2 * n_digits) * validation_size]
-    if seed != -1:
-        for _ in range((2 * n_digits) * int(overlap_resample_proportion * validation_size)):
-            sample_index = np.random.randint(0, (2 * n_digits) * validation_size)
-            validation_digit_indices = np.append(validation_digit_indices, validation_digit_indices[sample_index])
-        np.random.shuffle(validation_digit_indices)
+    train_indexes = train_partition_indices[:config['train-size']]
+    valid_indexes = train_partition_indices[config['train-size']:config['train-size'] + config['valid-size']]
+    test_indexes = test_partition_indices[:config['test-size']]
 
-    test_indices = np.array(range(len(digit_features_test)))
-    np.random.shuffle(test_indices)
-    test_indices = test_indices[:TEST_SET_SIZE]
-    if overlap_resample_proportion != 0.0:
-        for _ in range((2 * n_digits) * int(overlap_resample_proportion * (TEST_SET_SIZE // (2 * n_digits)))):
-            sample_index = np.random.randint(0, TEST_SET_SIZE)
-            test_indices = np.append(test_indices, test_indices[sample_index])
-        np.random.shuffle(test_indices)
+    for _ in range(int(config['train-size'] * config['overlap'])):
+        train_indexes = numpy.append(train_indexes, train_indexes[numpy.random.randint(0, config['train-size'])])
+
+    for _ in range(int(config['valid-size'] * config['overlap'])):
+        valid_indexes = numpy.append(valid_indexes, valid_indexes[numpy.random.randint(0, config['valid-size'])])
+
+    for _ in range(int(config['test-size'] * config['overlap'])):
+        test_indexes = numpy.append(test_indexes, test_indexes[numpy.random.randint(0, config['test-size'])])
+
+    numpy.random.shuffle(train_indexes)
+    numpy.random.shuffle(valid_indexes)
+    numpy.random.shuffle(test_indexes)
+
+    train_indexes = train_indexes[:len(train_indexes) - (len(train_indexes) % (2 * config['num-digits']))]
+    valid_indexes = valid_indexes[:len(valid_indexes) - (len(valid_indexes) % (2 * config['num-digits']))]
+    test_indexes = test_indexes[:len(test_indexes) - (len(test_indexes) % (2 * config['num-digits']))]
+
+    train_indexes = train_indexes.reshape(-1, 2 * config['num-digits'])
+    valid_indexes = valid_indexes.reshape(-1, 2 * config['num-digits'])
+    test_indexes = test_indexes.reshape(-1, 2 * config['num-digits'])
+
+    return
 
     # Create sum data and labels.
     addition_train_indices = np.array([np.array([train_digit_indices[i + j] for j in range(2 * n_digits)])
@@ -186,6 +140,7 @@ def write_data(out_dir: str, n_digits, overlap_resample_proportion, labels, trai
     addition_test_indices = np.array([np.array([test_indices[i + j] for j in range(2 * n_digits)])
                                       for i in range(0, len(test_indices), (2 * n_digits))])
     addition_test_indices = np.unique(addition_test_indices, axis=0)
+
     addition_x_train = np.array([np.array([digit_features[i] for i in example]) for example in addition_train_indices])
     addition_y_train = np.array([digits_to_sum(np.array([digit_labels[i] for i in example]), n_digits) for example in addition_train_indices])
     addition_x_validation = np.array([np.array([digit_features[i] for i in example]) for example in addition_validation_indices])
@@ -364,54 +319,26 @@ def write_data(out_dir: str, n_digits, overlap_resample_proportion, labels, trai
         write_file(os.path.join(test_out_dir, 'imagedigitsum_targets.txt'), test_image_digit_sum_targets)
 
 
-def create_addition_dataset_and_models(n_digits, overlap_resample_proportion, labels, train_size, validation_size, fold):
-    """Generate dataset for MNIST addition: [img, img, ..., img] + [img, img, ..., img].
-    :param n_digits: Number of digits representing each number.
-    :param overlap_resample_proportion: The proportion of data that is resampled to create overlaps.
-    :param labels: The possible sum labels.
-    :param train_size: Size of training dataset
-    :param validation_size: Size of validation dataset
-    :param fold: The fold identifier. Used as the seed for RNG generating split
-    """
-    out_dir = os.path.join(DATA_PATH, "n_digits::{:01d}/fold::{:02d}/train_size::{:05d}/overlap::{:.2f}".format(n_digits, fold, train_size, overlap_resample_proportion))
-    config_path = os.path.join(out_dir, 'config.json')
-    if os.path.isfile(config_path):
-        print("Found existing config file, skipping generation. " + config_path)
-        return
-
-    write_data(out_dir, n_digits, overlap_resample_proportion, labels, train_size, validation_size, fold)
-
-    config = {
-        'architecture': {
-            'reference': [
-                'https://github.com/ML-KULeuven/deepproblog/blob/master/src/deepproblog/examples/MNIST/network.py#L44',
-                'https://arxiv.org/pdf/1907.08194.pdf#page=30',
-            ]
-        },
-        'network': {},
-        'validationSamples': int(validation_size),
-        'numTrainPairs': int(train_size),
-        'fold': int(fold),
-        'timestamp': str(datetime.datetime.now()),
-    }
-
-    for i, learning_rate in enumerate(LEARNING_RATES):
-        create_model(learning_rate, n_digits, overlap_resample_proportion, train_size, fold)
-
-    with open(config_path, 'w') as file:
-        json.dump(config, file, indent=4)
-
+def fetch_data(config):
+    return tensorflow.keras.datasets.mnist.load_data("mnist.npz")
 
 def main():
-    for n_digits in N_DIGITS:
-        train_sizes = np.array(TRAINING_SIZES) // (2 * n_digits)
-        validation_size = VALIDATION_SET_SIZE // (2 * n_digits)
-        max_number = sum([9 * (10 ** i) for i in range(n_digits)])
-        labels = list(range(2 * max_number + 1))
-        for train_size in train_sizes:
-            for overlap_resample_proportion in OVERLAP_RESAMPLE_PROPORTIONS:
-                for fold in range(-1, N_FOLDS):
-                    create_addition_dataset_and_models(n_digits, overlap_resample_proportion, labels, train_size, validation_size, fold)
+    for dataset_id in DATASETS:
+        config = DATASET_CONFIG[dataset_id]
+        for split in range(config['num-splits']):
+            config['seed'] = split
+            for train_size in config['train-sizes']:
+                config['train-size'] = train_size
+                for overlap in config['overlaps']:
+                    config['overlap'] = overlap
+
+                    out_dir = os.path.join(THIS_DIR, "..", "data", dataset_id, str(split), str(train_size), str(overlap))
+                    if os.path.isfile(os.path.join(out_dir, CONFIG_FILENAME)):
+                        print("Data already exists for %s. Skipping generation." % out_dir)
+                        continue
+
+                    data = fetch_data(config)
+                    write_data(config, out_dir, data)
 
 
 if __name__ == '__main__':

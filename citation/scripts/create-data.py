@@ -166,13 +166,13 @@ def main():
         for split in range(config['num-splits']):
             config['seed'] = split
 
-            split_dir = os.path.join(THIS_DIR, '..', 'data', config['name'], str(config['seed']))
-            if os.path.isfile(os.path.join(split_dir, CONFIG_FILENAME)):
-                print("Data already exists for %s. Skipping generation." % split_dir)
+            out_dir = os.path.join(THIS_DIR, '..', 'data', dataset_id, str(split))
+            if os.path.isfile(os.path.join(out_dir, CONFIG_FILENAME)):
+                print("Data already exists for %s. Skipping generation." % out_dir)
                 continue
 
             data, edges, graph = fetch_data(config)
-            write_data(config, split_dir, graph, data, edges)
+            write_data(config, out_dir, graph, data, edges)
 
 if __name__ == '__main__':
     main()

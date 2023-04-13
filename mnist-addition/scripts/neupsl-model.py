@@ -25,7 +25,6 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         if application == 'learning':
             self._model = self._create_model(options=options)
         elif application == 'inference':
-            print('Loading model from: {}'.format(options['save-path']))
             self._model = tensorflow.keras.models.load_model(options['save-path'])
 
         return {}
@@ -35,11 +34,10 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         self._prepare_data(data, options=options)
 
         structured_gradients = tensorflow.constant(gradients, dtype=tensorflow.float32)
-        print('Structured gradients: {}'.format(structured_gradients))
 
         with tensorflow.GradientTape(persistent=True) as tape:
             output = self._model(self._features, training=True)
-            main_loss = tensorflow.reduce_mean(self._model.compiled_loss(output, output))
+            main_loss = tensorflow.reduce_mean(self._model.compiled_loss(self._labels, output))
             total_loss = tensorflow.add_n([main_loss] + self._model.losses)
 
         neural_gradients = tape.gradient(total_loss, output)

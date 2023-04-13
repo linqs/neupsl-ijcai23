@@ -1,15 +1,16 @@
 {
   "options": {
     "runtime.db.intids": true,
-    "runtime.log.level": "DEBUG",
-    "categoricalevaluator.categoryindexes": 2,
+    "runtime.log.level": "INFO",
+    "runtime.learn.method": "Energy",
+    "eval.closetruth": true,
     "categoricalevaluator.defaultpredicate": "ImageSum",
     "admmreasoner.computeperiod": 100,
     "admmreasoner.epsilonabs": 1.0e-6,
     "admmreasoner.epsilonrel": 1.0e-4,
-    "admmreasoner.maxiterations": 100,
+    "admmreasoner.maxiterations": 1000,
     "admmreasoner.stepsize": 1.0,
-    "gradientdescent.numsteps": 100,
+    "gradientdescent.numsteps": 1000,
     "gradientdescent.runfulliterations": true,
     "gradientdescent.stepsize": 1.0e-14
   },
@@ -24,26 +25,25 @@
     "ImageSum(ImageId1, ImageId2, +Number) = 1 .",
 
     "0.1: NeuralClassifier(+ImageId, X) / |ImageId| =  0.1 ^2"
-
   ],
   "predicates": {
     "NeuralClassifier/2": {
       "type": "DeepPredicate",
       "options": {
         "model-path": "../scripts/neupsl-model.py::MNISTAdditionModel",
-        "entity-data-map-path": "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/entity-data-map.txt",
+        "entity-data-map-path": "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/entity-data-map.txt",
         "entity-argument-indexes": "0",
         "class-size": 10,
-        "save-path": "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/saved-networks/nesy-trained-tf",
+        "save-path": "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/saved-networks/nesy-trained-tf",
         "alpha": 1.00,
         "learning-rate": 1.0e-3
       },
       "targets": {
         "learn": [
-          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-target-train.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-target-train.txt"
         ],
         "infer": [
-          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-target-test.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-target-test.txt"
         ]
       }
     },
@@ -59,28 +59,28 @@
       ],
       "targets": {
         "learn": [
-          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-target-train.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-target-train.txt"
         ],
         "infer": [
-          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-target-test.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-target-test.txt"
         ]
       },
       "truth": {
         "learn": [
-          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-truth-train.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-truth-train.txt"
         ],
         "infer": [
-          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-truth-test.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-truth-test.txt"
         ]
       }
     },
     "ImageSumBlock/2": {
       "observations": {
         "learn": [
-          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-block-train.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-block-train.txt"
         ],
         "infer": [
-          "../data/experiment::mnist-1/split::0/train-size::0004/overlap::0.00/image-sum-block-test.txt"
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-block-test.txt"
         ]
       }
     },

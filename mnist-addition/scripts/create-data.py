@@ -115,7 +115,7 @@ def create_image_sum_data(config, sum_entities, sum_labels):
     for index_i in range(len(sum_entities)):
         for index_j in range(config['max-sum'] + 1):
             image_sum_target.append(list(sum_entities[index_i]) + [index_j])
-        image_sum_truth.append(list(sum_entities[index_i]) + [sum_labels[index_i]])
+            image_sum_truth.append(list(sum_entities[index_i]) + [index_j] + [1 if index_j == sum_labels[index_i] else 0])
 
     return image_sum_target, image_sum_truth
 

@@ -1,7 +1,7 @@
 {
   "options": {
     "runtime.db.intids": true,
-    "runtime.log.level": "INFO",
+    "runtime.log.level": "DEBUG",
     "runtime.learn.method": "Energy",
     "eval.closetruth": true,
     "categoricalevaluator.defaultpredicate": "ImageSum",
@@ -10,7 +10,7 @@
     "admmreasoner.epsilonrel": 1.0e-4,
     "admmreasoner.maxiterations": 1000,
     "admmreasoner.stepsize": 1.0,
-    "gradientdescent.numsteps": 1000,
+    "gradientdescent.numsteps": 100,
     "gradientdescent.runfulliterations": true,
     "gradientdescent.stepsize": 1.0e-14
   },
@@ -36,7 +36,8 @@
         "class-size": 10,
         "save-path": "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/saved-networks/nesy-trained-tf",
         "alpha": 1.00,
-        "learning-rate": 1.0e-3
+        "learning-rate": 1.0e-3,
+        "dropout": 0.2
       },
       "targets": {
         "learn": [

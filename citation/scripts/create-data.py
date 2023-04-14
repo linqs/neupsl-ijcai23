@@ -22,7 +22,7 @@ util = importlib.import_module("util")
 
 DATASET_CITESEER = 'citeseer'
 DATASET_CORA = 'cora'
-DATASETS = [DATASET_CITESEER]
+DATASETS = [DATASET_CITESEER, DATASET_CORA]
 
 DATASET_CONFIG = {
     DATASET_CITESEER: {
@@ -31,7 +31,7 @@ DATASET_CONFIG = {
         "train-size": 165,
         "valid-size": 165,
         "test-size": 1000,
-        "num-splits": 1,
+        "num-splits": 2,
         "num-sgc-layers": 2,
     },
     DATASET_CORA: {
@@ -40,7 +40,7 @@ DATASET_CONFIG = {
         "train-size": 135,
         "valid-size": 135,
         "test-size": 1000,
-        "num-splits": 1,
+        "num-splits": 2,
         "num-sgc-layers": 2,
     },
 }
@@ -164,7 +164,7 @@ def main():
         for split in range(config['num-splits']):
             config['seed'] = split
 
-            out_dir = os.path.join(THIS_DIR, '..', 'data', dataset_id, str(split))
+            out_dir = os.path.join(THIS_DIR, '..', 'data', 'experiment::' + dataset_id, 'split::' + str(split))
             os.makedirs(out_dir, exist_ok=True)
 
             if os.path.isfile(os.path.join(out_dir, CONFIG_FILENAME)):

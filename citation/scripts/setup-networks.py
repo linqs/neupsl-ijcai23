@@ -24,7 +24,7 @@ util = importlib.import_module("util")
 
 DATASET_CITESEER = 'citeseer'
 DATASET_CORA = 'cora'
-DATASETS = [DATASET_CITESEER]
+DATASETS = [DATASET_CITESEER, DATASET_CORA]
 
 MODEL_SIMPLE = 'simple'
 MODEL_SMOOTHED = 'smoothed'
@@ -50,7 +50,7 @@ DEFAULT_PARAMETERS = {
         'loss': tensorflow.keras.losses.KLDivergence(),
         'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
     },
-    (DATASET_CITESEER, MODEL_SIMPLE): {
+    (DATASET_CORA, MODEL_SIMPLE): {
         'hidden-units': 0,
         'learning-rate': 1.5e-0,
         'weight-regularizer': 5.0e-5,
@@ -221,7 +221,7 @@ def main():
     hyperparameters = util.enumerate_hyperparameters(HYPERPARAMETERS)
 
     for dataset in DATASETS:
-        dataset_dir = os.path.join(THIS_DIR, '..', 'data', dataset)
+        dataset_dir = os.path.join(THIS_DIR, '..', 'data', 'experiment::' + dataset)
 
         for split_id in sorted(os.listdir(dataset_dir)):
             split_dir = os.path.join(dataset_dir, split_id)
@@ -237,11 +237,11 @@ def main():
 
                 config['model'] = model
                 config['dataset'] = dataset
-                config['seed'] = int(split_id)
+                config['seed'] = int(split_id.split('::')[1])
 
                 random.seed(config['seed'])
 
-                if RUN_HYPERPARAMETER_SEARCH and int(split_id) == 0:
+                if RUN_HYPERPARAMETER_SEARCH and int(split_id.split('::')[1]) == 0:
                     for index in range(len(hyperparameters)):
                         hyperparameters_string = ''
                         for key in sorted(hyperparameters[index].keys()):

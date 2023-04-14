@@ -16,15 +16,17 @@ util = importlib.import_module("util")
 class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
     def __init__(self):
         super().__init__()
+        self._application = None
         self._model = None
         self._features = None
         self._labels = None
         self._digit_labels = None
 
     def internal_init_model(self, application, options={}):
-        if application == 'learning':
+        self._application = application
+        if self._application  == 'learning':
             self._model = self._create_model(options=options)
-        elif application == 'inference':
+        elif self._application  == 'inference':
             self._model = tensorflow.keras.models.load_model(options['save-path'])
 
         return {}
@@ -59,7 +61,12 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         self._prepare_data(data, options=options)
 
         predictions = self._model.predict(self._features, verbose=0)
-        return predictions, {}
+        results = {}
+
+        if self._application == 'inference':
+            results = {'metrics': util.calculate_metrics(predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
+
+        return predictions, results
 
 
     def internal_eval(self, data, options = {}):
@@ -82,15 +89,22 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         layers = [
             tensorflow.keras.layers.Input(shape=784),
             tensorflow.keras.layers.Reshape((28, 28, 1), input_shape=(784,)),
+            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.Conv2D(filters=6, kernel_size=5, data_format='channels_last'),
+            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.MaxPool2D(pool_size=(2, 2), data_format='channels_last'),
             tensorflow.keras.layers.Activation('relu'),
+            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.Conv2D(filters=16, kernel_size=5, data_format='channels_last'),
+            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.MaxPool2D(pool_size=(2, 2), data_format='channels_last'),
             tensorflow.keras.layers.Activation('relu'),
+            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.Flatten(),
             tensorflow.keras.layers.Dense(120, activation='relu', kernel_regularizer=tensorflow.keras.regularizers.L1(0.1)),
+            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.Dense(84, activation='relu', kernel_regularizer=tensorflow.keras.regularizers.L1(0.1)),
+            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.Dense(int(options['class-size']), activation='softmax')
         ]
 

@@ -1,0 +1,96 @@
+{
+  "options": {
+    "runtime.db.intids": true,
+    "runtime.log.level": "DEBUG",
+    "runtime.learn.method": "Energy",
+    "eval.closetruth": true,
+    "categoricalevaluator.defaultpredicate": "HasCat",
+    "admmreasoner.computeperiod": 100,
+    "admmreasoner.epsilonabs": 1.0e-6,
+    "admmreasoner.epsilonrel": 1.0e-4,
+    "admmreasoner.maxiterations": 100,
+    "admmreasoner.stepsize": 1.0,
+    "gradientdescent.numsteps": 25,
+    "gradientdescent.runfulliterations": true,
+    "gradientdescent.stepsize": 1.0e-2
+  },
+  "rules": [
+    "1.0: Neural(Paper, Label) = HasCat(Paper, Label) ^2",
+    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, Label) = HasCat(Paper2, Label) ^2",
+    "HasCat(Paper, +Label) = 1 ."
+  ],
+  "predicates": {
+    "Neural/2": {
+      "type": "DeepPredicate",
+      "options": {
+        "model-path": "../scripts/neupsl-model.py::CitationModel",
+        "entity-data-map-path": "../data/experiment::citeseer/split::0/entity-data-map.txt",
+        "entity-argument-indexes": "0",
+        "class-size": 6,
+        "load-path": "../data/experiment::citeseer/split::0/saved-networks/simple/pre-trained-tf",
+        "save-path": "../data/experiment::citeseer/split::0/saved-networks/simple/nesy-trained-tf",
+        "alpha": 0.01,
+        "learning-rate": 1.0e-12
+      },
+      "targets": {
+        "learn": [
+          "../data/experiment::citeseer/split::0/category-target-train.txt",
+          "../data/experiment::citeseer/split::0/category-target-test.txt",
+          "../data/experiment::citeseer/split::0/category-target-valid.txt",
+          "../data/experiment::citeseer/split::0/category-target-latent.txt"
+        ],
+        "infer": [
+          "../data/experiment::citeseer/split::0/category-target-test.txt",
+          "../data/experiment::citeseer/split::0/category-target-latent.txt"
+        ]
+      }
+    },
+    "Link/2": {
+      "observations": {
+        "learn": [
+          "../data/experiment::citeseer/split::0/edges.txt"
+        ],
+        "infer": [
+          "../data/experiment::citeseer/split::0/edges.txt"
+        ]
+      }
+    },
+    "HasCat/2": {
+      "evaluations": [
+        {
+          "evaluator": "CategoricalEvaluator",
+          "options": {
+            "categoricalevaluator.categoryindexes": 1,
+            "eval.includeobs": true
+          }
+        }
+      ],
+      "observations": {
+        "infer": [
+          "../data/experiment::citeseer/split::0/category-truth-train.txt",
+          "../data/experiment::citeseer/split::0/category-truth-valid.txt"
+        ]
+      },
+      "targets": {
+        "learn": [
+          "../data/experiment::citeseer/split::0/category-target-train.txt",
+          "../data/experiment::citeseer/split::0/category-target-test.txt",
+          "../data/experiment::citeseer/split::0/category-target-valid.txt",
+          "../data/experiment::citeseer/split::0/category-target-latent.txt"
+        ],
+        "infer": [
+          "../data/experiment::citeseer/split::0/category-target-test.txt",
+          "../data/experiment::citeseer/split::0/category-target-latent.txt"
+        ]
+      },
+      "truth": {
+          "learn": [
+          "../data/experiment::citeseer/split::0/category-truth-train.txt"
+          ],
+          "infer": [
+          "../data/experiment::citeseer/split::0/category-truth-test.txt"
+          ]
+      }
+    }
+  }
+}

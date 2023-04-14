@@ -37,13 +37,8 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
 
         with tensorflow.GradientTape(persistent=True) as tape:
             output = self._model(self._features, training=True)
-            main_loss = tensorflow.reduce_mean(self._model.compiled_loss(self._labels, output))
-            total_loss = tensorflow.add_n([main_loss] + self._model.losses)
 
-        neural_gradients = tape.gradient(total_loss, output)
-        output_gradients = (1.0 - float(options['alpha'])) * neural_gradients + float(options['alpha']) * structured_gradients
-
-        gradients = tape.gradient(output, self._model.trainable_weights, output_gradients=output_gradients)
+        gradients = tape.gradient(output, self._model.trainable_weights, output_gradients=structured_gradients)
         self._model.optimizer.apply_gradients(zip(gradients, self._model.trainable_weights))
 
         # Compute the metrics scores.
@@ -52,7 +47,7 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         self._model.compiled_metrics.reset_state()
         self._model.compiled_metrics.update_state(self._digit_labels, new_output)
 
-        results = {'loss': float(total_loss.numpy())}
+        results = {}
 
         for metric in self._model.compiled_metrics.metrics:
             results[metric.name] = float(metric.result().numpy())
@@ -71,8 +66,7 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         self._prepare_data(data, options=options)
 
         predictions, _ = self.internal_predict(data, options=options)
-        results = {'loss': float(self._model.compiled_loss(tensorflow.constant(predictions, dtype=tensorflow.float32), self._digit_labels).numpy()),
-                   'metrics': util.calculate_metrics(predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
+        results = {'metrics': util.calculate_metrics(predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
 
         return results
 

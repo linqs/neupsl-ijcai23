@@ -21,6 +21,9 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         self._features = None
         self._labels = None
         self._digit_labels = None
+        self._predictions = None
+        self._tape = None
+
 
     def internal_init_model(self, application, options={}):
         self._application = application
@@ -37,10 +40,7 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
 
         structured_gradients = tensorflow.constant(gradients, dtype=tensorflow.float32)
 
-        with tensorflow.GradientTape(persistent=True) as tape:
-            output = self._model(self._features, training=True)
-
-        gradients = tape.gradient(output, self._model.trainable_weights, output_gradients=structured_gradients)
+        gradients = self._tape.gradient(self._predictions, self._model.trainable_weights, output_gradients=structured_gradients)
         self._model.optimizer.apply_gradients(zip(gradients, self._model.trainable_weights))
 
         # Compute the metrics scores.
@@ -60,13 +60,17 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
     def internal_predict(self, data, options = {}):
         self._prepare_data(data, options=options)
 
-        predictions = self._model.predict(self._features, verbose=0)
         results = {}
 
         if self._application == 'inference':
-            results = {'metrics': util.calculate_metrics(predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
+            self._predictions = self._model.predict(self._features, verbose=0)
+            results = {'metrics': util.calculate_metrics(self._predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
+        else:
+            with tensorflow.GradientTape(persistent=True) as tape:
+                self._predictions = self._model(self._features, training=True)
+                self._tape = tape
 
-        return predictions, results
+        return self._predictions, results
 
 
     def internal_eval(self, data, options = {}):

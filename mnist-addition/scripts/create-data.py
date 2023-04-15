@@ -4,18 +4,13 @@
 # Before a directory is generated, the existence of a config file for that directory will be checked,
 # if it exists generation is skipped.
 
-import datetime
 import importlib
-import json
 import os
 import sys
 
 import numpy
-import pandas
 import tensorflow
 
-from typing import Iterable
-from itertools import product
 
 THIS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 
@@ -33,7 +28,7 @@ DATASET_CONFIG = {
         "train-sizes": [40, 60, 80],
         "valid-size": 1000,
         "test-size": 1000,
-        "num-splits": 1,
+        "num-splits": 2,
         "num-digits": 1,
         "max-sum": 18,
         "overlaps": [0.0, 0.5, 1.0],
@@ -91,7 +86,6 @@ def generate_split(config, features, labels, start_index, end_index):
     for _ in range(int(len(indexes) * config['overlap'])):
         indexes = numpy.append(indexes, indexes[numpy.random.randint(0, end_index - start_index)])
 
-    numpy.random.shuffle(indexes)
     indexes = indexes[:len(indexes) - (len(indexes) % (2 * config['num-digits']))]
     indexes = numpy.unique(indexes.reshape(-1, 2 * config['num-digits']), axis=0)
 
@@ -200,9 +194,10 @@ def main():
             write_shared_data(config, shared_out_dir)
 
         for split in range(config['num-splits']):
-            config['seed'] = split
             for train_size in config['train-sizes']:
                 config['train-size'] = train_size
+                config['seed'] = 10 * (10 * train_size + split) + config['num-digits']
+                print("Using seed %d." % config['seed'])
                 for overlap in config['overlaps']:
                     config['overlap'] = overlap
                     out_dir = os.path.join(shared_out_dir, "split::%01d" % split, "train-size::%04d" % train_size, "overlap::%.2f" % overlap)

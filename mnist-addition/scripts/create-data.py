@@ -28,7 +28,7 @@ DATASET_CONFIG = {
         "train-sizes": [40, 60, 80],
         "valid-size": 1000,
         "test-size": 1000,
-        "num-splits": 2,
+        "num-splits": 5,
         "num-digits": 1,
         "max-sum": 18,
         "overlaps": [0.0, 0.5, 1.0],

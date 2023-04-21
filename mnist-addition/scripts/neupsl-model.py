@@ -64,8 +64,9 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
 
         if self._application == 'inference':
             self._predictions = self._model.predict(self._features, verbose=0)
-            results = {'metrics': util.calculate_metrics(self._predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
+            results = {'mode': 'inference', 'metrics': util.calculate_metrics(self._predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
         else:
+            results['mode'] = 'learning'
             with tensorflow.GradientTape(persistent=True) as tape:
                 self._predictions = self._model(self._features, training=True)
                 self._tape = tape

@@ -1,9 +1,9 @@
 {
   "options": {
     "runtime.db.intids": true,
-    "runtime.log.level": "DEBUG",
+    "runtime.log.level": "TRACE",
     "runtime.learn.method": "Energy",
-    "eval.closetruth": true,
+    "eval.closetruth": false,
     "categoricalevaluator.defaultpredicate": "HasCat",
     "gradientdescent.numsteps": 25,
     "gradientdescent.stepsize": 1.0e-2
@@ -23,7 +23,6 @@
         "class-size": 7,
         "load-path": "../data/experiment::cora/split::0/saved-networks/simple/pre-trained-tf",
         "save-path": "../data/experiment::cora/split::0/saved-networks/simple/nesy-trained-tf",
-        "alpha": 0.01,
         "learning-rate": 1.0e-12
       },
       "targets": {

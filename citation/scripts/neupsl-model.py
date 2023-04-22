@@ -19,9 +19,12 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         self._model = None
         self._features = None
         self._labels = None
+        self._predictions = None
+        self._tape = None
 
 
     def internal_init_model(self, application, options={}):
+        self._application = application
         if application == 'learning':
             self._model = tensorflow.keras.models.load_model(options['load-path'])
         elif application == 'inference':
@@ -32,21 +35,12 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
 
         return {}
 
-
     def internal_fit(self, data, gradients, options={}):
         self._prepare_data(data, options=options)
 
         structured_gradients = tensorflow.constant(gradients, dtype=tensorflow.float32)
 
-        with tensorflow.GradientTape(persistent=True) as tape:
-            output = self._model(self._features, training=True)
-            main_loss = tensorflow.reduce_mean(self._model.compiled_loss(self._labels, output))
-            total_loss = tensorflow.add_n([main_loss] + self._model.losses)
-
-        neural_gradients = tape.gradient(total_loss, output)
-        output_gradients = (1.0 - float(options['alpha'])) * neural_gradients + float(options['alpha']) * structured_gradients
-
-        gradients = tape.gradient(output, self._model.trainable_weights, output_gradients=output_gradients)
+        gradients = self._tape.gradient(self._predictions, self._model.trainable_weights, output_gradients=structured_gradients)
         self._model.optimizer.apply_gradients(zip(gradients, self._model.trainable_weights))
 
         # Compute the metrics scores.
@@ -55,19 +49,28 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         self._model.compiled_metrics.reset_state()
         self._model.compiled_metrics.update_state(self._labels, new_output)
 
-        results = {'loss': float(total_loss.numpy())}
+        results = {}
 
         for metric in self._model.compiled_metrics.metrics:
             results[metric.name] = float(metric.result().numpy())
 
         return results
 
-
     def internal_predict(self, data, options = {}):
         self._prepare_data(data, options=options)
 
-        predictions = self._model.predict(self._features, verbose=0)
-        return predictions, {}
+        results = {}
+
+        if self._application == 'inference':
+            self._predictions = self._model.predict(self._features, verbose=0)
+            results = {'mode': 'inference', 'metrics': util.calculate_metrics(self._predictions, self._labels.numpy(), ['categorical_accuracy'])}
+        else:
+            results['mode'] = 'learning'
+            with tensorflow.GradientTape(persistent=True) as tape:
+                self._predictions = self._model(self._features, training=True)
+                self._tape = tape
+
+        return self._predictions, results
 
 
     def internal_eval(self, data, options = {}):

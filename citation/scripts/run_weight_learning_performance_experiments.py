@@ -63,8 +63,7 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
 
 NEURAL_NETWORK_OPTIONS = {
     "learning-rate": ["1.0e-2", "1.0e-4"],
-    "dropout": ["0.0", "0.2"],
-    "alpha": ["1.0"]
+    "dropout": ["0.0", "0.2"]
 }
 
 
@@ -150,50 +149,49 @@ def run_first_order_wl_methods(dataset_name):
             for options in enumerate_hyperparameters(method_options_dict):
                 for learning_rate in NEURAL_NETWORK_OPTIONS["learning-rate"]:
                     for dropout in NEURAL_NETWORK_OPTIONS["dropout"]:
-                        for alpha in NEURAL_NETWORK_OPTIONS["alpha"]:
-                            experiment_out_dir = split_out_dir
-                            for key, value in sorted(options.items()):
-                                experiment_out_dir = os.path.join(experiment_out_dir, "{}::{}".format(key, value))
-                            experiment_out_dir = os.path.join(experiment_out_dir, "learning-rate::{}".format(learning_rate))
-                            experiment_out_dir = os.path.join(experiment_out_dir, "dropout::{}".format(dropout))
-                            experiment_out_dir = os.path.join(experiment_out_dir, "alpha::{}".format(alpha))
+                        experiment_out_dir = split_out_dir
+                        for key, value in sorted(options.items()):
+                            experiment_out_dir = os.path.join(experiment_out_dir, "{}::{}".format(key, value))
+                        experiment_out_dir = os.path.join(experiment_out_dir, "learning-rate::{}".format(learning_rate))
+                        experiment_out_dir = os.path.join(experiment_out_dir, "dropout::{}".format(dropout))
 
-                            os.makedirs(experiment_out_dir, exist_ok=True)
+                        os.makedirs(experiment_out_dir, exist_ok=True)
 
-                            if os.path.exists(os.path.join(experiment_out_dir, "out.txt")):
-                                print("Skipping experiment: {}.".format(experiment_out_dir))
-                                continue
+                        if os.path.exists(os.path.join(experiment_out_dir, "out.txt")):
+                            print("Skipping experiment: {}.".format(experiment_out_dir))
+                            continue
 
-                            dataset_json.update({"options":{**original_options,
-                                                            **STANDARD_DATASET_OPTIONS[dataset_name],
-                                                            **STANDARD_EXPERIMENT_OPTIONS,
-                                                            **options,
-                                                            "runtime.learn.output.model.path": "./citation_learned.psl".format(dataset_name)}})
+                        dataset_json.update({"options":{**original_options,
+                                                        **STANDARD_DATASET_OPTIONS[dataset_name],
+                                                        **STANDARD_EXPERIMENT_OPTIONS,
+                                                        **options,
+                                                        "runtime.learn.output.model.path": "./citation_learned.psl".format(dataset_name)}})
 
-                            dataset_json["predicates"]["Neural/2"]["options"]["learning-rate"] = learning_rate
-                            dataset_json["predicates"]["Neural/2"]["options"]["dropout"] = dropout
-                            dataset_json["predicates"]["Neural/2"]["options"]["alpha"] = dropout
+                        dataset_json["predicates"]["Neural/2"]["options"]["learning-rate"] = learning_rate
+                        dataset_json["predicates"]["Neural/2"]["options"]["dropout"] = dropout
 
-                            # Set the data path.
-                            set_data_path(dataset_json, split, dataset_name)
+                        # Set the data path.
+                        set_data_path(dataset_json, split, dataset_name)
 
-                            # Write the options the json file.
-                            with open(os.path.join(CLI_DIR, "citation.json"), "w") as file:
-                                json.dump(dataset_json, file, indent=4)
+                        # Write the options the json file.
+                        with open(os.path.join(CLI_DIR, "citation.json"), "w") as file:
+                            json.dump(dataset_json, file, indent=4)
 
-                            # Run the experiment.
-                            print("Running experiment: {}.".format(experiment_out_dir))
-                            exit_code = os.system("cd {} && ./run.sh {} > out.txt 2> out.err".format(CLI_DIR, experiment_out_dir))
+                        # Run the experiment.
+                        print("Running experiment: {}.".format(experiment_out_dir))
+                        exit_code = os.system("cd {} && ./run.sh {} > out.txt 2> out.err".format(CLI_DIR, experiment_out_dir))
 
-                            if exit_code != 0:
-                                print("Experiment failed: {}.".format(experiment_out_dir))
-                                exit()
+                        if exit_code != 0:
+                            print("Experiment failed: {}.".format(experiment_out_dir))
+                            exit()
 
-                            # Save the output and json file.
-                            os.system("mv {} {}".format(os.path.join(CLI_DIR, "out.txt"), experiment_out_dir))
-                            os.system("mv {} {}".format(os.path.join(CLI_DIR, "out.err"), experiment_out_dir))
-                            os.system("cp {} {}".format(os.path.join(CLI_DIR, "citation.json"), experiment_out_dir))
-                            os.system("cp {} {}".format(os.path.join(CLI_DIR, "citation_learned.psl"), experiment_out_dir))
+                        # Save the output and json file.
+                        os.system("mv {} {}".format(os.path.join(CLI_DIR, "out.txt"), experiment_out_dir))
+                        os.system("mv {} {}".format(os.path.join(CLI_DIR, "out.err"), experiment_out_dir))
+                        os.system("cp {} {}".format(os.path.join(CLI_DIR, "citation.json"), experiment_out_dir))
+                        os.system("cp {} {}".format(os.path.join(CLI_DIR, "citation_learned.psl"), experiment_out_dir))
+                        os.system("cp -r {} {}".format(os.path.join(CLI_DIR, "inferred-predicates"), experiment_out_dir))
+
 
 def main():
     for dataset in ["citeseer", "cora"]:

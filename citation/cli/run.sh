@@ -18,7 +18,7 @@ readonly ADDITIONAL_PSL_OPTIONS=''
 function main() {
     trap exit SIGINT
 
-    bash "${THIS_DIR}/../data/fetchData.sh"
+#    bash "${THIS_DIR}/../data/fetchData.sh"
 
     # Make sure we can run PSL.
     check_requirements

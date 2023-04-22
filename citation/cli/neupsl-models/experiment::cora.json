@@ -5,13 +5,7 @@
     "runtime.learn.method": "Energy",
     "eval.closetruth": true,
     "categoricalevaluator.defaultpredicate": "HasCat",
-    "admmreasoner.computeperiod": 100,
-    "admmreasoner.epsilonabs": 1.0e-6,
-    "admmreasoner.epsilonrel": 1.0e-4,
-    "admmreasoner.maxiterations": 100,
-    "admmreasoner.stepsize": 1.0,
     "gradientdescent.numsteps": 25,
-    "gradientdescent.runfulliterations": true,
     "gradientdescent.stepsize": 1.0e-2
   },
   "rules": [
@@ -60,8 +54,7 @@
         {
           "evaluator": "CategoricalEvaluator",
           "options": {
-            "categoricalevaluator.categoryindexes": 1,
-            "eval.includeobs": true
+            "categoricalevaluator.categoryindexes": 1
           }
         }
       ],

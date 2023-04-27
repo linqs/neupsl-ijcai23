@@ -32,7 +32,7 @@ DATASET_CONFIG = {
         "train-size": 1200,
         "valid-size": 500,
         "test-size": 1000,
-        "num-splits": 2,
+        "num-splits": 5,
         "num-sgc-layers": 2,
     },
     DATASET_CORA: {
@@ -42,7 +42,7 @@ DATASET_CONFIG = {
         "train-size": 800,
         "valid-size": 500,
         "test-size": 1000,
-        "num-splits": 2,
+        "num-splits": 5,
         "num-sgc-layers": 2,
     },
 }

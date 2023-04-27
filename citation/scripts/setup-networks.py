@@ -28,7 +28,7 @@ DATASETS = [DATASET_CITESEER, DATASET_CORA]
 
 MODEL_SIMPLE = 'simple'
 MODEL_SMOOTHED = 'smoothed'
-MODELS = [MODEL_SIMPLE]
+MODELS = [MODEL_SMOOTHED, MODEL_SIMPLE]
 
 HYPERPARAMETERS = {
     'hidden-units': [0, 16, 32, 64],
@@ -50,7 +50,25 @@ DEFAULT_PARAMETERS = {
         'loss': tensorflow.keras.losses.KLDivergence(),
         'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
     },
+    (DATASET_CITESEER, MODEL_SMOOTHED): {
+        'hidden-units': 0,
+        'learning-rate': 1.0e-0,
+        'weight-regularizer': 1.0e-6,
+        'epochs': 1,
+        'batch': 1024,
+        'loss': tensorflow.keras.losses.KLDivergence(),
+        'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
+    },
     (DATASET_CORA, MODEL_SIMPLE): {
+        'hidden-units': 0,
+        'learning-rate': 1.5e-0,
+        'weight-regularizer': 5.0e-5,
+        'epochs': 250,
+        'batch': 1024,
+        'loss': tensorflow.keras.losses.KLDivergence(),
+        'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
+    },
+    (DATASET_CORA, MODEL_SMOOTHED): {
         'hidden-units': 0,
         'learning-rate': 1.5e-0,
         'weight-regularizer': 5.0e-5,

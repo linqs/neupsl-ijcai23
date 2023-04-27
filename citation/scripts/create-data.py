@@ -28,8 +28,9 @@ DATASET_CONFIG = {
     DATASET_CITESEER: {
         "name": DATASET_CITESEER,
         "class-size": 6,
-        "train-size": 165,
-        "valid-size": 165,
+        "obs-size": 600,
+        "train-size": 1200,
+        "valid-size": 500,
         "test-size": 1000,
         "num-splits": 2,
         "num-sgc-layers": 2,
@@ -37,8 +38,9 @@ DATASET_CONFIG = {
     DATASET_CORA: {
         "name": DATASET_CORA,
         "class-size": 7,
-        "train-size": 135,
-        "valid-size": 135,
+        "obs-size": 400,
+        "train-size": 800,
+        "valid-size": 500,
         "test-size": 1000,
         "num-splits": 2,
         "num-sgc-layers": 2,
@@ -48,12 +50,14 @@ DATASET_CONFIG = {
 CONFIG_FILENAME = "config.json"
 
 
-def _generate_partitions(graph, device, class_size, train_count, test_count, valid_count):
+def _generate_partitions(graph, device, class_size, obs_count, train_count, test_count, valid_count):
     """
     Generate train, test, and valid partition masks. Guarantee at least one node per class for each partition.
     """
     found_sample = False
     while not found_sample:
+        graph.ndata["obs-train-mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
+        graph.ndata["unobs-train-mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
         graph.ndata["train-mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
         graph.ndata["test-mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
         graph.ndata["valid-mask"] = torch.zeros(graph.num_nodes(), dtype=torch.bool, device=device)
@@ -61,12 +65,14 @@ def _generate_partitions(graph, device, class_size, train_count, test_count, val
 
         permutation = torch.randperm(graph.num_nodes(), device=device)
 
-        graph.ndata["train-mask"][permutation[:train_count]] = True
-        graph.ndata["test-mask"][permutation[train_count:train_count + valid_count]] = True
-        graph.ndata["valid-mask"][permutation[train_count + valid_count:train_count + valid_count + test_count]] = True
-        graph.ndata["latent-mask"][permutation[train_count + valid_count + test_count:]] = True
+        graph.ndata["obs-train-mask"][permutation[:obs_count]] = True
+        graph.ndata["unobs-train-mask"][permutation[obs_count: obs_count + train_count]] = True
+        graph.ndata["train-mask"][permutation[:obs_count + train_count]] = True
+        graph.ndata["test-mask"][permutation[obs_count + train_count: obs_count + train_count + valid_count]] = True
+        graph.ndata["valid-mask"][permutation[obs_count + train_count + valid_count: obs_count + train_count + valid_count + test_count]] = True
+        graph.ndata["latent-mask"][permutation[obs_count + train_count + valid_count + test_count:]] = True
 
-        for mask_name in ["train-mask", "test-mask", "valid-mask"]:
+        for mask_name in ["obs-train-mask", "unobs-train-mask", "train-mask", "test-mask", "valid-mask"]:
             found_sample = found_sample or len(torch.unique(graph.ndata["label"][graph.ndata[mask_name]])) == class_size
 
     return graph
@@ -93,7 +99,8 @@ def fetch_data(config):
 
     graph = dgl.add_self_loop(dgl.remove_self_loop(graph)).to(device)
 
-    graph = _generate_partitions(graph, device, config['class-size'], config['train-size'],
+    graph = _generate_partitions(graph, device, config['class-size'],
+                                 config['obs-size'], config['train-size'],
                                  config['test-size'], config['valid-size'])
 
     # GCN baseline.
@@ -108,7 +115,9 @@ def fetch_data(config):
     graph = dgl.remove_self_loop(graph)
     data = {}
     for (partition, indexes) in (
-            [('train', graph.nodes()[graph.ndata["train-mask"]]),
+            [('obs-train', graph.nodes()[graph.ndata["obs-train-mask"]]),
+             ('unobs-train', graph.nodes()[graph.ndata["unobs-train-mask"]]),
+             ('train', graph.nodes()[graph.ndata["train-mask"]]),
              ('test', graph.nodes()[graph.ndata["test-mask"]]),
              ('valid', graph.nodes()[graph.ndata["valid-mask"]]),
              ('latent', graph.nodes()[graph.ndata["latent-mask"]])]):

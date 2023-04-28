@@ -26,7 +26,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
     def internal_init_model(self, application, options={}):
         self._application = application
         if application == 'learning':
-            self._model = tensorflow.keras.models.load_model(options['load-path'])
+            self._model = self._create_model(options=options)
         elif application == 'inference':
             self._model = tensorflow.keras.models.load_model(options['save-path'])
 
@@ -34,6 +34,31 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         tensorflow.keras.backend.set_value(self._model.optimizer.learning_rate, float(options['learning-rate']))
 
         return {}
+
+    def _create_model(self, options={}):
+        layers = [
+            tensorflow.keras.layers.Input(shape=int(options['input-shape'])),
+            tensorflow.keras.layers.Dropout(float(options['dropout'])),
+            tensorflow.keras.layers.Dense(256,
+                                          kernel_regularizer=tensorflow.keras.regularizers.l2(float(options['weight-regularizer'])),
+                                          bias_regularizer=tensorflow.keras.regularizers.l2(float(options['weight-regularizer'])),
+                                          activation='relu'),
+            tensorflow.keras.layers.Dropout(float(options['dropout'])),
+            tensorflow.keras.layers.Dense(int(options['class-size']),
+                                          kernel_regularizer=tensorflow.keras.regularizers.l2(float(options['weight-regularizer'])),
+                                          bias_regularizer=tensorflow.keras.regularizers.l2(float(options['weight-regularizer'])),
+                                          activation='softmax'),
+        ]
+
+        model = tensorflow.keras.Sequential(layers=layers)
+
+        model.compile(
+            optimizer=tensorflow.keras.optimizers.Adam(learning_rate=float(options['learning-rate'])),
+            loss='KLDivergence',
+            metrics=['categorical_accuracy']
+        )
+
+        return model
 
     def internal_fit(self, data, gradients, options={}):
         self._prepare_data(data, options=options)

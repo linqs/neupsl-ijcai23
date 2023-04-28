@@ -46,7 +46,7 @@ INFERENCE_OPTION_RANGES = {
 FIRST_ORDER_WL_METHODS = ["BinaryCrossEntropy", "Energy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
-    "gradientdescent.stepsize": ["1.0e-1", "1.0e-2", "1.0e-3"],
+    "gradientdescent.stepsize": ["1.0e-1", "1.0e-3"],
     "gradientdescent.negativelogregularization": ["1.0e-5"],
     "gradientdescent.negativeentropyregularization": ["0.0"]
 }
@@ -58,19 +58,19 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
     "MeanSquaredError": {
         "runtime.learn.method": ["MeanSquaredError"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
-        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2", "1.0e-3"],
+        "minimizer.proxruleweight": ["1.0e-1", "1.0e-3"],
         "minimizer.numinternaliterations": ["250"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
-        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2", "1.0e-3"],
+        "minimizer.proxruleweight": ["1.0e-1", "1.0e-3"],
         "minimizer.numinternaliterations": ["250"]
     }
 }
 
 NEURAL_NETWORK_OPTIONS = {
-    "learning-rate": ["1.0e-2", "1.0e-4"],
+    "learning-rate": ["1.0e-1", "1.0e-3"],
     "dropout": ["0.9", "0.1"]
 }
 

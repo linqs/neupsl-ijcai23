@@ -8,21 +8,25 @@ CLI_DIR = os.path.join(THIS_DIR, "../cli")
 RESULTS_BASE_DIR = os.path.join(THIS_DIR, "../results")
 PERFORMANCE_RESULTS_DIR = os.path.join(RESULTS_BASE_DIR, "performance")
 
-MODEL_TYPE = ["simple", "smooth"]
-SPLITS = ["0", "1", "2"]
+DATASETS = ["citeseer-extended"]
+MODEL_TYPES = ["smoothed", "simple"]
+SPLITS = ["0", "1", "2", "3", "4"]
 
 STANDARD_EXPERIMENT_OPTIONS = {
     "runtime.log.level": "TRACE",
     "gradientdescent.scalestepsize": "false",
     "weightlearning.inference": "DistributedDualBCDInference",
     "runtime.inference.method": "DistributedDualBCDInference",
-    "gradientdescent.numsteps": "1000",
+    "gradientdescent.numsteps": "1500",
     "gradientdescent.runfulliterations": "false",
     "duallcqp.computeperiod": "10",
     "duallcqp.maxiterations": "10000",
 }
 
 STANDARD_DATASET_OPTIONS = {
+    "citeseer-extended": {
+        "duallcqp.primaldualthreshold": "0.1"
+    },
     "citeseer": {
         "duallcqp.primaldualthreshold": "0.1"
     },
@@ -31,15 +35,19 @@ STANDARD_DATASET_OPTIONS = {
     }
 }
 
-INFERENCE_OPTION_RANGES = {
-    "duallcqp.regularizationparameter": ["1.0e-3"]
+DATAPATH_NAME = {
+    "citeseer-extended": "citeseer"
 }
 
-FIRST_ORDER_WL_METHODS = ["Energy", "BinaryCrossEntropy"]
+INFERENCE_OPTION_RANGES = {
+    "duallcqp.regularizationparameter": ["1.0e-1", "1.0e-2"]
+}
+
+FIRST_ORDER_WL_METHODS = ["BinaryCrossEntropy", "Energy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
-    "gradientdescent.stepsize": ["1.0e-1", "1.0e-3"],
-    "gradientdescent.negativelogregularization": ["1.0e-1", "1.0e-3"],
+    "gradientdescent.stepsize": ["1.0e-1", "1.0e-2", "1.0e-3"],
+    "gradientdescent.negativelogregularization": ["1.0e-5"],
     "gradientdescent.negativeentropyregularization": ["0.0"]
 }
 
@@ -49,21 +57,21 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
     },
     "MeanSquaredError": {
         "runtime.learn.method": ["MeanSquaredError"],
-        "minimizer.objectivedifferencetolerance": ["1.0"],
-        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["100"]
+        "minimizer.objectivedifferencetolerance": ["0.1"],
+        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2", "1.0e-3"],
+        "minimizer.numinternaliterations": ["250"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
-        "minimizer.objectivedifferencetolerance": ["1.0"],
-        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["100"]
+        "minimizer.objectivedifferencetolerance": ["0.1"],
+        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2", "1.0e-3"],
+        "minimizer.numinternaliterations": ["250"]
     }
 }
 
 NEURAL_NETWORK_OPTIONS = {
     "learning-rate": ["1.0e-2", "1.0e-4"],
-    "dropout": ["0.0", "0.2"]
+    "dropout": ["0.9", "0.1"]
 }
 
 
@@ -84,13 +92,13 @@ def enumerate_hyperparameters(hyperparameters_dict: dict, current_hyperparameter
         return hyperparameters
 
 
-def set_data_path(dataset_json, split, dataset_name):
+def set_data_path(dataset_json, split, dataset_name, neural_model_type):
     dataset_json["predicates"]["Neural/2"]["options"]["entity-data-map-path"] = \
         "../data/experiment::{}/split::{}/entity-data-map.txt".format(dataset_name, split)
     dataset_json["predicates"]["Neural/2"]["options"]["load-path"] = \
-        "../data/experiment::{}/split::{}/saved-networks/simple/pre-trained-tf".format(dataset_name, split)
+        "../data/experiment::{}/split::{}/saved-networks/{}/pre-trained-tf".format(dataset_name, split, neural_model_type)
     dataset_json["predicates"]["Neural/2"]["options"]["save-path"] = \
-        "../data/experiment::{}/split::{}/saved-networks/simple/nesy-trained-tf".format(dataset_name, split)
+        "../data/experiment::{}/split::{}/saved-networks/{}/nesy-trained-tf".format(dataset_name, split, neural_model_type)
     dataset_json["predicates"]["Neural/2"]["targets"]["learn"] = \
         ["../data/experiment::{}/split::{}/category-target-train.txt".format(dataset_name, split),
          "../data/experiment::{}/split::{}/category-target-test.txt".format(dataset_name, split),
@@ -105,11 +113,13 @@ def set_data_path(dataset_json, split, dataset_name):
     dataset_json["predicates"]["Link/2"]["observations"]["infer"] = \
         ["../data/experiment::{}/split::{}/edges.txt".format(dataset_name, split)]
 
+    dataset_json["predicates"]["HasCat/2"]["observations"]["learn"] = \
+        ["../data/experiment::{}/split::{}/category-truth-obs-train.txt".format(dataset_name, split)]
     dataset_json["predicates"]["HasCat/2"]["observations"]["infer"] = \
         ["../data/experiment::{}/split::{}/category-truth-train.txt".format(dataset_name, split),
          "../data/experiment::{}/split::{}/category-truth-valid.txt".format(dataset_name, split)]
     dataset_json["predicates"]["HasCat/2"]["targets"]["learn"] = \
-        ["../data/experiment::{}/split::{}/category-target-train.txt".format(dataset_name, split),
+        ["../data/experiment::{}/split::{}/category-target-unobs-train.txt".format(dataset_name, split),
          "../data/experiment::{}/split::{}/category-target-test.txt".format(dataset_name, split),
          "../data/experiment::{}/split::{}/category-target-valid.txt".format(dataset_name, split),
          "../data/experiment::{}/split::{}/category-target-latent.txt".format(dataset_name, split)]
@@ -117,13 +127,13 @@ def set_data_path(dataset_json, split, dataset_name):
         ["../data/experiment::{}/split::{}/category-target-test.txt".format(dataset_name, split),
          "../data/experiment::{}/split::{}/category-target-latent.txt".format(dataset_name, split)]
     dataset_json["predicates"]["HasCat/2"]["truth"]["learn"] = \
-        ["../data/experiment::{}/split::{}/category-truth-train.txt".format(dataset_name, split)]
+        ["../data/experiment::{}/split::{}/category-truth-unobs-train.txt".format(dataset_name, split)]
     dataset_json["predicates"]["HasCat/2"]["truth"]["infer"] = \
         ["../data/experiment::{}/split::{}/category-truth-test.txt".format(dataset_name, split)]
 
 
-def run_first_order_wl_methods(dataset_name):
-    base_out_dir = os.path.join(PERFORMANCE_RESULTS_DIR, dataset_name, "first_order_wl_methods")
+def run_first_order_wl_methods(dataset_name, neural_model_type):
+    base_out_dir = os.path.join(PERFORMANCE_RESULTS_DIR, dataset_name, "first_order_wl_methods", neural_model_type)
     os.makedirs(base_out_dir, exist_ok=True)
 
     # Load the json file with the dataset options.
@@ -165,13 +175,13 @@ def run_first_order_wl_methods(dataset_name):
                                                         **STANDARD_DATASET_OPTIONS[dataset_name],
                                                         **STANDARD_EXPERIMENT_OPTIONS,
                                                         **options,
-                                                        "runtime.learn.output.model.path": "./citation_learned.psl".format(dataset_name)}})
+                                                        "runtime.learn.output.model.path": "./citation_learned.psl"}})
 
                         dataset_json["predicates"]["Neural/2"]["options"]["learning-rate"] = learning_rate
                         dataset_json["predicates"]["Neural/2"]["options"]["dropout"] = dropout
 
                         # Set the data path.
-                        set_data_path(dataset_json, split, dataset_name)
+                        set_data_path(dataset_json, split, DATAPATH_NAME[dataset_name], neural_model_type)
 
                         # Write the options the json file.
                         with open(os.path.join(CLI_DIR, "citation.json"), "w") as file:
@@ -194,8 +204,9 @@ def run_first_order_wl_methods(dataset_name):
 
 
 def main():
-    for dataset in ["citeseer", "cora"]:
-        run_first_order_wl_methods(dataset)
+    for dataset in DATASETS:
+        for neural_model_type in MODEL_TYPES:
+            run_first_order_wl_methods(dataset, neural_model_type)
 
 
 if __name__ == '__main__':

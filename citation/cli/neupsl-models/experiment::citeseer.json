@@ -10,7 +10,7 @@
     "admmreasoner.epsilonrel": 1.0e-4,
     "admmreasoner.maxiterations": 100,
     "admmreasoner.stepsize": 1.0,
-    "gradientdescent.numsteps": 25,
+    "gradientdescent.numsteps": 500,
     "gradientdescent.runfulliterations": true,
     "gradientdescent.stepsize": 1.0e-2
   },
@@ -29,8 +29,13 @@
         "class-size": 6,
         "load-path": "../data/experiment::citeseer/split::0/saved-networks/simple/pre-trained-tf",
         "save-path": "../data/experiment::citeseer/split::0/saved-networks/simple/nesy-trained-tf",
-        "alpha": 0.01,
-        "learning-rate": 1.0e-12
+        "alpha": 1.0,
+        "load-model": false,
+        "learning-rate": 1.0e-3,
+        "hidden-units": 256,
+        "input-size": 3703,
+        "weight-regularizer": 1.0e-6,
+        "dropout": 0.9
       },
       "targets": {
         "learn": [
@@ -61,7 +66,7 @@
           "evaluator": "CategoricalEvaluator",
           "options": {
             "categoricalevaluator.categoryindexes": 1,
-            "eval.includeobs": true
+            "eval.includeobs": false
           }
         }
       ],

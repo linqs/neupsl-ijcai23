@@ -71,7 +71,9 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
 
 NEURAL_NETWORK_OPTIONS = {
     "learning-rate": ["1.0e-2", "1.0e-4"],
-    "dropout": ["0.0", "0.1"]
+    "weight-regularizer": ["0.0"],
+    "hidden-size": ["128", "512"],
+    "dropout": ["0.1", "0.9"]
 }
 
 

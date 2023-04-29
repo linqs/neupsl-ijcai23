@@ -39,7 +39,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         layers = [
             tensorflow.keras.layers.Input(shape=int(options['input-shape'])),
             tensorflow.keras.layers.Dropout(float(options['dropout'])),
-            tensorflow.keras.layers.Dense(256,
+            tensorflow.keras.layers.Dense(int(options['hidden-size']),
                                           kernel_regularizer=tensorflow.keras.regularizers.l2(float(options['weight-regularizer'])),
                                           bias_regularizer=tensorflow.keras.regularizers.l2(float(options['weight-regularizer'])),
                                           activation='relu'),

@@ -168,6 +168,8 @@ def run_first_order_wl_methods(dataset_name, neural_model_type):
                                     experiment_out_dir = os.path.join(experiment_out_dir, "{}::{}".format(key, value))
                                 experiment_out_dir = os.path.join(experiment_out_dir, "learning-rate::{}".format(learning_rate))
                                 experiment_out_dir = os.path.join(experiment_out_dir, "dropout::{}".format(dropout))
+                                experiment_out_dir = os.path.join(experiment_out_dir, "hidden-size::{}".format(hidden_size))
+                                experiment_out_dir = os.path.join(experiment_out_dir, "weight-regularizer::{}".format(weight_regularizer))
 
                                 os.makedirs(experiment_out_dir, exist_ok=True)
 

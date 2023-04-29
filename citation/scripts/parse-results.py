@@ -36,6 +36,9 @@ def parse_log(log_path):
     results = []
     with open(log_path, 'r') as file:
         for line in file:
+            if "Final Validation Evaluation Metric:" in line:
+                match = re.search(r': ([\d\.]+)', line)
+                results.append(float(match.group(1)))
             if 'Evaluation results' in line:
                 match = re.search(r': ([\d\.]+)', line)
                 results.append(float(match.group(1)))
@@ -60,7 +63,8 @@ def main():
                             parts = os.path.dirname(log_path.split("{}/{}/{}/{}/{}/".format(experiment, dataset_name, experiment_group, feature_type, loss))[1]).split("/")
                             if len(results[experiment][dataset_name][experiment_group][feature_type][loss]['rows']) == 0:
                                 results[experiment][dataset_name][experiment_group][feature_type][loss]['header'] = [row.split("::")[0] for row in parts]
-                                results[experiment][dataset_name][experiment_group][feature_type][loss]['header'].append('Categorical Accuracy')
+                                results[experiment][dataset_name][experiment_group][feature_type][loss]['header'].append('Validation Categorical Accuracy')
+                                results[experiment][dataset_name][experiment_group][feature_type][loss]['header'].append('Test Categorical Accuracy')
                             results[experiment][dataset_name][experiment_group][feature_type][loss]['rows'].append([row.split("::")[1] for row in parts])
         
                             for log_result in parse_log(log_path):

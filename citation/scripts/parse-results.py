@@ -12,12 +12,14 @@ LOG_FILENAME = 'out.txt'
 
 def print_results(results):
     for experiment, result in sorted(results.items()):
-        for experiment_group, experiment_group_result in sorted(result.items()):
-            for method, method_result in sorted(experiment_group_result.items()):
-                print("Experiment: {}, Experiment Group: {}, Method:{}".format(experiment, experiment_group, method))
-                print(' '.join(method_result['header']))
-                for row in method_result['rows']:
-                    print(' '.join([str(value) for value in row]))
+        for dataset_name, dataset_result in sorted(result.items()):
+            for experiment_group, experiment_group_result in sorted(dataset_result.items()):
+                for feature_type, feature_type_result in sorted(experiment_group_result.items()):
+                    for loss, loss_result in sorted(feature_type_result.items()):
+                        print("Experiment: {}, Dataset: {}, Experiment Group: {}, Feature Type: {}, Loss: {}".format(experiment, dataset_name, experiment_group, feature_type, loss))
+                        print(' '.join(loss_result['header']))
+                        for row in loss_result['rows']:
+                            print(' '.join([str(value) for value in row]))
 
 
 def get_log_paths(path):

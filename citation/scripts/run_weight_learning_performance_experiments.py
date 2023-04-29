@@ -17,7 +17,7 @@ STANDARD_EXPERIMENT_OPTIONS = {
     "gradientdescent.scalestepsize": "false",
     "weightlearning.inference": "DistributedDualBCDInference",
     "runtime.inference.method": "DistributedDualBCDInference",
-    "gradientdescent.numsteps": "1500",
+    "gradientdescent.numsteps": "1000",
     "gradientdescent.runfulliterations": "false",
     "duallcqp.computeperiod": "10",
     "duallcqp.maxiterations": "10000",
@@ -58,13 +58,13 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
     "MeanSquaredError": {
         "runtime.learn.method": ["MeanSquaredError"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
-        "minimizer.proxruleweight": ["1.0e-1", "1.0e-3"],
+        "minimizer.proxruleweight": ["1.0e-2", "1.0e-3"],
         "minimizer.numinternaliterations": ["250"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
-        "minimizer.proxruleweight": ["1.0e-1", "1.0e-3"],
+        "minimizer.proxruleweight": ["1.0e-2", "1.0e-3"],
         "minimizer.numinternaliterations": ["250"]
     }
 }

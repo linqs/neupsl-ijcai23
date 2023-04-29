@@ -8,7 +8,7 @@ CLI_DIR = os.path.join(THIS_DIR, "../cli")
 RESULTS_BASE_DIR = os.path.join(THIS_DIR, "../results")
 PERFORMANCE_RESULTS_DIR = os.path.join(RESULTS_BASE_DIR, "performance")
 
-DATASETS = ["citeseer-extended"]
+DATASETS = ["citeseer"]
 MODEL_TYPES = ["smoothed", "simple"]
 SPLITS = ["0", "1", "2", "3", "4"]
 
@@ -26,11 +26,8 @@ STANDARD_EXPERIMENT_OPTIONS = {
 }
 
 STANDARD_DATASET_OPTIONS = {
-    "citeseer-extended": {
-        "duallcqp.primaldualthreshold": "0.1"
-    },
     "citeseer": {
-        "duallcqp.primaldualthreshold": "0.1"
+        "duallcqp.primaldualthreshold": "1.0"
     },
     "cora": {
         "duallcqp.primaldualthreshold": "0.1"
@@ -38,7 +35,7 @@ STANDARD_DATASET_OPTIONS = {
 }
 
 DATAPATH_NAME = {
-    "citeseer-extended": "citeseer"
+    "citeseer": "citeseer"
 }
 
 INFERENCE_OPTION_RANGES = {
@@ -59,20 +56,20 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
     },
     "MeanSquaredError": {
         "runtime.learn.method": ["MeanSquaredError"],
-        "minimizer.objectivedifferencetolerance": ["0.1"],
+        "minimizer.objectivedifferencetolerance": ["1.0"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
         "minimizer.numinternaliterations": ["500"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
-        "minimizer.objectivedifferencetolerance": ["0.1"],
+        "minimizer.objectivedifferencetolerance": ["1.0"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
         "minimizer.numinternaliterations": ["500"]
     }
 }
 
 NEURAL_NETWORK_OPTIONS = {
-    "learning-rate": ["1.0e-3", "1.0e-5"],
+    "learning-rate": ["1.0e-2", "1.0e-4"],
     "weight-regularizer": ["1.0e-6"],
     "hidden-size": ["1024"],
     "dropout": ["0.1", "0.9"]

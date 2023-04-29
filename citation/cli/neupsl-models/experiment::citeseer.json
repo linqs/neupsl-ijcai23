@@ -19,11 +19,14 @@
       "options": {
         "model-path": "../scripts/neupsl-model.py::CitationModel",
         "entity-data-map-path": "../data/experiment::citeseer/split::0/entity-data-map.txt",
+        "input-shape": 3703,
         "entity-argument-indexes": "0",
         "class-size": 6,
         "load-path": "../data/experiment::citeseer/split::0/saved-networks/simple/pre-trained-tf",
         "save-path": "../data/experiment::citeseer/split::0/saved-networks/simple/nesy-trained-tf",
-        "learning-rate": 1.0e-12
+        "learning-rate": 1.0e-12,
+        "dropout": 1.0e-1,
+        "weight-regularizer": 1.0e-4
       },
       "targets": {
         "learn": [
@@ -58,14 +61,22 @@
         }
       ],
       "observations": {
+        "learn": [
+          "../data/experiment::citeseer/split::0/category-truth-obs-train.txt"
+        ],
         "infer": [
           "../data/experiment::citeseer/split::0/category-truth-train.txt",
           "../data/experiment::citeseer/split::0/category-truth-valid.txt"
         ]
       },
+      "validation": {
+        "learn": [
+          "../data/experiment::citeseer/split::0/category-truth-valid.txt"
+        ]
+      },
       "targets": {
         "learn": [
-          "../data/experiment::citeseer/split::0/category-target-train.txt",
+          "../data/experiment::citeseer/split::0/category-target-unobs-train.txt",
           "../data/experiment::citeseer/split::0/category-target-test.txt",
           "../data/experiment::citeseer/split::0/category-target-valid.txt",
           "../data/experiment::citeseer/split::0/category-target-latent.txt"
@@ -77,7 +88,7 @@
       },
       "truth": {
           "learn": [
-          "../data/experiment::citeseer/split::0/category-truth-train.txt"
+          "../data/experiment::citeseer/split::0/category-truth-unobs-train.txt"
           ],
           "infer": [
           "../data/experiment::citeseer/split::0/category-truth-test.txt"

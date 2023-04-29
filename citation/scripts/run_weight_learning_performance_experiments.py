@@ -45,7 +45,7 @@ INFERENCE_OPTION_RANGES = {
 FIRST_ORDER_WL_METHODS = ["BinaryCrossEntropy", "Energy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
-    "gradientdescent.stepsize": ["1.0e-3", "1.0e-5"],
+    "gradientdescent.stepsize": ["1.0e-4", "1.0e-2"],
     "gradientdescent.negativelogregularization": ["1.0e-1"],
     "gradientdescent.negativeentropyregularization": ["0.0"]
 }

@@ -70,7 +70,7 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
 }
 
 NEURAL_NETWORK_OPTIONS = {
-    "learning-rate": ["1.0e-1", "1.0e-3"],
+    "learning-rate": ["1.0e-2", "1.0e-4"],
     "dropout": ["0.9", "0.1"]
 }
 

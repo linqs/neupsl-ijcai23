@@ -44,21 +44,25 @@ def parse_log(log_path):
 def main():
     results = {}
     for experiment in sorted(os.listdir(RESULTS_DIR)):
-        results[experiment] = {experiment_group: dict() for experiment_group in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment)))}
-        for experiment_group in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment))):
-            results[experiment][experiment_group] = {method: dict() for method in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, experiment_group)))}
-            for method in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, experiment_group))):
-                results[experiment][experiment_group][method] = {'header': [], 'rows': []}
-                log_paths = get_log_paths(os.path.join(RESULTS_DIR, experiment, experiment_group, method))
-                for log_path in log_paths:
-                    parts = os.path.dirname(log_path.split("{}/{}/{}/".format(experiment, experiment_group, method))[1]).split("/")
-                    if len(results[experiment][experiment_group][method]['rows']) == 0:
-                        results[experiment][experiment_group][method]['header'] = [row.split("::")[0] for row in parts]
-                        results[experiment][experiment_group][method]['header'].append('Categorical Accuracy')
-                    results[experiment][experiment_group][method]['rows'].append([row.split("::")[1] for row in parts])
-
-                    for log_result in parse_log(log_path):
-                        results[experiment][experiment_group][method]['rows'][-1].append(log_result)
+        results[experiment] = {dataset_name: dict() for dataset_name in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment)))}
+        for dataset_name in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment))):
+            results[dataset_name] = {experiment_group: dict() for experiment_group in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, dataset_name)))}
+            for experiment_group in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, dataset_name))):
+                results[experiment][dataset_name][experiment_group] = {method: dict() for method in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, dataset_name, experiment_group)))}
+                for feature_type in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, dataset_name, experiment_group))):
+                    results[experiment][dataset_name][experiment_group][feature_type] = {loss: dict() for loss in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, dataset_name, experiment_group, feature_type)))}
+                    for loss in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, dataset_name, experiment_group, feature_type))):
+                        results[experiment][dataset_name][experiment_group][feature_type][loss] = {'header': [], 'rows': []}
+                        log_paths = get_log_paths(os.path.join(RESULTS_DIR, experiment, dataset_name, experiment_group, feature_type, loss))
+                        for log_path in log_paths:
+                            parts = os.path.dirname(log_path.split("{}/{}/{}/{}/{}/".format(experiment, dataset_name, experiment_group, feature_type, loss))[1]).split("/")
+                            if len(results[experiment][dataset_name][experiment_group][feature_type][loss]['rows']) == 0:
+                                results[experiment][dataset_name][experiment_group][feature_type][loss]['header'] = [row.split("::")[0] for row in parts]
+                                results[experiment][dataset_name][experiment_group][feature_type][loss]['header'].append('Categorical Accuracy')
+                            results[experiment][dataset_name][experiment_group][feature_type][loss]['rows'].append([row.split("::")[1] for row in parts])
+        
+                            for log_result in parse_log(log_path):
+                                results[experiment][dataset_name][experiment_group][feature_type][loss]['rows'][-1].append(log_result)
     print_results(results)
 
 

@@ -15,17 +15,19 @@ SPLITS = ["0", "1", "2", "3", "4"]
 STANDARD_EXPERIMENT_OPTIONS = {
     "runtime.log.level": "TRACE",
     "gradientdescent.scalestepsize": "false",
+    "gradientdescent.validationbreakwindow": "100",
+    "gradientdescent.validationbreak": "true",
     "weightlearning.inference": "DistributedDualBCDInference",
     "runtime.inference.method": "DistributedDualBCDInference",
     "gradientdescent.numsteps": "1000",
     "gradientdescent.runfulliterations": "false",
     "duallcqp.computeperiod": "10",
-    "duallcqp.maxiterations": "10000",
+    "duallcqp.maxiterations": "25000",
 }
 
 STANDARD_DATASET_OPTIONS = {
     "citeseer-extended": {
-        "duallcqp.primaldualthreshold": "1.0"
+        "duallcqp.primaldualthreshold": "0.1"
     },
     "citeseer": {
         "duallcqp.primaldualthreshold": "0.1"
@@ -59,20 +61,20 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
         "runtime.learn.method": ["MeanSquaredError"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["250"]
+        "minimizer.numinternaliterations": ["500"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["250"]
+        "minimizer.numinternaliterations": ["500"]
     }
 }
 
 NEURAL_NETWORK_OPTIONS = {
-    "learning-rate": ["1.0e-2", "1.0e-4"],
-    "weight-regularizer": ["1.0e-2", "1.0e-4"],
-    "hidden-size": ["128", "512"],
+    "learning-rate": ["1.0e-3", "1.0e-5"],
+    "weight-regularizer": ["1.0e-6"],
+    "hidden-size": ["1024"],
     "dropout": ["0.1", "0.9"]
 }
 

@@ -105,11 +105,6 @@ function fetch_file() {
 # For snapshot builds, the local maven cache ($HOME/.m2) is checked first, and then the snapshot deployment servers.
 # Snapshots are fetched from the local maven repo and other builds are fetched remotely.
 function fetch_psl() {
-    if [[ -e "${JAR_PATH}" ]] ; then
-        echo "Using PSL jar found at ${JAR_PATH}. To fetch a new version, delete this cached jar."
-        return
-    fi
-
     if [[ "${PSL_VERSION}" =~ .*-SNAPSHOT$ ]]; then
         local snapshotLocalPath="$HOME/.m2/repository/org/linqs/psl-cli/${PSL_VERSION}/psl-cli-${PSL_VERSION}.jar"
         if [[ -e "${snapshotLocalPath}" ]] ; then

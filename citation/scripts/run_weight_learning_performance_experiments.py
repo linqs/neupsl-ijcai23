@@ -25,7 +25,7 @@ STANDARD_EXPERIMENT_OPTIONS = {
 
 STANDARD_DATASET_OPTIONS = {
     "citeseer-extended": {
-        "duallcqp.primaldualthreshold": "0.1"
+        "duallcqp.primaldualthreshold": "1.0"
     },
     "citeseer": {
         "duallcqp.primaldualthreshold": "0.1"
@@ -46,9 +46,9 @@ INFERENCE_OPTION_RANGES = {
 FIRST_ORDER_WL_METHODS = ["BinaryCrossEntropy", "Energy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
-    "gradientdescent.stepsize": ["1.0e-1", "1.0e-3"],
-    "gradientdescent.negativelogregularization": ["1.0e-5"],
-    "gradientdescent.negativeentropyregularization": ["0.0"]
+    "gradientdescent.stepsize": ["1.0e-2", "1.0e-4"],
+    "gradientdescent.negativelogregularization": ["1.0e-1", "1.0e-3"],
+    "gradientdescent.negativeentropyregularization": ["10.0", "1.0e-1"]
 }
 
 FIRST_ORDER_WL_METHODS_OPTION_RANGES = {

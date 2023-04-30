@@ -68,16 +68,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         gradients = self._tape.gradient(self._predictions, self._model.trainable_weights, output_gradients=structured_gradients)
         self._model.optimizer.apply_gradients(zip(gradients, self._model.trainable_weights))
 
-        # Compute the metrics scores.
-        new_output = self._model(self._features)
-
-        self._model.compiled_metrics.reset_state()
-        self._model.compiled_metrics.update_state(self._labels, new_output)
-
         results = {}
-
-        for metric in self._model.compiled_metrics.metrics:
-            results[metric.name] = float(metric.result().numpy())
 
         return results
 
@@ -86,14 +77,14 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
 
         results = {}
 
-        if self._application == 'inference':
-            self._predictions = self._model.predict(self._features, verbose=0)
-            results = {'mode': 'inference', 'metrics': util.calculate_metrics(self._predictions, self._labels.numpy(), ['categorical_accuracy'])}
-        else:
+        if options["learn"]:
             results['mode'] = 'learning'
             with tensorflow.GradientTape(persistent=True) as tape:
                 self._predictions = self._model(self._features, training=True)
                 self._tape = tape
+        else:
+            self._predictions = self._model.predict(self._features, verbose=0)
+            results = {'mode': 'inference'}
 
         return self._predictions, results
 
@@ -102,8 +93,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         self._prepare_data(data, options=options)
 
         predictions, _ = self.internal_predict(data, options=options)
-        results = {'loss': float(self._model.compiled_loss(tensorflow.constant(predictions, dtype=tensorflow.float32), self._labels).numpy()),
-                   'metrics': util.calculate_metrics(predictions, self._labels.numpy(), ['categorical_accuracy'])}
+        results = {}
 
         return results
 
@@ -114,8 +104,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
 
 
     def _prepare_data(self, data, options = {}):
-        if self._features is not None and self._labels is not None:
+        if self._features is not None:
             return
 
         self._features = tensorflow.constant(numpy.asarray(data[:,:-1]), dtype=tensorflow.float32)
-        self._labels = tensorflow.constant(numpy.asarray([util.one_hot_encoding(int(label), int(options['class-size'])) for label in data[:,-1]]), dtype=tensorflow.float32)

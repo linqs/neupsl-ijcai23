@@ -22,17 +22,17 @@ util = importlib.import_module("util")
 
 DATASET_CITESEER = 'citeseer'
 DATASET_CORA = 'cora'
-DATASETS = [DATASET_CITESEER, DATASET_CORA]
+DATASETS = [DATASET_CITESEER]
 
 DATASET_CONFIG = {
     DATASET_CITESEER: {
         "name": DATASET_CITESEER,
         "class-size": 6,
         "obs-size": 0,
-        "train-size": 165,
-        "valid-size": 165,
-        "test-size": 1000,
-        "num-splits": 5,
+        "train-size": 2221,
+        "valid-size": 740,
+        "test-size": 740,
+        "num-splits": 10,
         "num-sgc-layers": 2,
     },
     DATASET_CORA: {
@@ -42,7 +42,7 @@ DATASET_CONFIG = {
         "train-size": 135,
         "valid-size": 135,
         "test-size": 1000,
-        "num-splits": 5,
+        "num-splits": 10,
         "num-sgc-layers": 2,
     },
 }

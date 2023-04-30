@@ -10,7 +10,7 @@ PERFORMANCE_RESULTS_DIR = os.path.join(RESULTS_BASE_DIR, "performance")
 
 DATASETS = ["citeseer"]
 MODEL_TYPES = ["smoothed", "simple"]
-SPLITS = ["0", "1", "2", "3", "4"]
+SPLITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
 STANDARD_EXPERIMENT_OPTIONS = {
     "runtime.log.level": "TRACE",
@@ -42,11 +42,11 @@ INFERENCE_OPTION_RANGES = {
     "duallcqp.regularizationparameter": ["1.0e-1"]
 }
 
-FIRST_ORDER_WL_METHODS = ["BinaryCrossEntropy", "Energy"]
+FIRST_ORDER_WL_METHODS = ["Energy", "BinaryCrossEntropy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
-    "gradientdescent.stepsize": ["1.0e-3", "1.0e-2"],
-    "gradientdescent.negativelogregularization": ["1.0e-1"],
+    "gradientdescent.stepsize": ["1.0e-2", "1.0e-3"],
+    "gradientdescent.negativelogregularization": ["1.0e-1", "1.0e-3"],
     "gradientdescent.negativeentropyregularization": ["0.0"]
 }
 
@@ -69,9 +69,9 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
 }
 
 NEURAL_NETWORK_OPTIONS = {
-    "weight-regularizer": ["0.0"],
+    "weight-regularizer": ["1.0e-5", "1.0e-7"],
     "hidden-size": ["1024"],
-    "dropout": ["0.9", "0.1"]
+    "dropout": ["0.0", "0.1", "0.9"]
 }
 
 

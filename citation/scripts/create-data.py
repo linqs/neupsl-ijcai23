@@ -68,8 +68,8 @@ def _generate_partitions(graph, device, class_size, obs_count, train_count, test
         graph.ndata["obs-train-mask"][permutation[:obs_count]] = True
         graph.ndata["unobs-train-mask"][permutation[obs_count: obs_count + train_count]] = True
         graph.ndata["train-mask"][permutation[:obs_count + train_count]] = True
-        graph.ndata["test-mask"][permutation[obs_count + train_count: obs_count + train_count + valid_count]] = True
-        graph.ndata["valid-mask"][permutation[obs_count + train_count + valid_count: obs_count + train_count + valid_count + test_count]] = True
+        graph.ndata["valid-mask"][permutation[obs_count + train_count: obs_count + train_count + valid_count]] = True
+        graph.ndata["test-mask"][permutation[obs_count + train_count + valid_count: obs_count + train_count + valid_count + test_count]] = True
         graph.ndata["latent-mask"][permutation[obs_count + train_count + valid_count + test_count:]] = True
 
         for mask_name in ["obs-train-mask", "unobs-train-mask", "train-mask", "test-mask", "valid-mask"]:

@@ -16,6 +16,7 @@
     "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, '3') = HasCat(Paper2, '3') ^2",
     "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, '4') = HasCat(Paper2, '4') ^2",
     "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, '5') = HasCat(Paper2, '5') ^2",
+    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, '6') = HasCat(Paper2, '6') ^2",
     "HasCat(Paper, +Label) = 1 ."
   ],
   "predicates": {
@@ -24,11 +25,14 @@
       "options": {
         "model-path": "../scripts/neupsl-model.py::CitationModel",
         "entity-data-map-path": "../data/experiment::cora/split::0/entity-data-map.txt",
+        "input-shape": 1433,
         "entity-argument-indexes": "0",
         "class-size": 7,
         "load-path": "../data/experiment::cora/split::0/saved-networks/simple/pre-trained-tf",
         "save-path": "../data/experiment::cora/split::0/saved-networks/simple/nesy-trained-tf",
-        "learning-rate": 1.0e-12
+        "learning-rate": 1.0e-12,
+        "dropout": 1.0e-1,
+        "weight-regularizer": 1.0e-4
       },
       "targets": {
         "learn": [

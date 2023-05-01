@@ -22,7 +22,7 @@ util = importlib.import_module("util")
 
 DATASET_CITESEER = 'citeseer'
 DATASET_CORA = 'cora'
-DATASETS = [DATASET_CITESEER]
+DATASETS = [DATASET_CITESEER, DATASET_CORA]
 
 DATASET_CONFIG = {
     DATASET_CITESEER: {

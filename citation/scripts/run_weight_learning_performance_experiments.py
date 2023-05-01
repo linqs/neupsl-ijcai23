@@ -8,7 +8,7 @@ CLI_DIR = os.path.join(THIS_DIR, "../cli")
 RESULTS_BASE_DIR = os.path.join(THIS_DIR, "../results")
 PERFORMANCE_RESULTS_DIR = os.path.join(RESULTS_BASE_DIR, "performance")
 
-DATASETS = ["citeseer"]
+DATASETS = ["citeseer", "cora"]
 MODEL_TYPES = ["smoothed", "simple"]
 SPLITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
@@ -35,7 +35,8 @@ STANDARD_DATASET_OPTIONS = {
 }
 
 DATAPATH_NAME = {
-    "citeseer": "citeseer"
+    "citeseer": "citeseer",
+    "cora": "cora"
 }
 
 INFERENCE_OPTION_RANGES = {

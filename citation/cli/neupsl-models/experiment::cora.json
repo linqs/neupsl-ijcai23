@@ -10,7 +10,12 @@
   },
   "rules": [
     "1.0: Neural(Paper, Label) = HasCat(Paper, Label) ^2",
-    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, Label) = HasCat(Paper2, Label) ^2",
+    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, '0') = HasCat(Paper2, '0') ^2",
+    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, '1') = HasCat(Paper2, '1') ^2",
+    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, '2') = HasCat(Paper2, '2') ^2",
+    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, '3') = HasCat(Paper2, '3') ^2",
+    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, '4') = HasCat(Paper2, '4') ^2",
+    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, '5') = HasCat(Paper2, '5') ^2",
     "HasCat(Paper, +Label) = 1 ."
   ],
   "predicates": {
@@ -58,14 +63,22 @@
         }
       ],
       "observations": {
+        "learn": [
+          "../data/experiment::cora/split::0/category-truth-obs-train.txt"
+        ],
         "infer": [
           "../data/experiment::cora/split::0/category-truth-train.txt",
           "../data/experiment::cora/split::0/category-truth-valid.txt"
         ]
       },
+      "validation": {
+        "learn": [
+          "../data/experiment::cora/split::0/category-truth-valid.txt"
+        ]
+      },
       "targets": {
         "learn": [
-          "../data/experiment::cora/split::0/category-target-train.txt",
+          "../data/experiment::cora/split::0/category-target-unobs-train.txt",
           "../data/experiment::cora/split::0/category-target-test.txt",
           "../data/experiment::cora/split::0/category-target-valid.txt",
           "../data/experiment::cora/split::0/category-target-latent.txt"
@@ -77,7 +90,7 @@
       },
       "truth": {
           "learn": [
-          "../data/experiment::cora/split::0/category-truth-train.txt"
+          "../data/experiment::cora/split::0/category-truth-unobs-train.txt"
           ],
           "infer": [
           "../data/experiment::cora/split::0/category-truth-test.txt"

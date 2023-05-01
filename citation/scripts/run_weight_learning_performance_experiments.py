@@ -42,7 +42,7 @@ INFERENCE_OPTION_RANGES = {
     "duallcqp.regularizationparameter": ["1.0e-1"]
 }
 
-FIRST_ORDER_WL_METHODS = ["Energy", "BinaryCrossEntropy"]
+FIRST_ORDER_WL_METHODS = ["Energy", "MeanSquaredError", "BinaryCrossEntropy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
     "gradientdescent.stepsize": ["1.0e-2", "1.0e-3"],
@@ -57,13 +57,13 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
     "MeanSquaredError": {
         "runtime.learn.method": ["MeanSquaredError"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
-        "minimizer.proxruleweight": ["1.0", "1.0e-1", "1.0e-2"],
+        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
         "minimizer.numinternaliterations": ["500"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
-        "minimizer.proxruleweight": ["1.0", "1.0e-1", "1.0e-2"],
+        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
         "minimizer.numinternaliterations": ["500"]
     }
 }
@@ -71,7 +71,7 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
 NEURAL_NETWORK_OPTIONS = {
     "weight-regularizer": ["1.0e-5", "1.0e-7"],
     "hidden-size": ["1024"],
-    "dropout": ["0.0", "0.1", "0.9"]
+    "dropout": ["0.0", "0.1"]
 }
 
 
@@ -118,6 +118,8 @@ def set_data_path(dataset_json, split, dataset_name, neural_model_type):
     dataset_json["predicates"]["HasCat/2"]["observations"]["infer"] = \
         ["../data/experiment::{}/split::{}/category-truth-train.txt".format(dataset_name, split),
          "../data/experiment::{}/split::{}/category-truth-valid.txt".format(dataset_name, split)]
+    dataset_json["predicates"]["HasCat/2"]["validation"]["learn"] = \
+        ["../data/experiment::{}/split::{}/category-truth-valid.txt".format(dataset_name, split)]
     dataset_json["predicates"]["HasCat/2"]["targets"]["learn"] = \
         ["../data/experiment::{}/split::{}/category-target-unobs-train.txt".format(dataset_name, split),
          "../data/experiment::{}/split::{}/category-target-test.txt".format(dataset_name, split),

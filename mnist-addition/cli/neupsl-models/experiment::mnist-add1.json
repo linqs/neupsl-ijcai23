@@ -60,7 +60,7 @@
                     "evaluator": "CategoricalEvaluator",
                     "options": {
                         "categoricalevaluator.categoryindexes": 2,
-                        "eval.includeobs": true
+                        "eval.includeobs": false
                     }
                 }
             ],

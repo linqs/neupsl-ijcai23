@@ -1,5 +1,6 @@
 {
     "options": {
+        "inference.normalize": false,
         "runtime.db.intids": true,
         "runtime.log.level": "TRACE",
         "runtime.learn.method": "BinaryCrossEntropy",
@@ -23,33 +24,31 @@
         "gradientdescent.scalestepsize": "false"
     },
     "rules": [
-        "NeuralClassifier(ImageId, Number) = PredictedNumber(ImageId, Number) .",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId2, X) + NeuralClassifier(ImageId4, Y) <= ImageDigitSum(ImageId2, ImageId4, Z) + 1.0 ^2",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId2, X) + ImageDigitSum(ImageId2, ImageId4, Z) <= NeuralClassifier(ImageId4, Y) + 1.0 ^2",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId4, Y) + ImageDigitSum(ImageId2, ImageId4, Z) <= NeuralClassifier(ImageId2, X) + 1.0 ^2",
 
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId2, X) + NeuralClassifier(ImageId4, Y) <= ImageDigitSum(ImageId2, ImageId4, Z) + 1.0 ^2",
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId2, X) + ImageDigitSum(ImageId2, ImageId4, Z) <= NeuralClassifier(ImageId4, Y) + 1.0 ^2",
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId4, Y) + ImageDigitSum(ImageId2, ImageId4, Z) <= NeuralClassifier(ImageId2, X) + 1.0 ^2",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId1, X) + NeuralClassifier(ImageId3, Y) <= ImageDigitSum(ImageId1, ImageId3, Z) + 1.0 ^2",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId1, X) + ImageDigitSum(ImageId1, ImageId3, Z) <= NeuralClassifier(ImageId3, Y) + 1.0 ^2",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId3, Y) + ImageDigitSum(ImageId1, ImageId3, Z) <= NeuralClassifier(ImageId1, X) + 1.0 ^2",
 
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId1, X) + NeuralClassifier(ImageId3, Y) <= ImageDigitSum(ImageId1, ImageId3, Z) + 1.0 ^2",
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId1, X) + ImageDigitSum(ImageId1, ImageId3, Z) <= NeuralClassifier(ImageId3, Y) + 1.0 ^2",
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId3, Y) + ImageDigitSum(ImageId1, ImageId3, Z) <= NeuralClassifier(ImageId1, X) + 1.0 ^2",
+        "ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & ImageDigitSum(ImageId2, ImageId4, Z_1) & ImageDigitSum(ImageId1, ImageId3, Z_10) & PlacedNumberSum(Z_10, Z_1, Z) -> ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) .",
+        "ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & ImageDigitSum(ImageId2, ImageId4, Z_1) & ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) & PlacedNumberSum(Z_10, Z_1, Z) -> ImageDigitSum(ImageId1, ImageId3, Z_10) .",
+        "ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & ImageDigitSum(ImageId1, ImageId3, Z_10) & ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) & PlacedNumberSum(Z_10, Z_1, Z) -> ImageDigitSum(ImageId2, ImageId4, Z_1) .",
 
-        "ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) & ImageDigitSum(ImageId2, ImageId4, Z_1) & ImageDigitSum(ImageId1, ImageId3, Z_10) & PlacedNumberSum(Z_10, Z_1, Z) -> ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) .",
-        "ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) & ImageDigitSum(ImageId2, ImageId4, Z_1) & ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) & PlacedNumberSum(Z_10, Z_1, Z) -> ImageDigitSum(ImageId1, ImageId3, Z_10) .",
-        "ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) & ImageDigitSum(ImageId1, ImageId3, Z_10) & ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) & PlacedNumberSum(Z_10, Z_1, Z) -> ImageDigitSum(ImageId2, ImageId4, Z_1) .",
+        "0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + ImageDigitSum(ImageId2, ImageId4, +Z_1) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) . {Z_1: PossibleOnesSums(Z_1, Z)}",
+        "0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + ImageDigitSum(ImageId1, ImageId3, +Z_10) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) . {Z_10: PossibleTensSums(Z_10, Z)}",
 
-        "0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + ImageDigitSum(ImageId2, ImageId4, +Z_1) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) . {Z_1: PossibleOnesSums(Z_1, Z)}",
-        "0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + ImageDigitSum(ImageId1, ImageId3, +Z_10) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) . {Z_10: PossibleTensSums(Z_10, Z)}",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId2, +X) >= ImageDigitSum(ImageId2, ImageId4, Z) {X: PossibleDigits(X, Z)}",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId4, +X) >= ImageDigitSum(ImageId2, ImageId4, Z) {X: PossibleDigits(X, Z)}",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId1, +X) >= ImageDigitSum(ImageId1, ImageId3, Z) {X: PossibleDigits(X, Z)}",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId3, +X) >= ImageDigitSum(ImageId1, ImageId3, Z) {X: PossibleDigits(X, Z)}",
 
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId2, +X) >= ImageDigitSum(ImageId2, ImageId4, Z) {X: PossibleDigits(X, Z)}",
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId4, +X) >= ImageDigitSum(ImageId2, ImageId4, Z) {X: PossibleDigits(X, Z)}",
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId1, +X) >= ImageDigitSum(ImageId1, ImageId3, Z) {X: PossibleDigits(X, Z)}",
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId3, +X) >= ImageDigitSum(ImageId1, ImageId3, Z) {X: PossibleDigits(X, Z)}",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId1, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleTensDigits(X, Z)}",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId3, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleTensDigits(X, Z)}",
 
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId1, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleTensDigits(X, Z)}",
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId3, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleTensDigits(X, Z)}",
-
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId2, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleOnesDigits(X, Z)}",
-        "1.0: 0 * ImageSumTargetBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId4, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleOnesDigits(X, Z)}",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId2, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleOnesDigits(X, Z)}",
+        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId4, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleOnesDigits(X, Z)}",
 
         "ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, +Number) = 1 .",
         "ImageDigitSum(ImageIdX, ImageIdY, +Number) = 1 .",
@@ -64,81 +63,143 @@
                 "entity-data-map-path": "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/entity-data-map.txt",
                 "entity-argument-indexes": "0",
                 "class-size": 10,
-                "save-path": "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/saved-networks/nesy-trained-tf",
+                "save-path": "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/saved-networks/nesy-trained-tf",
                 "alpha": 1.0,
                 "learning-rate": "1.0e-3",
                 "dropout": 0.2
             },
             "targets": {
                 "learn": [
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-target-train.txt",
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-target-valid.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-target-train.txt",
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-target-valid.txt"
                 ],
                 "infer": [
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-target-test.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-target-test.txt"
                 ]
             }
         },
-        "ImageSum/3": {
+        "ImageSum/5": {
             "evaluations": [
                 {
                     "evaluator": "CategoricalEvaluator",
                     "options": {
-                        "categoricalevaluator.categoryindexes": 2,
-                        "eval.includeobs": true
+                        "categoricalevaluator.categoryindexes": 4,
+                        "eval.includeobs": false
                     }
                 }
             ],
             "targets": {
                 "learn": [
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-sum-target-train.txt",
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-sum-target-valid.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-target-train.txt",
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-target-valid.txt"
                 ],
                 "infer": [
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-sum-target-test.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-target-test.txt"
                 ]
             },
             "validation": {
                 "learn": [
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-sum-truth-valid.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-truth-valid.txt"
                 ]
               },
             "truth": {
                 "learn": [
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-sum-truth-train.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-truth-train.txt"
                 ],
                 "infer": [
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-sum-truth-test.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-truth-test.txt"
                 ]
             }
         },
-        "ImageSumBlock/2": {
-            "observations": {
+        "ImageDigitSum/3": {
+            "targets": {
                 "learn": [
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-sum-block-train.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-digit-sum-target-train.txt",
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-digit-sum-target-valid.txt"
                 ],
                 "infer": [
-                    "../data/experiment::mnist-1/split::3/train-size::0080/overlap::1.00/image-sum-block-test.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-digit-sum-target-test.txt"
+                ]
+            }
+        },
+        "ImageSumBlock/4": {
+            "observations": {
+                "learn": [
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-block-train.txt",
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-block-valid.txt"
+                ],
+                "infer": [
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-block-test.txt"
                 ]
             }
         },
         "NumberSum/3": {
             "observations": {
                 "learn": [
-                    "../data/experiment::mnist-1/number-sum.txt"
+                    "../data/experiment::mnist-2/number-sum.txt"
                 ],
                 "infer": [
-                    "../data/experiment::mnist-1/number-sum.txt"
+                    "../data/experiment::mnist-2/number-sum.txt"
+                ]
+            }
+        },
+        "PlacedNumberSum/3": {
+            "observations": {
+                "learn": [
+                    "../data/experiment::mnist-2/placed-number-sums.txt"
+                ],
+                "infer": [
+                    "../data/experiment::mnist-2/placed-number-sums.txt"
                 ]
             }
         },
         "PossibleDigits/2": {
             "observations": {
                 "learn": [
-                    "../data/experiment::mnist-1/possible-digits.txt"
+                    "../data/experiment::mnist-2/possible-digits.txt"
                 ],
                 "infer": [
-                    "../data/experiment::mnist-1/possible-digits.txt"
+                    "../data/experiment::mnist-2/possible-digits.txt"
+                ]
+            }
+        },
+        "PossibleOnesDigits/2": {
+            "observations": {
+                "learn": [
+                    "../data/experiment::mnist-2/possible-ones-digits.txt"
+                ],
+                "infer": [
+                    "../data/experiment::mnist-2/possible-ones-digits.txt"
+                ]
+            }
+        },
+        "PossibleOnesSums/2": {
+            "observations": {
+                "learn": [
+                    "../data/experiment::mnist-2/possible-ones-sums.txt"
+                ],
+                "infer": [
+                    "../data/experiment::mnist-2/possible-ones-sums.txt"
+                ]
+            }
+        },
+        "PossibleTensDigits/2": {
+            "observations": {
+                "learn": [
+                    "../data/experiment::mnist-2/possible-tens-digits.txt"
+                ],
+                "infer": [
+                    "../data/experiment::mnist-2/possible-tens-digits.txt"
+                ]
+            }
+        },
+        "PossibleTensSums/2": {
+            "observations": {
+                "learn": [
+                    "../data/experiment::mnist-2/possible-tens-sums.txt"
+                ],
+                "infer": [
+                    "../data/experiment::mnist-2/possible-tens-sums.txt"
                 ]
             }
         }

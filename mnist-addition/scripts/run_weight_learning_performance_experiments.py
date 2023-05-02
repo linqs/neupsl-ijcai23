@@ -8,20 +8,21 @@ MNIST_CLI_DIR = os.path.join(THIS_DIR, "../cli")
 RESULTS_BASE_DIR = os.path.join(THIS_DIR, "../results")
 PERFORMANCE_RESULTS_DIR = os.path.join(RESULTS_BASE_DIR, "performance")
 
-# SPLITS = ["0", "1", "2", "3", "4"]
-SPLITS = ["0", "1", "2"]
+SPLITS = ["0", "1", "2", "3", "4"]
 TRAIN_SIZES = ["0040", "0060", "0080"]
 OVERLAPS = ["0.00", "0.50", "1.00"]
 
 STANDARD_EXPERIMENT_OPTIONS = {
     "runtime.log.level": "TRACE",
     "gradientdescent.scalestepsize": "false",
+    "gradientdescent.validationbreakwindow": "500",
+    "gradientdescent.validationbreak": "true",
     "weightlearning.inference": "DistributedDualBCDInference",
     "runtime.inference.method": "DistributedDualBCDInference",
-    "gradientdescent.numsteps": "2500",
+    "gradientdescent.numsteps": "5000",
     "gradientdescent.runfulliterations": "false",
     "duallcqp.computeperiod": "10",
-    "duallcqp.maxiterations": "1000",
+    "duallcqp.maxiterations": "25000",
 }
 
 STANDARD_DATASET_OPTIONS = {
@@ -31,14 +32,14 @@ STANDARD_DATASET_OPTIONS = {
 }
 
 INFERENCE_OPTION_RANGES = {
-    "duallcqp.regularizationparameter": ["1.0e-1", "1.0e-2"]
+    "duallcqp.regularizationparameter": ["1.0e-1"]
 }
 
-FIRST_ORDER_WL_METHODS = ["Energy", "BinaryCrossEntropy"]
+FIRST_ORDER_WL_METHODS = ["Energy", "MeanSquaredError", "BinaryCrossEntropy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
-    "gradientdescent.stepsize": ["1.0e-3", "1.0e-14"],
-    "gradientdescent.negativelogregularization": ["1.0e-2"],
+    "gradientdescent.stepsize": ["1.0e-2", "1.0e-3"],
+    "gradientdescent.negativelogregularization": ["1.0", "1.0e-1", "1.0e-3"],
     "gradientdescent.negativeentropyregularization": ["0.0"]
 }
 
@@ -48,21 +49,20 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
     },
     "MeanSquaredError": {
         "runtime.learn.method": ["MeanSquaredError"],
-        "minimizer.objectivedifferencetolerance": ["1.0"],
-        "minimizer.proxruleweight": ["1.0", "1.0e-1"],
-        "minimizer.numinternaliterations": ["1000"]
+        "minimizer.objectivedifferencetolerance": ["0.1"],
+        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
+        "minimizer.numinternaliterations": ["500"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
-        "minimizer.objectivedifferencetolerance": ["1.0"],
-        "minimizer.proxruleweight": ["1.0", "1.0e-1"],
-        "minimizer.numinternaliterations": ["1000"]
+        "minimizer.objectivedifferencetolerance": ["0.1"],
+        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
+        "minimizer.numinternaliterations": ["500"]
     }
 }
 
 NEURAL_NETWORK_OPTIONS = {
-    "learning-rate": ["1.0e-3"],
-    "dropout": ["0.0", "0.2"]
+    "dropout": ["0.0", "0.1"]
 }
 
 
@@ -89,16 +89,20 @@ def set_data_path(dataset_json, split, train_size, overlap):
     dataset_json["predicates"]["NeuralClassifier/2"]["options"]["save-path"] = \
         "../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/saved-networks/nesy-trained-tf".format(split, train_size, overlap)
     dataset_json["predicates"]["NeuralClassifier/2"]["targets"]["learn"] = \
-        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-target-train.txt".format(split, train_size, overlap)]
+        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-target-train.txt".format(split, train_size, overlap),
+         "../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-target-valid.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["NeuralClassifier/2"]["targets"]["infer"] = \
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-target-test.txt".format(split, train_size, overlap)]
 
     dataset_json["predicates"]["ImageSum/3"]["targets"]["learn"] = \
-        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-target-train.txt".format(split, train_size, overlap)]
+        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-target-train.txt".format(split, train_size, overlap),
+         "../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-target-valid.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSum/3"]["targets"]["infer"] = \
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-target-test.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSum/3"]["truth"]["learn"] = \
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-truth-train.txt".format(split, train_size, overlap)]
+    dataset_json["predicates"]["ImageSum/3"]["validation"]["learn"] = \
+        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-truth-valid.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSum/3"]["truth"]["infer"] = \
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-truth-test.txt".format(split, train_size, overlap)]
 
@@ -113,7 +117,7 @@ def run_first_order_wl_methods():
     os.makedirs(base_out_dir, exist_ok=True)
 
     # Load the json file with the dataset options.
-    dataset_json_path = os.path.join(MNIST_CLI_DIR, "mnist-addition.json")
+    dataset_json_path = os.path.join(MNIST_CLI_DIR, "neupsl-models/experiment::mnist-add1.json")
 
     dataset_json = None
     with open(dataset_json_path, "r") as file:
@@ -138,49 +142,49 @@ def run_first_order_wl_methods():
                     method_options_dict = {**standard_experiment_option_ranges,
                                            **FIRST_ORDER_WL_METHODS_OPTION_RANGES[method]}
                     for options in enumerate_hyperparameters(method_options_dict):
-                        for learning_rate in NEURAL_NETWORK_OPTIONS["learning-rate"]:
-                            for dropout in NEURAL_NETWORK_OPTIONS["dropout"]:
-                                experiment_out_dir = split_out_dir
-                                for key, value in sorted(options.items()):
-                                    experiment_out_dir = os.path.join(experiment_out_dir, "{}::{}".format(key, value))
-                                experiment_out_dir = os.path.join(experiment_out_dir, "learning-rate::{}".format(learning_rate))
-                                experiment_out_dir = os.path.join(experiment_out_dir, "dropout::{}".format(dropout))
+                        for dropout in NEURAL_NETWORK_OPTIONS["dropout"]:
+                            experiment_out_dir = split_out_dir
+                            for key, value in sorted(options.items()):
+                                experiment_out_dir = os.path.join(experiment_out_dir, "{}::{}".format(key, value))
+                            experiment_out_dir = os.path.join(experiment_out_dir, "dropout::{}".format(dropout))
 
-                                os.makedirs(experiment_out_dir, exist_ok=True)
+                            os.makedirs(experiment_out_dir, exist_ok=True)
 
-                                if os.path.exists(os.path.join(experiment_out_dir, "out.txt")):
-                                    print("Skipping experiment: {}.".format(experiment_out_dir))
-                                    continue
+                            if os.path.exists(os.path.join(experiment_out_dir, "out.txt")):
+                                print("Skipping experiment: {}.".format(experiment_out_dir))
+                                continue
 
-                                dataset_json.update({"options":{**original_options,
-                                                                **STANDARD_EXPERIMENT_OPTIONS,
-                                                                **STANDARD_DATASET_OPTIONS["mnist-addition"],
-                                                                **options,
-                                                                "runtime.learn.output.model.path": "./mnist-addition_learned.psl"}})
+                            dataset_json.update({"options":{**original_options,
+                                                            **STANDARD_EXPERIMENT_OPTIONS,
+                                                            **STANDARD_DATASET_OPTIONS["mnist-addition"],
+                                                            **options,
+                                                            "runtime.learn.output.model.path": "./mnist-addition_learned.psl"}})
 
-                                dataset_json["predicates"]["NeuralClassifier/2"]["options"]["learning-rate"] = learning_rate
-                                dataset_json["predicates"]["NeuralClassifier/2"]["options"]["dropout"] = dropout
+                            dataset_json["predicates"]["NeuralClassifier/2"]["options"]["learning-rate"] = options["gradientdescent.stepsize"]
+                            dataset_json["predicates"]["NeuralClassifier/2"]["options"]["dropout"] = dropout
 
-                                # Set the data path.
-                                set_data_path(dataset_json, split, train_size, overlap)
+                            # Set the data path.
+                            set_data_path(dataset_json, split, train_size, overlap)
 
-                                # Write the options the json file.
-                                with open(dataset_json_path, "w") as file:
-                                    json.dump(dataset_json, file, indent=4)
+                            # Write the options the json file.
+                            with open(os.path.join(MNIST_CLI_DIR, "mnist-addition.json"), "w") as file:
+                                json.dump(dataset_json, file, indent=4)
 
-                                # Run the experiment.
-                                print("Running experiment: {}.".format(experiment_out_dir))
-                                exit_code = os.system("cd {} && ./run.sh {} > out.txt 2> out.err".format(MNIST_CLI_DIR, experiment_out_dir))
+                            # Run the experiment.
+                            print("Running experiment: {}.".format(experiment_out_dir))
+                            exit_code = os.system("cd {} && ./run.sh {} > out.txt 2> out.err".format(MNIST_CLI_DIR, experiment_out_dir))
 
-                                if exit_code != 0:
-                                    print("Experiment failed: {}.".format(experiment_out_dir))
-                                    exit()
+                            if exit_code != 0:
+                                print("Experiment failed: {}.".format(experiment_out_dir))
+                                exit()
 
-                                # Save the output and json file.
-                                os.system("mv {} {}".format(os.path.join(MNIST_CLI_DIR, "out.txt"), experiment_out_dir))
-                                os.system("mv {} {}".format(os.path.join(MNIST_CLI_DIR, "out.err"), experiment_out_dir))
-                                os.system("cp {} {}".format(os.path.join(MNIST_CLI_DIR, "mnist-addition.json"), experiment_out_dir))
-                                os.system("cp {} {}".format(os.path.join(MNIST_CLI_DIR, "mnist-addition_learned.psl"), experiment_out_dir))
+                            # Save the output and json file.
+                            os.system("mv {} {}".format(os.path.join(MNIST_CLI_DIR, "out.txt"), experiment_out_dir))
+                            os.system("mv {} {}".format(os.path.join(MNIST_CLI_DIR, "out.err"), experiment_out_dir))
+                            os.system("cp {} {}".format(os.path.join(MNIST_CLI_DIR, "mnist-addition.json"), experiment_out_dir))
+                            os.system("cp {} {}".format(os.path.join(MNIST_CLI_DIR, "mnist-addition_learned.psl"), experiment_out_dir))
+                            os.system("cp -r {} {}".format(os.path.join(MNIST_CLI_DIR, "inferred-predicates"), experiment_out_dir))
+
 
 def main():
     run_first_order_wl_methods()

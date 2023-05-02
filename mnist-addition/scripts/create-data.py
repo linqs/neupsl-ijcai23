@@ -39,7 +39,7 @@ DATASET_CONFIG = {
         "train-sizes": [40, 60, 80],
         "valid-size": 1000,
         "test-size": 1000,
-        "num-splits": 1,
+        "num-splits": 5,
         "num-digits": 2,
         "max-sum": 198,
         "overlaps": [0.0, 0.5, 1.0],
@@ -76,15 +76,11 @@ def digits_to_sum(digits, n_digits):
     return digits_to_number(digits[:n_digits]) + digits_to_number(digits[n_digits:])
 
 
-def generate_split(config, features, labels, start_index, end_index):
-    numpy.random.seed(config['seed'])
-
-    all_indexes = numpy.array(range(len(features)))
-    numpy.random.shuffle(all_indexes)
-
-    indexes = all_indexes[start_index:end_index]
+def generate_split(config, labels, indexes):
     for _ in range(int(len(indexes) * config['overlap'])):
-        indexes = numpy.append(indexes, indexes[numpy.random.randint(0, end_index - start_index)])
+        indexes = numpy.append(indexes, indexes[numpy.random.randint(0, len(indexes))])
+
+    numpy.random.shuffle(indexes)
 
     indexes = indexes[:len(indexes) - (len(indexes) % (2 * config['num-digits']))]
     indexes = numpy.unique(indexes.reshape(-1, 2 * config['num-digits']), axis=0)
@@ -125,14 +121,20 @@ def create_image_data(config, entities):
 
 def write_specific_data(config, out_dir, features, labels):
     total_image_entities = numpy.array([], dtype=numpy.int32)
-    indexes = {
-        'train': [0, config['train-size']],
-        'valid': [config['train-size'], config['train-size'] + config['valid-size']],
-        'test': [config['train-size'] + config['valid-size'], config['train-size'] + config['valid-size'] + config['test-size']]
+
+    numpy.random.seed(config['seed'])
+
+    all_indexes = numpy.array(range(len(features)))
+    numpy.random.shuffle(all_indexes)
+
+    partition_indexes = {
+        'train': all_indexes[0: config['train-size']],
+        'valid': all_indexes[config['train-size']: config['train-size'] + config['valid-size']],
+        'test': all_indexes[config['train-size'] + config['valid-size']: config['train-size'] + config['valid-size'] + config['test-size']]
     }
 
     for partition in ['train', 'valid', 'test']:
-        image_sum_entities, image_sum_labels = generate_split(config, features, labels, indexes[partition][0], indexes[partition][1])
+        image_sum_entities, image_sum_labels = generate_split(config, labels, partition_indexes[partition])
         image_sum_target, image_sum_truth = create_image_sum_data(config, image_sum_entities, image_sum_labels)
 
         image_entities = numpy.unique(image_sum_entities.reshape(-1)).reshape(-1, 1)
@@ -179,11 +181,6 @@ def fetch_data():
 def main():
     for dataset_id in DATASETS:
         config = DATASET_CONFIG[dataset_id]
-
-        # TODO(Connor): Add data generation for mnist 2.
-        if config['name'] == DATASET_MNIST_2:
-            print("Mnist 2 data generation is not yet supported.")
-            continue
 
         shared_out_dir = os.path.join(THIS_DIR, "..", "data", "experiment::" + dataset_id)
         os.makedirs(shared_out_dir, exist_ok=True)

@@ -13,6 +13,7 @@ TRAIN_SIZES = ["0040", "0060", "0080"]
 OVERLAPS = ["0.00", "0.50", "1.00"]
 
 STANDARD_EXPERIMENT_OPTIONS = {
+    "inference.normalize": "false",
     "runtime.log.level": "TRACE",
     "gradientdescent.scalestepsize": "false",
     "gradientdescent.validationbreakwindow": "500",
@@ -38,8 +39,8 @@ INFERENCE_OPTION_RANGES = {
 FIRST_ORDER_WL_METHODS = ["Energy", "MeanSquaredError", "BinaryCrossEntropy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
-    "gradientdescent.stepsize": ["1.0e-2", "1.0e-3"],
-    "gradientdescent.negativelogregularization": ["1.0", "1.0e-1", "1.0e-3"],
+    "gradientdescent.stepsize": ["1.0e-3", "1.0e-4"],
+    "gradientdescent.negativelogregularization": ["1.0e-3"],
     "gradientdescent.negativeentropyregularization": ["0.0"]
 }
 
@@ -107,7 +108,8 @@ def set_data_path(dataset_json, split, train_size, overlap):
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-truth-test.txt".format(split, train_size, overlap)]
 
     dataset_json["predicates"]["ImageSumBlock/2"]["observations"]["learn"] = \
-        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-block-train.txt".format(split, train_size, overlap)]
+        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-block-train.txt".format(split, train_size, overlap),
+         "../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-block-valid.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSumBlock/2"]["observations"]["infer"] = \
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-block-test.txt".format(split, train_size, overlap)]
 

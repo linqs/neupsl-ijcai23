@@ -16,14 +16,14 @@ STANDARD_EXPERIMENT_OPTIONS = {
     "inference.normalize": "false",
     "runtime.log.level": "TRACE",
     "gradientdescent.scalestepsize": "false",
-    "gradientdescent.validationbreakwindow": "500",
+    "gradientdescent.validationbreakwindow": "1000",
     "gradientdescent.validationbreak": "true",
     "weightlearning.inference": "DistributedDualBCDInference",
     "runtime.inference.method": "DistributedDualBCDInference",
     "gradientdescent.numsteps": "5000",
     "gradientdescent.runfulliterations": "false",
-    "duallcqp.computeperiod": "10",
-    "duallcqp.maxiterations": "25000",
+    "duallcqp.computeperiod": "50",
+    "duallcqp.maxiterations": "250",
 }
 
 STANDARD_DATASET_OPTIONS = {
@@ -33,11 +33,11 @@ STANDARD_DATASET_OPTIONS = {
 }
 
 INFERENCE_OPTION_RANGES = {
-    "duallcqp.regularizationparameter": ["1.0e-1"]
+    "duallcqp.regularizationparameter": ["1.0e-3"]
 }
 
 # FIRST_ORDER_WL_METHODS = ["Energy", "MeanSquaredError", "BinaryCrossEntropy"]
-FIRST_ORDER_WL_METHODS = ["BinaryCrossEntropy"]
+FIRST_ORDER_WL_METHODS = ["Energy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
     "gradientdescent.stepsize": ["1.0e-3"],
@@ -53,13 +53,13 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
         "runtime.learn.method": ["MeanSquaredError"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["500"]
+        "minimizer.numinternaliterations": ["1000"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["500"]
+        "minimizer.numinternaliterations": ["1000"]
     }
 }
 
@@ -92,21 +92,17 @@ def set_data_path(dataset_json, split, train_size, overlap):
         "../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/saved-networks/nesy-trained-tf".format(split, train_size, overlap)
     dataset_json["predicates"]["NeuralClassifier/2"]["targets"]["learn"] = \
         ["../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-target-train.txt".format(split, train_size, overlap),
-         # "../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-target-valid.txt".format(split, train_size, overlap)
-         ]
+         "../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-target-valid.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["NeuralClassifier/2"]["targets"]["infer"] = \
         ["../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-target-test.txt".format(split, train_size, overlap)]
 
     dataset_json["predicates"]["ImageSum/5"]["targets"]["learn"] = \
         ["../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-target-train.txt".format(split, train_size, overlap),
-         # "../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-target-valid.txt".format(split, train_size, overlap)
-         ]
+         "../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-target-valid.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSum/5"]["targets"]["infer"] = \
         ["../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-target-test.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSum/5"]["validation"]["learn"] = \
-        [
-            # "../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-truth-valid.txt".format(split, train_size, overlap)
-         ]
+        ["../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-truth-valid.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSum/5"]["truth"]["learn"] = \
         ["../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-truth-train.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSum/5"]["truth"]["infer"] = \
@@ -114,15 +110,13 @@ def set_data_path(dataset_json, split, train_size, overlap):
 
     dataset_json["predicates"]["ImageDigitSum/3"]["targets"]["learn"] = \
         ["../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-digit-sum-target-train.txt".format(split, train_size, overlap),
-         # "../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-digit-sum-target-valid.txt".format(split, train_size, overlap)
-         ]
+         "../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-digit-sum-target-valid.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageDigitSum/3"]["targets"]["infer"] = \
         ["../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-digit-sum-target-test.txt".format(split, train_size, overlap)]
 
     dataset_json["predicates"]["ImageSumBlock/4"]["observations"]["learn"] = \
         ["../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-block-train.txt".format(split, train_size, overlap),
-         # "../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-block-valid.txt".format(split, train_size, overlap)
-         ]
+         "../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-block-valid.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSumBlock/4"]["observations"]["infer"] = \
         ["../data/experiment::mnist-2/split::{}/train-size::{}/overlap::{}/image-sum-block-test.txt".format(split, train_size, overlap)]
 
@@ -138,7 +132,6 @@ def run_first_order_wl_methods():
     with open(dataset_json_path, "r") as file:
         dataset_json = json.load(file)
     original_options = dataset_json["options"]
-    original_neural_options = dataset_json["predicates"]["NeuralClassifier/2"]["options"]
 
     standard_experiment_option_ranges = {**INFERENCE_OPTION_RANGES,
                                          **FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES}

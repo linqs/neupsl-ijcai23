@@ -8,7 +8,8 @@ MNIST_CLI_DIR = os.path.join(THIS_DIR, "../cli")
 RESULTS_BASE_DIR = os.path.join(THIS_DIR, "../results")
 PERFORMANCE_RESULTS_DIR = os.path.join(RESULTS_BASE_DIR, "performance")
 
-SPLITS = ["0", "1", "2", "3", "4"]
+# SPLITS = ["0", "1", "2", "3", "4"]
+SPLITS = ["0"]
 TRAIN_SIZES = ["0040", "0060", "0080"]
 OVERLAPS = ["0.00", "0.50", "1.00"]
 
@@ -23,7 +24,7 @@ STANDARD_EXPERIMENT_OPTIONS = {
     "gradientdescent.numsteps": "5000",
     "gradientdescent.runfulliterations": "false",
     "duallcqp.computeperiod": "10",
-    "duallcqp.maxiterations": "25000",
+    "duallcqp.maxiterations": "1000",
 }
 
 STANDARD_DATASET_OPTIONS = {
@@ -33,7 +34,7 @@ STANDARD_DATASET_OPTIONS = {
 }
 
 INFERENCE_OPTION_RANGES = {
-    "duallcqp.regularizationparameter": ["1.0e-1"]
+    "duallcqp.regularizationparameter": ["1.0e-1", "1.0e-2", "1.0e-3"]
 }
 
 FIRST_ORDER_WL_METHODS = ["Energy", "MeanSquaredError", "BinaryCrossEntropy"]
@@ -52,13 +53,13 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
         "runtime.learn.method": ["MeanSquaredError"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["500"]
+        "minimizer.numinternaliterations": ["1000"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["500"]
+        "minimizer.numinternaliterations": ["1000"]
     }
 }
 

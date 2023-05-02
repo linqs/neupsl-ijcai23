@@ -11,6 +11,8 @@ import sys
 import numpy
 import tensorflow
 
+from itertools import product
+
 
 THIS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 
@@ -26,7 +28,7 @@ DATASET_CONFIG = {
         "name": DATASET_MNIST_1,
         "class-size": 10,
         "train-sizes": [40, 60, 80],
-        "valid-size": 1000,
+        "valid-size": 100,
         "test-size": 1000,
         "num-splits": 5,
         "num-digits": 1,
@@ -36,8 +38,8 @@ DATASET_CONFIG = {
     DATASET_MNIST_2: {
         "name": DATASET_MNIST_2,
         "class-size": 10,
-        "train-sizes": [40, 60, 80],
-        "valid-size": 1000,
+        "train-sizes": [40, 60, 80, 160],
+        "valid-size": 100,
         "test-size": 1000,
         "num-splits": 5,
         "num-digits": 2,
@@ -99,6 +101,15 @@ def create_entity_data_map(features, labels, entities):
     return [[int(row[0])] + row[1:] for row in entity_data_map]
 
 
+def create_image_digit_sum_data(sum_entities):
+    image_digit_sum_targets = []
+    for example_indices in sum_entities:
+        image_digit_sum_targets += [[example_indices[0], example_indices[2], k] for k in range(19)]
+        image_digit_sum_targets += [[example_indices[1], example_indices[3], k] for k in range(19)]
+    image_digit_sum_targets = numpy.unique(image_digit_sum_targets, axis=0).tolist()
+
+    return image_digit_sum_targets
+
 def create_image_sum_data(config, sum_entities, sum_labels):
     image_sum_target = []
     image_sum_truth = []
@@ -137,6 +148,9 @@ def write_specific_data(config, out_dir, features, labels):
         image_sum_entities, image_sum_labels = generate_split(config, labels, partition_indexes[partition])
         image_sum_target, image_sum_truth = create_image_sum_data(config, image_sum_entities, image_sum_labels)
 
+        if config["num-digits"] == 2:
+            image_digit_sum_targets = create_image_digit_sum_data(image_sum_entities)
+
         image_entities = numpy.unique(image_sum_entities.reshape(-1)).reshape(-1, 1)
         image_target = create_image_data(config, image_entities)
 
@@ -146,6 +160,10 @@ def write_specific_data(config, out_dir, features, labels):
         util.write_psl_file(os.path.join(out_dir, f'image-sum-target-{partition}.txt'), image_sum_target)
         util.write_psl_file(os.path.join(out_dir, f'image-sum-truth-{partition}.txt'), image_sum_truth)
         util.write_psl_file(os.path.join(out_dir, f'image-target-{partition}.txt'), image_target)
+        util.write_psl_file(os.path.join(out_dir, f'image-digit-labels-{partition}.txt'), list(zip(partition_indexes[partition], labels[partition_indexes[partition]])))
+
+        if config["num-digits"] == 2:
+            util.write_psl_file(os.path.join(out_dir, f'image-digit-sum-target-{partition}.txt'), image_digit_sum_targets)
 
     entity_data_map = create_entity_data_map(features, labels, total_image_entities)
     util.write_psl_file(os.path.join(out_dir, 'entity-data-map.txt'), entity_data_map)
@@ -153,7 +171,7 @@ def write_specific_data(config, out_dir, features, labels):
     util.write_json_file(os.path.join(out_dir, CONFIG_FILENAME), config)
 
 
-def create_sum_data(config):
+def create_sum_data_add1(config):
     number_sum = []
     possible_digits = []
     for index_i in range(config['class-size']):
@@ -163,10 +181,67 @@ def create_sum_data(config):
 
     return number_sum, possible_digits
 
+def create_sum_data_add2(config):
+    # Possible tens place digits.
+    digits_sums = product(range(10), repeat=4)
+    possible_tens_digits_dict = {}
+    for digits_sum in digits_sums:
+        if digits_sum[0] in possible_tens_digits_dict:
+            possible_tens_digits_dict[digits_sum[0]].add(
+                10 * digits_sum[0] + digits_sum[1] + 10 * digits_sum[2] + digits_sum[3])
+        else:
+            possible_tens_digits_dict[digits_sum[0]] = {
+                10 * digits_sum[0] + digits_sum[1] + 10 * digits_sum[2] + digits_sum[3]}
+
+    possible_tens_digits = []
+    for key in possible_tens_digits_dict:
+        for value in possible_tens_digits_dict[key]:
+            possible_tens_digits.append([key, value])
+
+    # Possible ones place digits.
+    digits_sums = product(range(10), repeat=4)
+    possible_ones_digits_dict = {}
+    for digits_sum in digits_sums:
+        if digits_sum[1] in possible_ones_digits_dict:
+            possible_ones_digits_dict[digits_sum[1]].add(
+                10 * digits_sum[0] + digits_sum[1] + 10 * digits_sum[2] + digits_sum[3])
+        else:
+            possible_ones_digits_dict[digits_sum[1]] = {
+                10 * digits_sum[0] + digits_sum[1] + 10 * digits_sum[2] + digits_sum[3]}
+
+    possible_ones_digits = []
+    for key in possible_ones_digits_dict:
+        for value in possible_ones_digits_dict[key]:
+            possible_ones_digits.append([key, value])
+
+    # Placed number sum.
+    placed_number_sums = []
+    digit_sums = product(range(19), repeat=2)
+    for digit_sum in digit_sums:
+        placed_number_sums += [[digit_sum[0], digit_sum[1], 10 * digit_sum[0] + digit_sum[1]]]
+
+    # Possible sums.
+    possible_ones_sums = []
+    possible_tens_sums = []
+    digit_sums = product(range(19), repeat=2)
+    for digit_sum in digit_sums:
+        possible_ones_sums += [[digit_sum[1], 10 * digit_sum[0] + digit_sum[1]]]
+        possible_tens_sums += [[digit_sum[0], 10 * digit_sum[0] + digit_sum[1]]]
+
+    return possible_tens_digits, possible_ones_digits, placed_number_sums, possible_ones_sums, possible_tens_sums
+
 def write_shared_data(config, out_dir):
-    number_sum, possible_digits = create_sum_data(config)
+    number_sum, possible_digits = create_sum_data_add1(config)
     util.write_psl_file(os.path.join(out_dir, 'number-sum.txt'), number_sum)
     util.write_psl_file(os.path.join(out_dir, 'possible-digits.txt'), possible_digits)
+
+    if config['num-digits'] == 2:
+        possible_tens_digits, possible_ones_digits, placed_number_sums, possible_ones_sums, possible_tens_sums = create_sum_data_add2(config)
+        util.write_psl_file(os.path.join(out_dir, 'possible-tens-digits.txt'), possible_tens_digits)
+        util.write_psl_file(os.path.join(out_dir, 'possible-ones-digits.txt'), possible_ones_digits)
+        util.write_psl_file(os.path.join(out_dir, 'placed-number-sums.txt'), placed_number_sums)
+        util.write_psl_file(os.path.join(out_dir, 'possible-ones-sums.txt'), possible_ones_sums)
+        util.write_psl_file(os.path.join(out_dir, 'possible-tens-sums.txt'), possible_tens_sums)
 
     util.write_json_file(os.path.join(out_dir, CONFIG_FILENAME), config)
 

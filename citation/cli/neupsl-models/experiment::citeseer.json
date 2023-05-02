@@ -1,5 +1,6 @@
 {
   "options": {
+    "inference.normalize": false,
     "runtime.db.intids": true,
     "runtime.log.level": "TRACE",
     "runtime.learn.method": "Energy",

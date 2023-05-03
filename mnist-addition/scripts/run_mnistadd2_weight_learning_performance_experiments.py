@@ -9,8 +9,8 @@ RESULTS_BASE_DIR = os.path.join(THIS_DIR, "../results")
 PERFORMANCE_RESULTS_DIR = os.path.join(RESULTS_BASE_DIR, "performance")
 
 SPLITS = ["0", "1", "2", "3", "4"]
-TRAIN_SIZES = ["0160"]
-OVERLAPS = ["1.00"]
+TRAIN_SIZES = ["0040", "0060", "0080"]
+OVERLAPS = ["0.00", "0.50", "1.00"]
 
 STANDARD_EXPERIMENT_OPTIONS = {
     "inference.normalize": "false",
@@ -23,7 +23,7 @@ STANDARD_EXPERIMENT_OPTIONS = {
     "gradientdescent.numsteps": "5000",
     "gradientdescent.runfulliterations": "false",
     "duallcqp.computeperiod": "50",
-    "duallcqp.maxiterations": "250",
+    "duallcqp.maxiterations": "500",
 }
 
 STANDARD_DATASET_OPTIONS = {
@@ -33,14 +33,13 @@ STANDARD_DATASET_OPTIONS = {
 }
 
 INFERENCE_OPTION_RANGES = {
-    "duallcqp.regularizationparameter": ["1.0e-3"]
+    "duallcqp.regularizationparameter": ["1.0e-2", "1.0e-3"]
 }
 
-# FIRST_ORDER_WL_METHODS = ["Energy", "MeanSquaredError", "BinaryCrossEntropy"]
-FIRST_ORDER_WL_METHODS = ["Energy"]
+FIRST_ORDER_WL_METHODS = ["Energy", "MeanSquaredError", "BinaryCrossEntropy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
-    "gradientdescent.stepsize": ["1.0e-3"],
+    "gradientdescent.stepsize": ["1.0e-2", "1.0e-3", "1.0e-4"],
     "gradientdescent.negativelogregularization": ["1.0e-3"],
     "gradientdescent.negativeentropyregularization": ["0.0"]
 }

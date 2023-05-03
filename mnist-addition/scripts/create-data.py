@@ -21,7 +21,7 @@ util = importlib.import_module("util")
 
 DATASET_MNIST_1 = 'mnist-1'
 DATASET_MNIST_2 = 'mnist-2'
-DATASETS = [DATASET_MNIST_1]
+DATASETS = [DATASET_MNIST_1, DATASET_MNIST_2]
 
 DATASET_CONFIG = {
     DATASET_MNIST_1: {
@@ -38,7 +38,7 @@ DATASET_CONFIG = {
     DATASET_MNIST_2: {
         "name": DATASET_MNIST_2,
         "class-size": 10,
-        "train-sizes": [40, 60, 80, 160],
+        "train-sizes": [40, 60, 80],
         "valid-size": 100,
         "test-size": 1000,
         "num-splits": 5,

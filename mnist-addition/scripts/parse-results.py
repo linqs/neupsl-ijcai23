@@ -12,12 +12,13 @@ LOG_FILENAME = 'out.txt'
 
 def print_results(results):
     for experiment, result in sorted(results.items()):
-        for experiment_group, experiment_group_result in sorted(result.items()):
-            for method, method_result in sorted(experiment_group_result.items()):
-                print("Experiment: {}, Experiment Group: {}, Method:{}".format(experiment, experiment_group, method))
-                print(' '.join(method_result['header']))
-                for row in method_result['rows']:
-                    print(' '.join([str(value) for value in row]))
+        for dataset, dataset_result in sorted(result.items()):
+            for experiment_group, experiment_group_result in sorted(dataset_result.items()):
+                for method, method_result in sorted(experiment_group_result.items()):
+                    print("Experiment: {}, Dataset: {}, Experiment Group: {}, Method:{}".format(experiment, dataset, experiment_group, method))
+                    print(' '.join(method_result['header']))
+                    for row in method_result['rows']:
+                        print(' '.join([str(value) for value in row]))
 
 
 def get_log_paths(path):
@@ -44,21 +45,24 @@ def parse_log(log_path):
 def main():
     results = {}
     for experiment in sorted(os.listdir(RESULTS_DIR)):
-        results[experiment] = {experiment_group: dict() for experiment_group in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment)))}
-        for experiment_group in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment))):
-            results[experiment][experiment_group] = {method: dict() for method in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, experiment_group)))}
-            for method in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, experiment_group))):
-                results[experiment][experiment_group][method] = {'header': [], 'rows': []}
-                log_paths = get_log_paths(os.path.join(RESULTS_DIR, experiment, experiment_group, method))
-                for log_path in log_paths:
-                    parts = os.path.dirname(log_path.split("{}/{}/{}/".format(experiment, experiment_group, method))[1]).split("/")
-                    if len(results[experiment][experiment_group][method]['rows']) == 0:
-                        results[experiment][experiment_group][method]['header'] = [row.split("::")[0] for row in parts]
-                        results[experiment][experiment_group][method]['header'].append('Categorical Accuracy')
-                    results[experiment][experiment_group][method]['rows'].append([row.split("::")[1] for row in parts])
+        results[experiment] = {dataset: dict() for dataset in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment)))}
+        for dataset in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment))):
+            results[experiment][dataset] = {experiment_group: dict() for experiment_group in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, dataset)))}
+            for experiment_group in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, dataset))):
+                results[experiment][dataset][experiment_group] = {method: dict() for method in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, dataset, experiment_group)))}
+                for method in sorted(os.listdir(os.path.join(RESULTS_DIR, experiment, dataset, experiment_group))):
+                    results[experiment][dataset][experiment_group][method] = {'header': [], 'rows': []}
+                    log_paths = get_log_paths(os.path.join(RESULTS_DIR, experiment, dataset, experiment_group, method))
+                    for log_path in log_paths:
+                        parts = os.path.dirname(log_path.split("{}/{}/{}/{}/".format(experiment, dataset, experiment_group, method))[1]).split("/")
+                        if len(results[experiment][dataset][experiment_group][method]['rows']) == 0:
+                            results[experiment][dataset][experiment_group][method]['header'] = [row.split("::")[0] for row in parts]
+                            results[experiment][dataset][experiment_group][method]['header'].append('Categorical Accuracy')
 
-                    for log_result in parse_log(log_path):
-                        results[experiment][experiment_group][method]['rows'][-1].append(log_result)
+                        results[experiment][dataset][experiment_group][method]['rows'].append([row.split("::")[1] for row in parts])
+
+                        for log_result in parse_log(log_path):
+                            results[experiment][dataset][experiment_group][method]['rows'][-1].append(log_result)
     print_results(results)
 
 

@@ -109,7 +109,7 @@ def set_data_path(dataset_json, split, train_size, overlap):
 
 
 def run_first_order_wl_methods():
-    base_out_dir = os.path.join(PERFORMANCE_RESULTS_DIR, "first_order_wl_methods")
+    base_out_dir = os.path.join(PERFORMANCE_RESULTS_DIR, "mnist-add1", "first_order_wl_methods")
     os.makedirs(base_out_dir, exist_ok=True)
 
     # Load the json file with the dataset options.

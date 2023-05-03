@@ -17,8 +17,6 @@ STANDARD_EXPERIMENT_OPTIONS = {
     "inference.normalize": "false",
     "runtime.log.level": "TRACE",
     "gradientdescent.scalestepsize": "false",
-    "gradientdescent.validationbreakwindow": "500",
-    "gradientdescent.validationbreak": "true",
     "weightlearning.inference": "DistributedDualBCDInference",
     "runtime.inference.method": "DistributedDualBCDInference",
     "gradientdescent.numsteps": "5000",
@@ -29,18 +27,18 @@ STANDARD_EXPERIMENT_OPTIONS = {
 
 STANDARD_DATASET_OPTIONS = {
     "mnist-addition": {
-        "duallcqp.primaldualthreshold": "0.1"
+        "duallcqp.primaldualthreshold": "0.001"
     }
 }
 
 INFERENCE_OPTION_RANGES = {
-    "duallcqp.regularizationparameter": ["1.0e-1", "1.0e-2", "1.0e-3"]
+    "duallcqp.regularizationparameter": ["1.0e-2"]
 }
 
 FIRST_ORDER_WL_METHODS = ["Energy", "MeanSquaredError", "BinaryCrossEntropy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
-    "gradientdescent.stepsize": ["1.0e-3", "1.0e-4"],
+    "gradientdescent.stepsize": ["1.0e-2", "1.0e-3"],
     "gradientdescent.negativelogregularization": ["1.0e-3"],
     "gradientdescent.negativeentropyregularization": ["0.0"]
 }
@@ -51,15 +49,15 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
     },
     "MeanSquaredError": {
         "runtime.learn.method": ["MeanSquaredError"],
-        "minimizer.objectivedifferencetolerance": ["0.1"],
+        "minimizer.objectivedifferencetolerance": ["0.01"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["1000"]
+        "minimizer.numinternaliterations": ["500"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
-        "minimizer.objectivedifferencetolerance": ["0.1"],
+        "minimizer.objectivedifferencetolerance": ["0.01"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["1000"]
+        "minimizer.numinternaliterations": ["500"]
     }
 }
 
@@ -91,26 +89,21 @@ def set_data_path(dataset_json, split, train_size, overlap):
     dataset_json["predicates"]["NeuralClassifier/2"]["options"]["save-path"] = \
         "../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/saved-networks/nesy-trained-tf".format(split, train_size, overlap)
     dataset_json["predicates"]["NeuralClassifier/2"]["targets"]["learn"] = \
-        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-target-train.txt".format(split, train_size, overlap),
-         "../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-target-valid.txt".format(split, train_size, overlap)]
+        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-target-train.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["NeuralClassifier/2"]["targets"]["infer"] = \
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-target-test.txt".format(split, train_size, overlap)]
 
     dataset_json["predicates"]["ImageSum/3"]["targets"]["learn"] = \
-        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-target-train.txt".format(split, train_size, overlap),
-         "../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-target-valid.txt".format(split, train_size, overlap)]
+        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-target-train.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSum/3"]["targets"]["infer"] = \
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-target-test.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSum/3"]["truth"]["learn"] = \
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-truth-train.txt".format(split, train_size, overlap)]
-    dataset_json["predicates"]["ImageSum/3"]["validation"]["learn"] = \
-        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-truth-valid.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSum/3"]["truth"]["infer"] = \
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-truth-test.txt".format(split, train_size, overlap)]
 
     dataset_json["predicates"]["ImageSumBlock/2"]["observations"]["learn"] = \
-        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-block-train.txt".format(split, train_size, overlap),
-         "../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-block-valid.txt".format(split, train_size, overlap)]
+        ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-block-train.txt".format(split, train_size, overlap)]
     dataset_json["predicates"]["ImageSumBlock/2"]["observations"]["infer"] = \
         ["../data/experiment::mnist-1/split::{}/train-size::{}/overlap::{}/image-sum-block-test.txt".format(split, train_size, overlap)]
 

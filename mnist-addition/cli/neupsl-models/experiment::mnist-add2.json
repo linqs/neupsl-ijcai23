@@ -70,8 +70,7 @@
             },
             "targets": {
                 "learn": [
-                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-target-train.txt",
-                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-target-valid.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-target-train.txt"
                 ],
                 "infer": [
                     "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-target-test.txt"
@@ -90,18 +89,12 @@
             ],
             "targets": {
                 "learn": [
-                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-target-train.txt",
-                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-target-valid.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-target-train.txt"
                 ],
                 "infer": [
                     "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-target-test.txt"
                 ]
             },
-            "validation": {
-                "learn": [
-                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-truth-valid.txt"
-                ]
-              },
             "truth": {
                 "learn": [
                     "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-truth-train.txt"

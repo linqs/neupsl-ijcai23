@@ -107,8 +107,7 @@
         "ImageDigitSum/3": {
             "targets": {
                 "learn": [
-                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-digit-sum-target-train.txt",
-                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-digit-sum-target-valid.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-digit-sum-target-train.txt"
                 ],
                 "infer": [
                     "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-digit-sum-target-test.txt"
@@ -118,8 +117,7 @@
         "ImageSumBlock/4": {
             "observations": {
                 "learn": [
-                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-block-train.txt",
-                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-block-valid.txt"
+                    "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-block-train.txt"
                 ],
                 "infer": [
                     "../data/experiment::mnist-2/split::3/train-size::0080/overlap::1.00/image-sum-block-test.txt"

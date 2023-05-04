@@ -587,8 +587,8 @@ def run_first_order_wl_methods():
         method_out_dir = os.path.join(base_out_dir, method)
         os.makedirs(method_out_dir, exist_ok=True)
 
-        for train_size in ["0080"]:
-            for overlap in ["1.00"]:
+        for train_size in TRAIN_SIZES:
+            for overlap in OVERLAPS:
                 options = BEST_HYPERPARAMETERS[method][train_size][overlap]
                 dropout = BEST_NEURAL_NETWORK_HYPERPARAMETERS[method][train_size][overlap]["dropout"]
 

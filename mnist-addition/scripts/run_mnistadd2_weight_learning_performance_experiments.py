@@ -45,7 +45,8 @@ FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
 
 FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
     "Energy": {
-        "runtime.learn.method": ["Energy"]
+        "runtime.learn.method": ["Energy"],
+        "gradientdescent.runfulliterations": ["true"],
     },
     "MeanSquaredError": {
         "runtime.learn.method": ["MeanSquaredError"],

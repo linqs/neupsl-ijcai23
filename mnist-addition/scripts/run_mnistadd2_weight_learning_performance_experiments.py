@@ -31,7 +31,7 @@ STANDARD_DATASET_OPTIONS = {
 }
 
 INFERENCE_OPTION_RANGES = {
-    "duallcqp.regularizationparameter": ["1.0e-3"]
+    "duallcqp.regularizationparameter": ["1.0e-2"]
 }
 
 FIRST_ORDER_WL_METHODS = ["Energy", "BinaryCrossEntropy"]

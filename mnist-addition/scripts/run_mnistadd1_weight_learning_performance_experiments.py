@@ -68,18 +68,21 @@ BEST_HYPERPARAMETERS = {
     "Energy": {
         "0040": {
             "0.00": {
+                "runtime.learn.method": "Energy",
                 "duallcqp.regularizationparameter": "1.0e-2",
                 "gradientdescent.stepsize": "1.0e-3",
                 "gradientdescent.negativelogregularization": "1.0e-3",
                 "gradientdescent.negativeentropyregularization": "0.0"
             },
             "0.50": {
+                "runtime.learn.method": "Energy",
                 "duallcqp.regularizationparameter": "1.0e-2",
                 "gradientdescent.stepsize": "1.0e-3",
                 "gradientdescent.negativelogregularization": "1.0e-3",
                 "gradientdescent.negativeentropyregularization": "0.0"
             },
             "1.00": {
+                "runtime.learn.method": "Energy",
                 "duallcqp.regularizationparameter": "1.0e-2",
                 "gradientdescent.stepsize": "1.0e-3",
                 "gradientdescent.negativelogregularization": "1.0e-3",
@@ -88,18 +91,21 @@ BEST_HYPERPARAMETERS = {
         },
         "0060": {
             "0.00": {
+                "runtime.learn.method": "Energy",
                 "duallcqp.regularizationparameter": "1.0e-2",
                 "gradientdescent.stepsize": "1.0e-2",
                 "gradientdescent.negativelogregularization": "1.0e-3",
                 "gradientdescent.negativeentropyregularization": "0.0"
             },
             "0.50": {
+                "runtime.learn.method": "Energy",
                 "duallcqp.regularizationparameter": "1.0e-2",
                 "gradientdescent.stepsize": "1.0e-3",
                 "gradientdescent.negativelogregularization": "1.0e-3",
                 "gradientdescent.negativeentropyregularization": "0.0"
             },
             "1.00": {
+                "runtime.learn.method": "Energy",
                 "duallcqp.regularizationparameter": "1.0e-2",
                 "gradientdescent.stepsize": "1.0e-3",
                 "gradientdescent.negativelogregularization": "1.0e-3",
@@ -108,18 +114,21 @@ BEST_HYPERPARAMETERS = {
         },
         "0080": {
             "0.00": {
+                "runtime.learn.method": "Energy",
                 "duallcqp.regularizationparameter": "1.0e-2",
                 "gradientdescent.stepsize": "1.0e-3",
                 "gradientdescent.negativelogregularization": "1.0e-3",
                 "gradientdescent.negativeentropyregularization": "0.0"
             },
             "0.50": {
+                "runtime.learn.method": "Energy",
                 "duallcqp.regularizationparameter": "1.0e-2",
                 "gradientdescent.stepsize": "1.0e-3",
                 "gradientdescent.negativelogregularization": "1.0e-3",
                 "gradientdescent.negativeentropyregularization": "0.0"
             },
             "1.00": {
+                "runtime.learn.method": "Energy",
                 "duallcqp.regularizationparameter": "1.0e-2",
                 "gradientdescent.stepsize": "1.0e-3",
                 "gradientdescent.negativelogregularization": "1.0e-3",
@@ -219,7 +228,7 @@ BEST_HYPERPARAMETERS = {
                 "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-2",
-                "gradientdescent.stepsize": "1.0e-2",
+                "gradientdescent.stepsize": "1.0e-3",
                 "gradientdescent.negativelogregularization": "1.0e-3",
                 "gradientdescent.negativeentropyregularization": "0.0"
             }
@@ -307,7 +316,7 @@ BEST_HYPERPARAMETERS = {
                 "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-2",
-                "gradientdescent.stepsize": "1.0e-2",
+                "gradientdescent.stepsize": "1.0e-3",
                 "gradientdescent.negativelogregularization": "1.0e-3",
                 "gradientdescent.negativeentropyregularization": "0.0"
             },
@@ -392,7 +401,7 @@ BEST_NEURAL_NETWORK_HYPERPARAMETERS = {
                 "dropout": "0.1"
             },
             "1.00": {
-                "dropout": "0.0"
+                "dropout": "0.1"
             }
         }
     },

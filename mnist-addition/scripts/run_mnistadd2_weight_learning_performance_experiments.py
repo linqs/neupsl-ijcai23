@@ -10,7 +10,7 @@ PERFORMANCE_RESULTS_DIR = os.path.join(RESULTS_BASE_DIR, "performance")
 
 SPLITS = ["0", "1", "2", "3", "4"]
 TRAIN_SIZES = ["0040", "0060", "0080"]
-OVERLAPS = ["1.00"]
+OVERLAPS = ["0.00", "0.50", "1.00"]
 
 STANDARD_EXPERIMENT_OPTIONS = {
     "inference.normalize": "false",

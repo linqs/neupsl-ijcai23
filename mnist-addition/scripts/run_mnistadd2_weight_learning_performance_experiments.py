@@ -41,8 +41,8 @@ FIRST_ORDER_WL_METHODS = ["Energy", "BinaryCrossEntropy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
     "gradientdescent.stepsize": ["1.0e-2"],
-    "gradientdescent.negativelogregularization": ["1.0e-3"],
-    "gradientdescent.negativeentropyregularization": ["0.0"]
+    "gradientdescent.negativelogregularization": ["1.0e-1", "1.0e-3"],
+    "gradientdescent.negativeentropyregularization": ["1.0", "0.0"]
 }
 
 FIRST_ORDER_WL_METHODS_OPTION_RANGES = {

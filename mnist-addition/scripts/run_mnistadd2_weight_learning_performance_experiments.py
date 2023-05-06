@@ -18,7 +18,7 @@ STANDARD_EXPERIMENT_OPTIONS = {
     "gradientdescent.scalestepsize": "false",
     "weightlearning.inference": "DistributedDualBCDInference",
     "runtime.inference.method": "DistributedDualBCDInference",
-    "minimizer.initialsquaredpenalty": "10.0",
+    "minimizer.initialsquaredpenalty": "1.0",
     "minimizer.initiallinearpenalty": "1.0",
     "gradientdescent.numsteps": "5000",
     "gradientdescent.runfulliterations": "false",
@@ -54,15 +54,15 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
         "runtime.learn.method": ["MeanSquaredError"],
         "minimizer.objectivedifferencetolerance": ["0.01"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["10", "100", "500"],
-        "minimizer.squaredpenaltydelta": ["1.0", "10.0"]
+        "minimizer.numinternaliterations": ["100", "500"],
+        "minimizer.squaredpenaltydelta": ["10.0"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.01"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["10", "100", "500"],
-        "minimizer.squaredpenaltydelta": ["1.0", "10.0"]
+        "minimizer.numinternaliterations": ["100", "500"],
+        "minimizer.squaredpenaltydelta": ["10.0"]
     }
 }
 
@@ -311,8 +311,8 @@ BEST_HYPERPARAMETERS = {
                 "minimizer.numinternaliterations": "100",
                 "duallcqp.regularizationparameter": "1.0e-3",
                 "gradientdescent.stepsize": "1.0e-2",
-                "gradientdescent.negativelogregularization": "1.0e-3",
-                "gradientdescent.negativeentropyregularization": "0.0"
+                "gradientdescent.negativelogregularization": "1.0e-1",
+                "gradientdescent.negativeentropyregularization": "10.0"
             }
         },
         "0080": {

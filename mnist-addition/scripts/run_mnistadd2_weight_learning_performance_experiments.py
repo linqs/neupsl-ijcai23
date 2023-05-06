@@ -55,19 +55,21 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
         "minimizer.objectivedifferencetolerance": ["0.01"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
         "minimizer.numinternaliterations": ["100", "500"],
-        "minimizer.squaredpenaltydelta": ["10.0"]
+        "minimizer.squaredpenaltydelta": ["10.0"],
+        "gradientdescent.runfulliterations": ["true"],
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.01"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
         "minimizer.numinternaliterations": ["100", "500"],
-        "minimizer.squaredpenaltydelta": ["10.0"]
+        "minimizer.squaredpenaltydelta": ["10.0"],
+        "gradientdescent.runfulliterations": ["true"]
     }
 }
 
 NEURAL_NETWORK_OPTIONS = {
-    "dropout": ["0.0"],
+    "dropout": ["0.0", "0.1"],
     "learning-rate": ["1.0e-3"],
 }
 

@@ -48,7 +48,7 @@ FIRST_ORDER_WL_METHODS = ["Energy", "StructuredPerceptron", "MeanSquaredError", 
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
     "gradientdescent.stepsize": ["1.0e-2", "1.0e-3"],
-    "gradientdescent.negativelogregularization": ["1.0e-1", "1.0e-3"],
+    "gradientdescent.negativelogregularization": ["1.0e-3"],
     "gradientdescent.negativeentropyregularization": ["0.0"]
 }
 
@@ -62,13 +62,13 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
     "MeanSquaredError": {
         "runtime.learn.method": ["MeanSquaredError"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
-        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
+        "minimizer.proxruleweight": ["1.0e-2"],
         "minimizer.numinternaliterations": ["500"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
-        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
+        "minimizer.proxruleweight": ["1.0e-2"],
         "minimizer.numinternaliterations": ["500"]
     }
 }

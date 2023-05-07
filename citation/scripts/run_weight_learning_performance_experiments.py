@@ -9,7 +9,8 @@ RESULTS_BASE_DIR = os.path.join(THIS_DIR, "../results")
 PERFORMANCE_RESULTS_DIR = os.path.join(RESULTS_BASE_DIR, "performance")
 
 DATASETS = ["citeseer", "cora"]
-MODEL_TYPES = ["smoothed", "simple"]
+# MODEL_TYPES = ["smoothed", "simple"]
+MODEL_TYPES = ["smoothed"]
 SPLITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
 STANDARD_EXPERIMENT_OPTIONS = {
@@ -23,15 +24,15 @@ STANDARD_EXPERIMENT_OPTIONS = {
     "gradientdescent.numsteps": "1000",
     "gradientdescent.runfulliterations": "false",
     "duallcqp.computeperiod": "10",
-    "duallcqp.maxiterations": "25000",
+    "duallcqp.maxiterations": "10000",
 }
 
 STANDARD_DATASET_OPTIONS = {
     "citeseer": {
-        "duallcqp.primaldualthreshold": "1.0"
+        "duallcqp.primaldualthreshold": "0.1"
     },
     "cora": {
-        "duallcqp.primaldualthreshold": "1.0"
+        "duallcqp.primaldualthreshold": "0.1"
     }
 }
 
@@ -41,7 +42,7 @@ DATAPATH_NAME = {
 }
 
 INFERENCE_OPTION_RANGES = {
-    "duallcqp.regularizationparameter": ["1.0e-1"]
+    "duallcqp.regularizationparameter": ["1.0e-3"]
 }
 
 FIRST_ORDER_WL_METHODS = ["Energy", "StructuredPerceptron", "MeanSquaredError", "BinaryCrossEntropy"]
@@ -62,19 +63,19 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
     "MeanSquaredError": {
         "runtime.learn.method": ["MeanSquaredError"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
-        "minimizer.proxruleweight": ["1.0e-2"],
+        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
         "minimizer.numinternaliterations": ["500"]
     },
     "BinaryCrossEntropy": {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.1"],
-        "minimizer.proxruleweight": ["1.0e-2"],
+        "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
         "minimizer.numinternaliterations": ["500"]
     }
 }
 
 NEURAL_NETWORK_OPTIONS = {
-    "weight-regularizer": ["1.0e-5", "1.0e-7"],
+    "weight-regularizer": ["1.0e-5"],
     "hidden-size": ["1024"],
     "dropout": ["0.0", "0.1"]
 }

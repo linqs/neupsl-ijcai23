@@ -78,11 +78,12 @@ def digits_to_sum(digits, n_digits):
     return digits_to_number(digits[:n_digits]) + digits_to_number(digits[n_digits:])
 
 
-def generate_split(config, labels, indexes):
+def generate_split(config, labels, indexes, shuffle=True):
     for _ in range(int(len(indexes) * config['overlap'])):
         indexes = numpy.append(indexes, indexes[numpy.random.randint(0, len(indexes))])
 
-    numpy.random.shuffle(indexes)
+    if shuffle:
+        numpy.random.shuffle(indexes)
 
     indexes = indexes[:len(indexes) - (len(indexes) % (2 * config['num-digits']))]
     indexes = numpy.unique(indexes.reshape(-1, 2 * config['num-digits']), axis=0)
@@ -128,6 +129,74 @@ def create_image_data(config, entities):
             image_target.append(list(entities[index_i]) + [index_j])
 
     return image_target
+
+
+def write_mnist2_selected_data(features, labels):
+    config = DATASET_CONFIG[DATASET_MNIST_2]
+    config["train-size"] = 80
+    config["overlap"] = 0.0
+
+    out_dir = os.path.join(THIS_DIR, "..", "data", "experiment::" + DATASET_MNIST_2, "split::0", "train-size::selected", "overlap::%.2f" % config["overlap"])
+    os.makedirs(out_dir, exist_ok=True)
+
+    total_image_entities = numpy.array([], dtype=numpy.int32)
+
+    all_indexes = numpy.array(range(len(features)))
+    numpy.random.shuffle(all_indexes)
+
+    # Find the indexes of the examples that have the selected labels.
+    # The selected labels form the additions: [00 + 00, 00 + 01, ..., 09 + 09].
+    selected_indexes = numpy.array([], dtype=numpy.int32)
+
+    # First find the indexes for the 0's.
+    zero_label_indexes = numpy.where(labels == 0)[0][0: 4 + 3 * 9]
+
+    # Then find the indexes for the digits 1-9.
+    digit_label_indexes = numpy.array([], dtype=numpy.int32)
+    for digit in range(1, 10):
+        digit_label_indexes = numpy.concatenate([digit_label_indexes, [numpy.where(labels == digit)[0][0]]])
+
+    # Combine the indexes for the 0's and the digits 1-9.
+    selected_indexes = numpy.concatenate([selected_indexes, zero_label_indexes[0: 4]])
+    selected_indexes = numpy.concatenate([selected_indexes, zero_label_indexes[4: 7], [digit_label_indexes[0]]])
+    selected_indexes = numpy.concatenate([selected_indexes, zero_label_indexes[7: 10], [digit_label_indexes[1]]])
+    selected_indexes = numpy.concatenate([selected_indexes, zero_label_indexes[10: 13], [digit_label_indexes[2]]])
+    selected_indexes = numpy.concatenate([selected_indexes, zero_label_indexes[13: 16], [digit_label_indexes[3]]])
+    selected_indexes = numpy.concatenate([selected_indexes, zero_label_indexes[16: 19], [digit_label_indexes[4]]])
+    selected_indexes = numpy.concatenate([selected_indexes, zero_label_indexes[19: 22], [digit_label_indexes[5]]])
+    selected_indexes = numpy.concatenate([selected_indexes, zero_label_indexes[22: 25], [digit_label_indexes[6]]])
+    selected_indexes = numpy.concatenate([selected_indexes, zero_label_indexes[25: 28], [digit_label_indexes[7]]])
+    selected_indexes = numpy.concatenate([selected_indexes, zero_label_indexes[28: 31], [digit_label_indexes[8]]])
+
+    partition_indexes = {
+        'train': selected_indexes,
+        'valid': all_indexes[config['train-size']: config['train-size'] + config['valid-size']],
+        'test': all_indexes[config['train-size'] + config['valid-size']: config['train-size'] + config['valid-size'] + config['test-size']]
+    }
+
+    for partition in ['train', 'valid', 'test']:
+        image_sum_entities, image_sum_labels = generate_split(config, labels, partition_indexes[partition], False)
+        image_sum_target, image_sum_truth = create_image_sum_data(config, image_sum_entities, image_sum_labels)
+
+        image_digit_sum_targets = create_image_digit_sum_data(image_sum_entities)
+
+        image_entities = numpy.unique(image_sum_entities.reshape(-1)).reshape(-1, 1)
+        image_target = create_image_data(config, image_entities)
+
+        total_image_entities = numpy.append(total_image_entities, image_entities)
+
+        util.write_psl_file(os.path.join(out_dir, f'image-sum-block-{partition}.txt'), image_sum_entities)
+        util.write_psl_file(os.path.join(out_dir, f'image-sum-target-{partition}.txt'), image_sum_target)
+        util.write_psl_file(os.path.join(out_dir, f'image-sum-truth-{partition}.txt'), image_sum_truth)
+        util.write_psl_file(os.path.join(out_dir, f'image-target-{partition}.txt'), image_target)
+        util.write_psl_file(os.path.join(out_dir, f'image-digit-labels-{partition}.txt'), list(zip(partition_indexes[partition], labels[partition_indexes[partition]])))
+
+        util.write_psl_file(os.path.join(out_dir, f'image-digit-sum-target-{partition}.txt'), image_digit_sum_targets)
+
+    entity_data_map = create_entity_data_map(features, labels, total_image_entities)
+    util.write_psl_file(os.path.join(out_dir, 'entity-data-map.txt'), entity_data_map)
+
+    util.write_json_file(os.path.join(out_dir, CONFIG_FILENAME), config)
 
 
 def write_specific_data(config, out_dir, features, labels):
@@ -282,6 +351,9 @@ def main():
                     print("Generating data for %s." % out_dir)
                     features, labels = fetch_data()
                     write_specific_data(config, out_dir, features, labels)
+
+    features, labels = fetch_data()
+    write_mnist2_selected_data(features, labels)
 
 
 if __name__ == '__main__':

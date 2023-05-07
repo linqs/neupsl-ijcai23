@@ -22,7 +22,7 @@ STANDARD_EXPERIMENT_OPTIONS = {
     "minimizer.initiallinearpenalty": "1.0",
     "gradientdescent.numsteps": "5000",
     "gradientdescent.runfulliterations": "false",
-    "gradientdescent.iterationinferencebudget": "1.0e-2",
+    "gradientdescent.iterationinferencebudget": "2.5e-2",
     "duallcqp.computeperiod": "50",
     "duallcqp.maxiterations": "10000",
 }
@@ -41,8 +41,8 @@ FIRST_ORDER_WL_METHODS = ["Energy", "BinaryCrossEntropy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
     "gradientdescent.stepsize": ["1.0e-2"],
-    "gradientdescent.negativelogregularization": ["1.0e-1", "1.0e-3"],
-    "gradientdescent.negativeentropyregularization": ["1.0", "0.0"]
+    "gradientdescent.negativelogregularization": ["1.0e-3"],
+    "gradientdescent.negativeentropyregularization": ["0.0"]
 }
 
 FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
@@ -62,15 +62,17 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
         "runtime.learn.method": ["BinaryCrossEntropy"],
         "minimizer.objectivedifferencetolerance": ["0.01"],
         "minimizer.proxruleweight": ["1.0e-1", "1.0e-2"],
-        "minimizer.numinternaliterations": ["100", "500"],
+        "minimizer.numinternaliterations": ["1000"],
         "minimizer.squaredpenaltydelta": ["10.0"],
-        "gradientdescent.runfulliterations": ["true"]
+        "gradientdescent.energylosscoefficient": ["1.0"],
+        "gradientdescent.runfulliterations": ["true"],
+        "gradientdescent.l2usersetregularization": ["1.0e+3"],
     }
 }
 
 NEURAL_NETWORK_OPTIONS = {
     "dropout": ["0.0", "0.1"],
-    "learning-rate": ["1.0e-3"],
+    "learning-rate": ["1.0e-3", "1.0e-4"],
 }
 
 BEST_HYPERPARAMETERS = {

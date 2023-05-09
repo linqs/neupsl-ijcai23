@@ -639,47 +639,49 @@ def run_first_order_wl_methods_hyperparamter_search():
                                            **FIRST_ORDER_WL_METHODS_OPTION_RANGES[method]}
                     for options in enumerate_hyperparameters(method_options_dict):
                         for dropout in NEURAL_NETWORK_OPTIONS["dropout"]:
-                            experiment_out_dir = split_out_dir
-                            for key, value in sorted(options.items()):
-                                experiment_out_dir = os.path.join(experiment_out_dir, "{}::{}".format(key, value))
-                            experiment_out_dir = os.path.join(experiment_out_dir, "dropout::{}".format(dropout))
+                            for neural_learning_rate in NEURAL_NETWORK_OPTIONS["learning-rate"]:
+                                experiment_out_dir = split_out_dir
+                                for key, value in sorted(options.items()):
+                                    experiment_out_dir = os.path.join(experiment_out_dir, "{}::{}".format(key, value))
+                                experiment_out_dir = os.path.join(experiment_out_dir, "dropout::{}".format(dropout))
+                                experiment_out_dir = os.path.join(experiment_out_dir, "neural-learning-rate::{}".format(neural_learning_rate))
 
-                            os.makedirs(experiment_out_dir, exist_ok=True)
+                                os.makedirs(experiment_out_dir, exist_ok=True)
 
-                            if os.path.exists(os.path.join(experiment_out_dir, "out.txt")):
-                                print("Skipping experiment: {}.".format(experiment_out_dir))
-                                continue
+                                if os.path.exists(os.path.join(experiment_out_dir, "out.txt")):
+                                    print("Skipping experiment: {}.".format(experiment_out_dir))
+                                    continue
 
-                            dataset_json.update({"options":{**original_options,
-                                                            **STANDARD_EXPERIMENT_OPTIONS,
-                                                            **STANDARD_DATASET_OPTIONS["mnist-addition"],
-                                                            **options,
-                                                            "runtime.learn.output.model.path": "./mnist-addition_learned.psl"}})
+                                dataset_json.update({"options":{**original_options,
+                                                                **STANDARD_EXPERIMENT_OPTIONS,
+                                                                **STANDARD_DATASET_OPTIONS["mnist-addition"],
+                                                                **options,
+                                                                "runtime.learn.output.model.path": "./mnist-addition_learned.psl"}})
 
-                            dataset_json["predicates"]["NeuralClassifier/2"]["options"]["learning-rate"] = options["gradientdescent.stepsize"]
-                            dataset_json["predicates"]["NeuralClassifier/2"]["options"]["dropout"] = dropout
+                                dataset_json["predicates"]["NeuralClassifier/2"]["options"]["learning-rate"] = neural_learning_rate
+                                dataset_json["predicates"]["NeuralClassifier/2"]["options"]["dropout"] = dropout
 
-                            # Set the data path.
-                            set_data_path(dataset_json, split, train_size, overlap)
+                                # Set the data path.
+                                set_data_path(dataset_json, split, train_size, overlap)
 
-                            # Write the options the json file.
-                            with open(os.path.join(MNIST_CLI_DIR, "mnist-addition.json"), "w") as file:
-                                json.dump(dataset_json, file, indent=4)
+                                # Write the options the json file.
+                                with open(os.path.join(MNIST_CLI_DIR, "mnist-addition.json"), "w") as file:
+                                    json.dump(dataset_json, file, indent=4)
 
-                            # Run the experiment.
-                            print("Running experiment: {}.".format(experiment_out_dir))
-                            exit_code = os.system("cd {} && ./run.sh {} > out.txt 2> out.err".format(MNIST_CLI_DIR, experiment_out_dir))
+                                # Run the experiment.
+                                print("Running experiment: {}.".format(experiment_out_dir))
+                                exit_code = os.system("cd {} && ./run.sh {} > out.txt 2> out.err".format(MNIST_CLI_DIR, experiment_out_dir))
 
-                            if exit_code != 0:
-                                print("Experiment failed: {}.".format(experiment_out_dir))
-                                exit()
+                                if exit_code != 0:
+                                    print("Experiment failed: {}.".format(experiment_out_dir))
+                                    exit()
 
-                            # Save the output and json file.
-                            os.system("mv {} {}".format(os.path.join(MNIST_CLI_DIR, "out.txt"), experiment_out_dir))
-                            os.system("mv {} {}".format(os.path.join(MNIST_CLI_DIR, "out.err"), experiment_out_dir))
-                            os.system("cp {} {}".format(os.path.join(MNIST_CLI_DIR, "mnist-addition.json"), experiment_out_dir))
-                            os.system("cp {} {}".format(os.path.join(MNIST_CLI_DIR, "mnist-addition_learned.psl"), experiment_out_dir))
-                            os.system("cp -r {} {}".format(os.path.join(MNIST_CLI_DIR, "inferred-predicates"), experiment_out_dir))
+                                # Save the output and json file.
+                                os.system("mv {} {}".format(os.path.join(MNIST_CLI_DIR, "out.txt"), experiment_out_dir))
+                                os.system("mv {} {}".format(os.path.join(MNIST_CLI_DIR, "out.err"), experiment_out_dir))
+                                os.system("cp {} {}".format(os.path.join(MNIST_CLI_DIR, "mnist-addition.json"), experiment_out_dir))
+                                os.system("cp {} {}".format(os.path.join(MNIST_CLI_DIR, "mnist-addition_learned.psl"), experiment_out_dir))
+                                os.system("cp -r {} {}".format(os.path.join(MNIST_CLI_DIR, "inferred-predicates"), experiment_out_dir))
 
 def run_first_order_wl_methods():
     base_out_dir = os.path.join(PERFORMANCE_RESULTS_DIR, "mnist-add2", "first_order_wl_methods")

@@ -24,25 +24,11 @@
         "gradientdescent.scalestepsize": "false"
     },
     "rules": [
-        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId2, X) + NeuralClassifier(ImageId4, Y) <= ImageDigitSum(ImageId2, ImageId4, Z) + 1.0 ^2",
-        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId2, X) + ImageDigitSum(ImageId2, ImageId4, Z) <= NeuralClassifier(ImageId4, Y) + 1.0 ^2",
-        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId4, Y) + ImageDigitSum(ImageId2, ImageId4, Z) <= NeuralClassifier(ImageId2, X) + 1.0 ^2",
-
-        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId1, X) + NeuralClassifier(ImageId3, Y) <= ImageDigitSum(ImageId1, ImageId3, Z) + 1.0 ^2",
-        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId1, X) + ImageDigitSum(ImageId1, ImageId3, Z) <= NeuralClassifier(ImageId3, Y) + 1.0 ^2",
-        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + 0 * NumberSum(X, Y, Z) + NeuralClassifier(ImageId3, Y) + ImageDigitSum(ImageId1, ImageId3, Z) <= NeuralClassifier(ImageId1, X) + 1.0 ^2",
-
-        "ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & ImageDigitSum(ImageId2, ImageId4, Z_1) & ImageDigitSum(ImageId1, ImageId3, Z_10) & PlacedNumberSum(Z_10, Z_1, Z) -> ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) .",
-        "ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & ImageDigitSum(ImageId2, ImageId4, Z_1) & ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) & PlacedNumberSum(Z_10, Z_1, Z) -> ImageDigitSum(ImageId1, ImageId3, Z_10) .",
-        "ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & ImageDigitSum(ImageId1, ImageId3, Z_10) & ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) & PlacedNumberSum(Z_10, Z_1, Z) -> ImageDigitSum(ImageId2, ImageId4, Z_1) .",
-
-        "0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + ImageDigitSum(ImageId2, ImageId4, +Z_1) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) . {Z_1: PossibleOnesSums(Z_1, Z)}",
-        "0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + ImageDigitSum(ImageId1, ImageId3, +Z_10) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) . {Z_10: PossibleTensSums(Z_10, Z)}",
-
-        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId2, +X) >= ImageDigitSum(ImageId2, ImageId4, Z) {X: PossibleDigits(X, Z)}",
-        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId4, +X) >= ImageDigitSum(ImageId2, ImageId4, Z) {X: PossibleDigits(X, Z)}",
-        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId1, +X) >= ImageDigitSum(ImageId1, ImageId3, Z) {X: PossibleDigits(X, Z)}",
-        "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId3, +X) >= ImageDigitSum(ImageId1, ImageId3, Z) {X: PossibleDigits(X, Z)}",
+        "1.0: ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & NumberSum(X_1, Y_1, Z_1) & NeuralClassifier(ImageId2, X_1) & NeuralClassifier(ImageId4, Y_1) & NumberSum(X_10, Y_10, Z_10) & NeuralClassifier(ImageId1, X_10) & NeuralClassifier(ImageId3, Y_10) & PlacedNumberSum(Z_10, Z_1, Z) -> ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z)",
+        "1.0: ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & NumberSum(X_1, Y_1, Z_1) & NeuralClassifier(ImageId2, X_1) & NeuralClassifier(ImageId4, Y_1) & NumberSum(X_10, Y_10, Z_10) & NeuralClassifier(ImageId3, Y_10) & PlacedNumberSum(Z_10, Z_1, Z) & ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) -> NeuralClassifier(ImageId1, X_10)",
+        "1.0: ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & NumberSum(X_1, Y_1, Z_1) & NeuralClassifier(ImageId4, Y_1) & NumberSum(X_10, Y_10, Z_10) & NeuralClassifier(ImageId1, X_10) & NeuralClassifier(ImageId3, Y_10) & PlacedNumberSum(Z_10, Z_1, Z) & ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) -> NeuralClassifier(ImageId2, X_1)",
+        "1.0: ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & NumberSum(X_1, Y_1, Z_1) & NeuralClassifier(ImageId2, X_1) & NeuralClassifier(ImageId4, Y_1) & NumberSum(X_10, Y_10, Z_10) & NeuralClassifier(ImageId1, X_10) & PlacedNumberSum(Z_10, Z_1, Z) & ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) -> NeuralClassifier(ImageId3, Y_10)",
+        "1.0: ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) & NumberSum(X_1, Y_1, Z_1) & NeuralClassifier(ImageId2, X_1) & NumberSum(X_10, Y_10, Z_10) & NeuralClassifier(ImageId1, X_10) & NeuralClassifier(ImageId3, Y_10) & PlacedNumberSum(Z_10, Z_1, Z) & ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) -> NeuralClassifier(ImageId4, Y_1)",
 
         "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId1, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleTensDigits(X, Z)}",
         "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId3, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleTensDigits(X, Z)}",
@@ -51,7 +37,6 @@
         "1.0: 0 * ImageSumBlock(ImageId1, ImageId2, ImageId3, ImageId4) + NeuralClassifier(ImageId4, +X) >= ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, Z) {X: PossibleOnesDigits(X, Z)}",
 
         "ImageSum(ImageId1, ImageId2, ImageId3, ImageId4, +Number) = 1 .",
-        "ImageDigitSum(ImageIdX, ImageIdY, +Number) = 1 .",
 
         "0.1: NeuralClassifier(+ImageId, X) / |ImageId| =  0.1 ^2"
     ],

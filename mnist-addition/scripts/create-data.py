@@ -79,8 +79,9 @@ def digits_to_sum(digits, n_digits):
 
 
 def generate_split(config, labels, indexes, shuffle=True):
+    original_length = len(indexes)
     for _ in range(int(len(indexes) * config['overlap'])):
-        indexes = numpy.append(indexes, indexes[numpy.random.randint(0, len(indexes))])
+        indexes = numpy.append(indexes, indexes[numpy.random.randint(0, original_length)])
 
     if shuffle:
         numpy.random.shuffle(indexes)

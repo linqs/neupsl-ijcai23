@@ -45,7 +45,7 @@ INFERENCE_OPTION_RANGES = {
     "duallcqp.regularizationparameter": ["1.0e-3"]
 }
 
-FIRST_ORDER_WL_METHODS = ["Energy", "StructuredPerceptron", "MeanSquaredError", "BinaryCrossEntropy"]
+FIRST_ORDER_WL_METHODS = ["MeanSquaredError", "BinaryCrossEntropy", "Energy", "StructuredPerceptron"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
     "gradientdescent.stepsize": ["1.0e-2", "1.0e-3"],
@@ -77,7 +77,8 @@ FIRST_ORDER_WL_METHODS_OPTION_RANGES = {
 NEURAL_NETWORK_OPTIONS = {
     "weight-regularizer": ["1.0e-5"],
     "hidden-size": ["1024"],
-    "dropout": ["0.0", "0.1"]
+    # "dropout": ["0.0", "0.1"]
+    "dropout": ["0.0"]
 }
 
 

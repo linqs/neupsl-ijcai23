@@ -18,7 +18,6 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
         super().__init__()
         self._model = None
         self._features = None
-        self._labels = None
         self._predictions = None
         self._tape = None
 
@@ -26,7 +25,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
     def internal_init_model(self, application, options={}):
         self._application = application
         if application == 'learning':
-            self._model = self._create_model(options=options)
+            self._model = tensorflow.keras.models.load_model(options['load-path'])
         elif application == 'inference':
             self._model = tensorflow.keras.models.load_model(options['save-path'])
 

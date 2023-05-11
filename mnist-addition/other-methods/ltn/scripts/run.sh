@@ -4,7 +4,7 @@
 # This means we will run 15 times and take the top 10.
 
 readonly THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-readonly BASE_OUT_DIR="${THIS_DIR}/../results/experiment::ltn-classic"
+readonly BASE_OUT_DIR="${THIS_DIR}/../results"
 
 readonly BASE_REPO_DIR="${THIS_DIR}/../logictensornetworks-neurips22/examples/mnist"
 readonly MNIST_1_BASELINE_SCRIPT='single_digits_addition_baseline.py'
@@ -12,13 +12,14 @@ readonly MNIST_1_LTN_SCRIPT='single_digits_addition_ltn.py'
 readonly MNIST_2_BASELINE_SCRIPT='multi_digits_addition_baseline.py'
 readonly MNIST_2_LTN_SCRIPT='multi_digits_addition_ltn.py'
 
-readonly SPLITS=15
-readonly EPOCHS=20
+readonly SPLITS=2
+readonly EPOCHS=150
+readonly TEST_SIZE=1000
 
-readonly OVERLAPS='0.0 0.5 1.0 2.0'
+readonly OVERLAPS='0.0 0.5 1.0'
 
-readonly MNIST_1_SIZES='20 37 75 150 300 3000 25000 30000'
-readonly MNIST_2_SIZES='10 18 37 75 150 1500 12500 15000'
+readonly MNIST_1_SIZES='20 30 40'
+readonly MNIST_2_SIZES='10 15 20'
 
 function run_ltn() {
     local outDir=$1
@@ -55,11 +56,11 @@ function run_mnist() {
     local sizes=$3
     local script=$4
 
-    for split in $(seq 1 ${SPLITS}) ; do
+    for split in $(seq 0 ${SPLITS}) ; do
         for size in ${sizes} ; do
             for overlap in ${OVERLAPS} ; do
-                local outDir="${BASE_OUT_DIR}/problem::MNIST-${mnistType}/method::${method}/size::${size}/overlap::${overlap}/split::${split}"
-                local options="--epochs ${EPOCHS} --n-examples-train ${size} --overlap ${overlap}"
+                local outDir="${BASE_OUT_DIR}/method::${method}/experiment::mnist-${mnistType}/split::${split}/train-size::${size}/overlap::${overlap}/"
+                local options="--epochs ${EPOCHS} --n-examples-test ${TEST_SIZE} --n-examples-train ${size} --overlap ${overlap}"
 
                 echo "Running ${outDir}."
                 run_ltn "${outDir}" "${options}" "${script}"

@@ -86,7 +86,7 @@ def main():
 
     # MNIST 2
     for training_size in [40, 60, 80]:
-        for overlap in [0.00, 0.5, 1.0]:
+        for overlap in [0.0, 0.5, 1.0]:
             for split in range(NUM_SPLITS):
                 model = MNISTAddition2Baseline()
                 optimizer = tf.keras.optimizers.Adam(LEARNING_RATE)

@@ -66,4 +66,5 @@ def _load_args(args):
 
 
 if __name__ == '__main__':
+    _load_args(sys.argv)
     main()

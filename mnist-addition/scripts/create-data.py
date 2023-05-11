@@ -28,7 +28,7 @@ DATASET_CONFIG = {
         "name": DATASET_MNIST_1,
         "num-digits": 1,
         "class-size": 10,
-        "num-splits": 5,
+        "num-splits": 2,
         "train-sizes": [40, 60, 80],
         "valid-size": 100,
         "test-size": 1000,
@@ -38,7 +38,7 @@ DATASET_CONFIG = {
         "name": DATASET_MNIST_2,
         "num-digits": 2,
         "class-size": 10,
-        "num-splits": 5,
+        "num-splits": 2,
         "train-sizes": [40, 60, 80],
         "valid-size": 100,
         "test-size": 1000,
@@ -47,6 +47,7 @@ DATASET_CONFIG = {
 }
 
 CONFIG_FILENAME = "config.json"
+DEFAULT_SEED = 16
 
 
 def normalize_images(images):
@@ -77,8 +78,9 @@ def digits_to_sum(digits, n_digits):
 
 
 def generate_split(config, labels, indexes):
+    original_index_size = len(indexes)
     for _ in range(int(len(indexes) * config['overlap'])):
-        indexes = numpy.append(indexes, indexes[numpy.random.randint(0, len(indexes))])
+        indexes = numpy.append(indexes, indexes[numpy.random.randint(0, original_index_size)])
 
     indexes = indexes[:len(indexes) - (len(indexes) % (2 * config['num-digits']))]
     indexes = numpy.unique(indexes.reshape(-1, 2 * config['num-digits']), axis=0)
@@ -160,7 +162,6 @@ def write_specific_data(config, out_dir, features, labels):
         util.write_psl_file(os.path.join(out_dir, f'image-sum-target-{partition}.txt'), image_sum_target)
         util.write_psl_file(os.path.join(out_dir, f'image-sum-truth-{partition}.txt'), image_sum_truth)
         util.write_psl_file(os.path.join(out_dir, f'image-target-{partition}.txt'), image_target)
-        util.write_psl_file(os.path.join(out_dir, f'image-digit-labels-{partition}.txt'), list(zip(partition_indexes[partition], labels[partition_indexes[partition]])))
 
     entity_data_map = create_entity_data_map(features, labels, total_image_entities)
     util.write_psl_file(os.path.join(out_dir, 'entity-data-map.txt'), entity_data_map)
@@ -267,7 +268,7 @@ def main():
         for split in range(config['num-splits']):
             for train_size in config['train-sizes']:
                 config['train-size'] = train_size
-                config['seed'] = 10 * (10 * train_size + split) + config['num-digits']
+                config['seed'] = DEFAULT_SEED * 10000 + 10 * (10 * train_size + split) + config['num-digits']
                 print("Using seed %d." % config['seed'])
                 for overlap in config['overlaps']:
                     config['overlap'] = overlap

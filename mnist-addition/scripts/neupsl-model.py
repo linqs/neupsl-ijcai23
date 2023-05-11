@@ -3,6 +3,8 @@ import importlib
 import os
 import sys
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 import numpy
 import tensorflow
 
@@ -93,22 +95,15 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         layers = [
             tensorflow.keras.layers.Input(shape=784),
             tensorflow.keras.layers.Reshape((28, 28, 1), input_shape=(784,)),
-            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.Conv2D(filters=6, kernel_size=5, data_format='channels_last'),
-            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.MaxPool2D(pool_size=(2, 2), data_format='channels_last'),
             tensorflow.keras.layers.Activation('relu'),
-            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.Conv2D(filters=16, kernel_size=5, data_format='channels_last'),
-            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.MaxPool2D(pool_size=(2, 2), data_format='channels_last'),
             tensorflow.keras.layers.Activation('relu'),
-            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.Flatten(),
             tensorflow.keras.layers.Dense(120, activation='relu', kernel_regularizer=tensorflow.keras.regularizers.L1(0.1)),
-            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.Dense(84, activation='relu', kernel_regularizer=tensorflow.keras.regularizers.L1(0.1)),
-            tensorflow.keras.layers.Dropout(float(options['dropout'])),
             tensorflow.keras.layers.Dense(int(options['class-size']), activation='softmax')
         ]
 

@@ -1,16 +1,25 @@
 {
+  "infer": {
+    "options": {
+      "admmreasoner.maxiterations": 10000
+    }
+  },
+  "learn": {
+    "options": {
+      "admmreasoner.maxiterations": 10
+    }
+  },
   "options": {
     "runtime.db.intids": true,
     "runtime.log.level": "DEBUG",
     "runtime.learn.method": "Energy",
-    "eval.closetruth": true,
+    "eval.closetruth": false,
     "categoricalevaluator.defaultpredicate": "HasCat",
     "admmreasoner.computeperiod": 100,
     "admmreasoner.epsilonabs": 1.0e-6,
     "admmreasoner.epsilonrel": 1.0e-4,
-    "admmreasoner.maxiterations": 100,
     "admmreasoner.stepsize": 1.0,
-    "gradientdescent.numsteps": 500,
+    "gradientdescent.numsteps": 10,
     "gradientdescent.runfulliterations": true,
     "gradientdescent.stepsize": 1.0e-2
   },
@@ -24,39 +33,35 @@
       "type": "DeepPredicate",
       "options": {
         "model-path": "../scripts/neupsl-model.py::CitationModel",
-        "entity-data-map-path": "../data/experiment::cora/split::0/entity-data-map.txt",
+        "entity-data-map-path": "../data/experiment::cora/split::0/method::simple/entity-data-map.txt",
         "entity-argument-indexes": "0",
         "class-size": 7,
-        "load-path": "../data/experiment::cora/split::0/saved-networks/simple/pre-trained-tf",
-        "save-path": "../data/experiment::cora/split::0/saved-networks/simple/nesy-trained-tf",
+        "load-path": "../data/experiment::cora/split::0/method::simple/saved-networks/pre-trained-tf",
+        "save-path": "../data/experiment::cora/split::0/method::simple/saved-networks/nesy-trained-tf",
         "alpha": 1.0,
-        "load-model": false,
-        "learning-rate": 1.0e-3,
-        "hidden-units": 256,
-        "input-size": 1433,
-        "weight-regularizer": 1.0e-6,
-        "dropout": 0.9
+        "learning-rate": 1.0e-3
       },
       "targets": {
         "learn": [
-          "../data/experiment::cora/split::0/category-target-train.txt",
-          "../data/experiment::cora/split::0/category-target-test.txt",
-          "../data/experiment::cora/split::0/category-target-valid.txt",
-          "../data/experiment::cora/split::0/category-target-latent.txt"
+          "../data/experiment::cora/split::0/method::simple/category-target-train.txt",
+          "../data/experiment::cora/split::0/method::simple/category-target-test.txt",
+          "../data/experiment::cora/split::0/method::simple/category-target-valid.txt",
+          "../data/experiment::cora/split::0/method::simple/category-target-latent.txt"
         ],
         "infer": [
-          "../data/experiment::cora/split::0/category-target-test.txt",
-          "../data/experiment::cora/split::0/category-target-latent.txt"
+          "../data/experiment::cora/split::0/method::simple/category-target-test.txt",
+          "../data/experiment::cora/split::0/method::simple/category-target-valid.txt",
+          "../data/experiment::cora/split::0/method::simple/category-target-latent.txt"
         ]
       }
     },
     "Link/2": {
       "observations": {
         "learn": [
-          "../data/experiment::cora/split::0/edges.txt"
+          "../data/experiment::cora/split::0/method::simple/edges.txt"
         ],
         "infer": [
-          "../data/experiment::cora/split::0/edges.txt"
+          "../data/experiment::cora/split::0/method::simple/edges.txt"
         ]
       }
     },
@@ -72,28 +77,28 @@
       ],
       "observations": {
         "infer": [
-          "../data/experiment::cora/split::0/category-truth-train.txt",
-          "../data/experiment::cora/split::0/category-truth-valid.txt"
+          "../data/experiment::cora/split::0/method::simple/category-truth-train.txt",
         ]
       },
       "targets": {
         "learn": [
-          "../data/experiment::cora/split::0/category-target-train.txt",
-          "../data/experiment::cora/split::0/category-target-test.txt",
-          "../data/experiment::cora/split::0/category-target-valid.txt",
-          "../data/experiment::cora/split::0/category-target-latent.txt"
+          "../data/experiment::cora/split::0/method::simple/category-target-train.txt",
+          "../data/experiment::cora/split::0/method::simple/category-target-test.txt",
+          "../data/experiment::cora/split::0/method::simple/category-target-valid.txt",
+          "../data/experiment::cora/split::0/method::simple/category-target-latent.txt"
         ],
         "infer": [
-          "../data/experiment::cora/split::0/category-target-test.txt",
-          "../data/experiment::cora/split::0/category-target-latent.txt"
+          "../data/experiment::cora/split::0/method::simple/category-target-test.txt",
+          "../data/experiment::cora/split::0/method::simple/category-target-latent.txt",
+          "../data/experiment::cora/split::0/method::simple/category-target-valid.txt"
         ]
       },
       "truth": {
         "learn": [
-          "../data/experiment::cora/split::0/category-truth-train.txt"
+          "../data/experiment::cora/split::0/method::simple/category-truth-train.txt"
         ],
         "infer": [
-          "../data/experiment::cora/split::0/category-truth-test.txt"
+          "../data/experiment::cora/split::0/method::simple/category-truth-test.txt"
         ]
       }
     }

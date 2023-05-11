@@ -28,7 +28,7 @@ DATASETS = [DATASET_CITESEER, DATASET_CORA]
 
 MODEL_SIMPLE = 'simple'
 MODEL_SMOOTHED = 'smoothed'
-MODELS = [MODEL_SIMPLE]
+MODELS = [MODEL_SIMPLE, MODEL_SMOOTHED]
 
 HYPERPARAMETERS = {
     'hidden-units': [0, 16, 32, 64],
@@ -45,7 +45,16 @@ DEFAULT_PARAMETERS = {
         'hidden-units': 0,
         'learning-rate': 1.0e-0,
         'weight-regularizer': 1.0e-6,
-        'epochs': 1,
+        'epochs': 250,
+        'batch': 1024,
+        'loss': tensorflow.keras.losses.KLDivergence(),
+        'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
+    },
+    (DATASET_CITESEER, MODEL_SMOOTHED): {
+        'hidden-units': 0,
+        'learning-rate': 1.5e-0,
+        'weight-regularizer': 1.0e-6,
+        'epochs': 250,
         'batch': 1024,
         'loss': tensorflow.keras.losses.KLDivergence(),
         'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
@@ -58,12 +67,20 @@ DEFAULT_PARAMETERS = {
         'batch': 1024,
         'loss': tensorflow.keras.losses.KLDivergence(),
         'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
-    }
+    },
+    (DATASET_CORA, MODEL_SMOOTHED): {
+    'hidden-units': 0,
+    'learning-rate': 1.5e-0,
+    'weight-regularizer': 5.0e-7,
+    'epochs': 250,
+    'batch': 1024,
+    'loss': tensorflow.keras.losses.KLDivergence(),
+    'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
+}
 }
 
 VERBOSE = 0
-NUM_NETWORKS = 5
-NUM_RANDOM_SEEDS = 5
+NUM_RANDOM_SEEDS = 1
 
 SAVED_NETWORKS_DIRECTORY = 'saved-networks'
 CONFIG_FILENAME = 'config.json'
@@ -74,7 +91,7 @@ RUN_HYPERPARAMETER_SEARCH = False
 def build_network(config, hyperparameters):
     if hyperparameters['hidden-units'] != 0:
         layers = [
-            tensorflow.keras.layers.Input(shape=config['input-size-%s' % config['model']]),
+            tensorflow.keras.layers.Input(shape=config['input-size']),
             tensorflow.keras.layers.Dense(hyperparameters['hidden-units'],
                                           kernel_regularizer=tensorflow.keras.regularizers.l2(hyperparameters['weight-regularizer']),
                                           bias_regularizer=tensorflow.keras.regularizers.l2(hyperparameters['weight-regularizer']),
@@ -86,7 +103,7 @@ def build_network(config, hyperparameters):
         ]
     else:
         layers = [
-            tensorflow.keras.layers.Input(shape=config['input-size-%s' % config['model']]),
+            tensorflow.keras.layers.Input(shape=config['input-size']),
             tensorflow.keras.layers.Dense(config['output-size'],
                                           kernel_regularizer=tensorflow.keras.regularizers.l2(hyperparameters['weight-regularizer']),
                                           bias_regularizer=tensorflow.keras.regularizers.l2(hyperparameters['weight-regularizer']),
@@ -105,11 +122,11 @@ def build_network(config, hyperparameters):
 
 
 def fit_model(model, data, config, hyperparameters):
-    x_train = data['train']['features-%s' % config['model']]
+    x_train = data['train']['features']
     y_train = data['train']['labels']
-    x_test = data['test']['features-%s' % config['model']]
+    x_test = data['test']['features']
     y_test = data['test']['labels']
-    x_valid = data['valid']['features-%s' % config['model']]
+    x_valid = data['valid']['features']
     y_valid = data['valid']['labels']
 
     early_stop = [tensorflow.keras.callbacks.EarlyStopping(monitor="val_acc", patience=25, restore_best_weights=True)]
@@ -175,7 +192,7 @@ def build_model(data, config, out_dir, hyperparameters, tuning_hyperparameters):
         deep_predictions_data = []
         deep_probaility_data = []
 
-        deep_predictions = max_model.predict(data[partition]['features-%s' % config['model']], verbose=VERBOSE)
+        deep_predictions = max_model.predict(data[partition]['features'], verbose=VERBOSE)
         for entity, predictions in zip(data[partition]['entity-ids'], deep_predictions):
             max_index = numpy.argmax(predictions)
             for index in range(len(predictions)):
@@ -207,8 +224,7 @@ def build_model(data, config, out_dir, hyperparameters, tuning_hyperparameters):
 
 def load_data(dataset_dir):
     data = util.load_json_file(os.path.join(dataset_dir, "deep-data.json"))
-    config = {'input-size-simple': len(data['train']['features-simple'][0]),
-              'input-size-smoothed': len(data['train']['features-smoothed'][0]),
+    config = {'input-size': len(data['train']['features'][0]),
               'output-size': util.load_json_file(os.path.join(dataset_dir, "config.json"))['class-size']}
 
     for partition in data:
@@ -228,14 +244,18 @@ def main():
             if os.path.isfile(split_dir):
                 continue
 
-            for model in MODELS:
+            for model_id in sorted(os.listdir(split_dir)):
+                model_dir = os.path.join(split_dir, model_id)
+                if os.path.isfile(model_dir):
+                    continue
+
                 max_valid_accuracy = 0.0
-                hyperparameter_setting = DEFAULT_PARAMETERS[(dataset, model)]
-                out_dir = os.path.join(split_dir, SAVED_NETWORKS_DIRECTORY, model)
+                hyperparameter_setting = DEFAULT_PARAMETERS[(dataset, model_id.split('::')[1])]
+                out_dir = os.path.join(model_dir, SAVED_NETWORKS_DIRECTORY)
 
-                data, config = load_data(split_dir)
+                data, config = load_data(model_dir)
 
-                config['model'] = model
+                config['model'] = model_id.split('::')[1]
                 config['dataset'] = dataset
                 config['seed'] = int(split_id.split('::')[1])
 

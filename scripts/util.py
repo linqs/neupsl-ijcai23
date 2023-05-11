@@ -5,7 +5,10 @@ import numpy
 
 def write_json_file(path, data, indent=4):
     with open(path, "w") as file:
-        json.dump(data, file, indent=indent)
+        if indent is None:
+            json.dump(data, file)
+        else:
+            json.dump(data, file, indent=indent)
 
 
 def load_json_file(path):

@@ -22,7 +22,7 @@ function run_psl() {
         cd "${cli_dir}"
 
         # Run PSL.
-        /usr/bin/time -v --output="${time_path}" ./run.sh > "${log_out_path}" 2> "${log_err_path}"
+        time ./run.sh > "${log_out_path}" 2> "${log_err_path}"
 
         # Copy any artifacts into the output directory.
         mv inferred-predicates "${results_dir}/"
@@ -53,7 +53,7 @@ function run() {
 
         local model_name=$(echo ${model} | sed "s/.json//")
 
-        for options_path in $(find "${data_dir}/${model_name}/" -name entity-data-map.txt | sort) ; do
+        for options_path in $(find "${data_dir}/${model_name}" -name entity-data-map.txt | sort) ; do
             cp ${neupsl_models_dir}/${model} ${cli_dir}/${experiment}.json
 
             local original_param_path=$(grep "entity-data-map.txt" "${cli_dir}/${experiment}.json" | sed "s#^.*data/${model_name}/\(.*\)/entity-data-map.txt.*\$#\1#")

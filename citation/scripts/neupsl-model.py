@@ -23,10 +23,7 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
 
     def internal_init_model(self, application, options={}):
         if application == 'learning':
-            if options['load-model'].lower() == 'true':
-                self._model = tensorflow.keras.models.load_model(options['load-path'])
-            else:
-                self._model = self._create_model(options=options)
+            self._model = tensorflow.keras.models.load_model(options['load-path'])
         elif application == 'inference':
             self._model = tensorflow.keras.models.load_model(options['save-path'])
 
@@ -94,28 +91,3 @@ class CitationModel(pslpython.deeppsl.model.DeepModel):
 
         self._features = tensorflow.constant(numpy.asarray(data[:,:-1]), dtype=tensorflow.float32)
         self._labels = tensorflow.constant(numpy.asarray([util.one_hot_encoding(int(label), int(options['class-size'])) for label in data[:,-1]]), dtype=tensorflow.float32)
-
-    def _create_model(self, options={}):
-        layers = [
-            tensorflow.keras.layers.Input(shape=int(options['input-size'])),
-            tensorflow.keras.layers.Dropout(float(options['dropout'])),
-            tensorflow.keras.layers.Dense(int(options['hidden-units']),
-                                          kernel_regularizer=tensorflow.keras.regularizers.l2(float(options['weight-regularizer'])),
-                                          bias_regularizer=tensorflow.keras.regularizers.l2(float(options['weight-regularizer'])),
-                                          activation='relu'),
-            tensorflow.keras.layers.Dropout(float(options['dropout'])),
-            tensorflow.keras.layers.Dense(int(options['class-size']),
-                                          kernel_regularizer=tensorflow.keras.regularizers.l2(float(options['weight-regularizer'])),
-                                          bias_regularizer=tensorflow.keras.regularizers.l2(float(options['weight-regularizer'])),
-                                          activation='softmax'),
-        ]
-
-        model = tensorflow.keras.Sequential(layers=layers)
-
-        model.compile(
-            optimizer=tensorflow.keras.optimizers.Adam(learning_rate=float(options['learning-rate'])),
-            loss=tensorflow.keras.losses.KLDivergence(),
-            metrics=[tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
-        )
-
-        return model

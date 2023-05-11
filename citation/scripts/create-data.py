@@ -24,6 +24,10 @@ DATASET_CITESEER = 'citeseer'
 DATASET_CORA = 'cora'
 DATASETS = [DATASET_CITESEER, DATASET_CORA]
 
+METHOD_SIMPLE = 'simple'
+METHOD_SMOOTHED = 'smoothed'
+METHODS = [METHOD_SIMPLE, METHOD_SMOOTHED]
+
 DATASET_CONFIG = {
     DATASET_CITESEER: {
         "name": DATASET_CITESEER,
@@ -127,16 +131,23 @@ def fetch_data(config):
 
 def write_data(config, out_dir, graph, data, edges):
     entity_data_map = []
-    entity_data_smoothed_map = []
+    deep_data = {}
 
     for key in data:
         category_targets = []
         category_truth = []
+        deep_data[key] = {}
         for entity_index in range(len(data[key]['entity-ids'])):
+            deep_data[key]['entity-ids'] = data[key]['entity-ids']
+            deep_data[key]['labels'] = data[key]['labels']
             entity = data[key]['entity-ids'][entity_index]
 
-            entity_data_map.append([entity] + data[key]['features-simple'][entity_index] + [data[key]['labels'][entity_index]])
-            entity_data_smoothed_map.append([entity] + data[key]['features-smoothed'][entity_index] + [data[key]['labels'][entity_index]])
+            if config['method'] == METHOD_SIMPLE:
+                deep_data[key]['features'] = data[key]['features-simple']
+                entity_data_map.append([entity] + data[key]['features-simple'][entity_index] + [data[key]['labels'][entity_index]])
+            else:
+                deep_data[key]['features'] = data[key]['features-smoothed']
+                entity_data_map.append([entity] + data[key]['features-smoothed'][entity_index] + [data[key]['labels'][entity_index]])
 
             for label_index in range(config['class-size']):
                 label = "0" if label_index != data[key]['labels'][entity_index] else "1"
@@ -150,8 +161,7 @@ def write_data(config, out_dir, graph, data, edges):
     util.write_psl_file(os.path.join(out_dir, "edges.txt"), edges)
 
     util.write_psl_file(os.path.join(out_dir, "entity-data-map.txt"), entity_data_map)
-    util.write_psl_file(os.path.join(out_dir, "entity-data-smoothed-map.txt"), entity_data_smoothed_map)
-    util.write_json_file(os.path.join(out_dir, "deep-data.json"), data, indent=0)
+    util.write_json_file(os.path.join(out_dir, "deep-data.json"), deep_data, indent=None)
 
     dgl.save_graphs(os.path.join(out_dir, 'dgl-graph.bin'), [graph])
 
@@ -163,16 +173,19 @@ def main():
         config = DATASET_CONFIG[dataset_id]
         for split in range(config['num-splits']):
             config['seed'] = split
-
-            out_dir = os.path.join(THIS_DIR, '..', 'data', 'experiment::' + dataset_id, 'split::' + str(split))
-            os.makedirs(out_dir, exist_ok=True)
-
-            if os.path.isfile(os.path.join(out_dir, CONFIG_FILENAME)):
-                print("Data already exists for %s. Skipping generation." % out_dir)
-                continue
+            split_dir = os.path.join(THIS_DIR, '..', 'data', 'experiment::' + dataset_id, 'split::' + str(split))
 
             data, edges, graph = fetch_data(config)
-            write_data(config, out_dir, graph, data, edges)
+            for method in METHODS:
+                config['method'] = method
+                out_dir = os.path.join(split_dir, 'method::' + method)
+                os.makedirs(out_dir, exist_ok=True)
+
+                if os.path.isfile(os.path.join(out_dir, CONFIG_FILENAME)):
+                    print("Data already exists for %s. Skipping generation." % out_dir)
+                    continue
+
+                write_data(config, out_dir, graph, data, edges)
 
 if __name__ == '__main__':
     main()

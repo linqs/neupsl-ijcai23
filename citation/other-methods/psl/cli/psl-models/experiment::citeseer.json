@@ -1,0 +1,52 @@
+{
+  "options": {
+    "runtime.db.intids": true,
+    "runtime.log.level": "DEBUG",
+    "categoricalevaluator.defaultpredicate": "HasCat",
+    "admmreasoner.computeperiod": 100,
+    "admmreasoner.epsilonabs": 1.0e-6,
+    "admmreasoner.epsilonrel": 1.0e-4,
+    "admmreasoner.stepsize": 1.0,
+    "admmreasoner.maxiterations": 10000
+  },
+  "rules": [
+    "1.0: 0 * Link(Paper1, Paper2) + HasCat(Paper1, Label) = HasCat(Paper2, Label) ^2",
+    "HasCat(Paper, +Label) = 1 ."
+  ],
+  "predicates": {
+    "Link/2": {
+      "observations": {
+        "infer": [
+          "../../../data/experiment::citeseer/split::0/method::simple/edges.txt"
+        ]
+      }
+    },
+    "HasCat/2": {
+      "evaluations": [
+        {
+          "evaluator": "CategoricalEvaluator",
+          "options": {
+            "categoricalevaluator.categoryindexes": 1
+          }
+        }
+      ],
+      "observations": {
+        "infer": [
+          "../../../data/experiment::citeseer/split::0/method::simple/category-truth-train.txt"
+        ]
+      },
+      "targets": {
+        "infer": [
+          "../../../data/experiment::citeseer/split::0/method::simple/category-target-test.txt",
+          "../../../data/experiment::citeseer/split::0/method::simple/category-target-valid.txt",
+          "../../../data/experiment::citeseer/split::0/method::simple/category-target-latent.txt"
+        ]
+      },
+      "truth": {
+        "infer": [
+          "../../../data/experiment::citeseer/split::0/method::simple/category-truth-test.txt"
+        ]
+      }
+    }
+  }
+}

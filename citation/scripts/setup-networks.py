@@ -70,18 +70,18 @@ DEFAULT_PARAMETERS = {
         'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
     },
     (DATASET_CORA, MODEL_SMOOTHED): {
-    'hidden-units': 0,
-    'learning-rate': 1.5e-0,
-    'weight-regularizer': 5.0e-7,
-    'epochs': 250,
-    'batch': 1024,
-    'loss': tensorflow.keras.losses.KLDivergence(),
-    'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
-}
+        'hidden-units': 0,
+        'learning-rate': 1.5e-0,
+        'weight-regularizer': 5.0e-7,
+        'epochs': 250,
+        'batch': 1024,
+        'loss': tensorflow.keras.losses.KLDivergence(),
+        'metrics': [tensorflow.keras.metrics.CategoricalAccuracy(name='acc')],
+    }
 }
 
 VERBOSE = 0
-NUM_RANDOM_SEEDS = 5
+NUM_RANDOM_SEEDS = 10
 
 SAVED_NETWORKS_DIRECTORY = 'saved-networks'
 CONFIG_FILENAME = 'config.json'
@@ -130,7 +130,7 @@ def fit_model(model, data, config, hyperparameters):
     x_valid = data['valid']['features']
     y_valid = data['valid']['labels']
 
-    early_stop = [tensorflow.keras.callbacks.EarlyStopping(monitor="val_acc", patience=25, restore_best_weights=True)]
+    early_stop = [tensorflow.keras.callbacks.EarlyStopping(monitor="val_acc", patience=150, restore_best_weights=True)]
 
     train_history = model.fit(
         x_train,

@@ -6,20 +6,19 @@
   },
   "learn": {
     "options": {
-      "admmreasoner.maxiterations": 10
+      "admmreasoner.maxiterations": 500
     }
   },
   "options": {
     "runtime.db.intids": true,
     "runtime.log.level": "DEBUG",
     "runtime.learn.method": "Energy",
-    "eval.closetruth": false,
     "categoricalevaluator.defaultpredicate": "HasCat",
     "admmreasoner.computeperiod": 100,
     "admmreasoner.epsilonabs": 1.0e-6,
     "admmreasoner.epsilonrel": 1.0e-4,
     "admmreasoner.stepsize": 1.0,
-    "gradientdescent.numsteps": 10,
+    "gradientdescent.numsteps": 100,
     "gradientdescent.runfulliterations": true,
     "gradientdescent.stepsize": 1.0e-2
   },
@@ -38,8 +37,8 @@
         "class-size": 6,
         "load-path": "../data/experiment::citeseer/split::0/method::simple/saved-networks/pre-trained-tf",
         "save-path": "../data/experiment::citeseer/split::0/method::simple/saved-networks/nesy-trained-tf",
-        "alpha": 1.0,
-        "learning-rate": 1.0e-3
+        "simple-learning-rate": 1.0e-4,
+        "smoothed-learning-rate": 1.0e-4
       },
       "targets": {
         "learn": [
@@ -50,6 +49,7 @@
         ],
         "infer": [
           "../data/experiment::citeseer/split::0/method::simple/category-target-test.txt",
+          "../data/experiment::citeseer/split::0/method::simple/category-target-valid.txt",
           "../data/experiment::citeseer/split::0/method::simple/category-target-latent.txt"
         ]
       }
@@ -69,8 +69,7 @@
         {
           "evaluator": "CategoricalEvaluator",
           "options": {
-            "categoricalevaluator.categoryindexes": 1,
-            "eval.includeobs": false
+            "categoricalevaluator.categoryindexes": 1
           }
         }
       ],
@@ -88,6 +87,7 @@
         ],
         "infer": [
           "../data/experiment::citeseer/split::0/method::simple/category-target-test.txt",
+          "../data/experiment::citeseer/split::0/method::simple/category-target-valid.txt",
           "../data/experiment::citeseer/split::0/method::simple/category-target-latent.txt"
         ]
       },

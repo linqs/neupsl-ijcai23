@@ -3,7 +3,6 @@
     "runtime.db.intids": true,
     "runtime.log.level": "TRACE",
     "runtime.learn.method": "Energy",
-    "eval.closetruth": false,
     "categoricalevaluator.defaultpredicate": "ImageSum",
     "admmreasoner.computeperiod": 100,
     "admmreasoner.epsilonabs": 1.0e-6,
@@ -51,8 +50,7 @@
         {
           "evaluator": "CategoricalEvaluator",
           "options": {
-            "categoricalevaluator.categoryindexes": 2,
-            "eval.includeobs": false
+            "categoricalevaluator.categoryindexes": 2
           }
         }
       ],

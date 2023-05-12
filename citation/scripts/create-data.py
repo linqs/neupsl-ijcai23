@@ -11,6 +11,8 @@ import os
 import random
 import sys
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 import dgl
 import numpy
 import torch
@@ -66,9 +68,9 @@ def _generate_partitions(graph, device, class_size, train_count, test_count, val
         permutation = torch.randperm(graph.num_nodes(), device=device)
 
         graph.ndata["train-mask"][permutation[:train_count]] = True
-        graph.ndata["test-mask"][permutation[train_count:train_count + valid_count]] = True
-        graph.ndata["valid-mask"][permutation[train_count + valid_count:train_count + valid_count + test_count]] = True
-        graph.ndata["latent-mask"][permutation[train_count + valid_count + test_count:]] = True
+        graph.ndata["test-mask"][permutation[train_count:train_count + test_count]] = True
+        graph.ndata["valid-mask"][permutation[train_count + test_count:train_count + test_count + valid_count]] = True
+        graph.ndata["latent-mask"][permutation[train_count + test_count + valid_count:]] = True
 
         for mask_name in ["train-mask", "test-mask", "valid-mask"]:
             found_sample = found_sample or len(torch.unique(graph.ndata["label"][graph.ndata[mask_name]])) == class_size

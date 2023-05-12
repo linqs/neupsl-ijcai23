@@ -11,13 +11,14 @@ import random
 import sys
 import time
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 import numpy
 import tensorflow
 
-
 THIS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
+DATA_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', 'data'))
+
 
 sys.path.append(os.path.join(THIS_DIR, '..', '..', 'scripts'))
 util = importlib.import_module("util")
@@ -80,7 +81,7 @@ DEFAULT_PARAMETERS = {
 }
 
 VERBOSE = 0
-NUM_RANDOM_SEEDS = 1
+NUM_RANDOM_SEEDS = 5
 
 SAVED_NETWORKS_DIRECTORY = 'saved-networks'
 CONFIG_FILENAME = 'config.json'
@@ -237,7 +238,7 @@ def main():
     hyperparameters = util.enumerate_hyperparameters(HYPERPARAMETERS)
 
     for dataset in DATASETS:
-        dataset_dir = os.path.join(THIS_DIR, '..', 'data', 'experiment::' + dataset)
+        dataset_dir = os.path.join(DATA_DIR, 'experiment::' + dataset)
 
         for split_id in sorted(os.listdir(dataset_dir)):
             split_dir = os.path.join(dataset_dir, split_id)

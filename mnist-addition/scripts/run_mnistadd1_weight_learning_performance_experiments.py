@@ -239,7 +239,7 @@ BEST_HYPERPARAMETERS = {
             "0.00": {
                 "runtime.learn.method": "BinaryCrossEntropy",
                 "minimizer.objectivedifferencetolerance": "0.01",
-                "minimizer.proxruleweight": "1.0e-2",
+                "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-3",
                 "gradientdescent.stepsize": "1.0e-3",
@@ -249,7 +249,7 @@ BEST_HYPERPARAMETERS = {
             "0.50": {
                 "runtime.learn.method": "BinaryCrossEntropy",
                 "minimizer.objectivedifferencetolerance": "0.01",
-                "minimizer.proxruleweight": "1.0e-2",
+                "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-3",
                 "gradientdescent.stepsize": "1.0e-3",
@@ -259,7 +259,7 @@ BEST_HYPERPARAMETERS = {
             "1.00": {
                 "runtime.learn.method": "BinaryCrossEntropy",
                 "minimizer.objectivedifferencetolerance": "0.01",
-                "minimizer.proxruleweight": "1.0e-2",
+                "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-3",
                 "gradientdescent.stepsize": "1.0e-3",
@@ -271,7 +271,7 @@ BEST_HYPERPARAMETERS = {
             "0.00": {
                 "runtime.learn.method": "BinaryCrossEntropy",
                 "minimizer.objectivedifferencetolerance": "0.01",
-                "minimizer.proxruleweight": "1.0e-2",
+                "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-3",
                 "gradientdescent.stepsize": "1.0e-3",
@@ -281,7 +281,7 @@ BEST_HYPERPARAMETERS = {
             "0.50": {
                 "runtime.learn.method": "BinaryCrossEntropy",
                 "minimizer.objectivedifferencetolerance": "0.01",
-                "minimizer.proxruleweight": "1.0e-2",
+                "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-3",
                 "gradientdescent.stepsize": "1.0e-3",
@@ -291,7 +291,7 @@ BEST_HYPERPARAMETERS = {
             "1.00": {
                 "runtime.learn.method": "BinaryCrossEntropy",
                 "minimizer.objectivedifferencetolerance": "0.01",
-                "minimizer.proxruleweight": "1.0e-2",
+                "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-3",
                 "gradientdescent.stepsize": "1.0e-3",
@@ -303,7 +303,7 @@ BEST_HYPERPARAMETERS = {
             "0.00": {
                 "runtime.learn.method": "BinaryCrossEntropy",
                 "minimizer.objectivedifferencetolerance": "0.01",
-                "minimizer.proxruleweight": "1.0e-2",
+                "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-3",
                 "gradientdescent.stepsize": "1.0e-3",
@@ -313,7 +313,7 @@ BEST_HYPERPARAMETERS = {
             "0.50": {
                 "runtime.learn.method": "BinaryCrossEntropy",
                 "minimizer.objectivedifferencetolerance": "0.01",
-                "minimizer.proxruleweight": "1.0e-2",
+                "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-3",
                 "gradientdescent.stepsize": "1.0e-3",
@@ -323,7 +323,7 @@ BEST_HYPERPARAMETERS = {
             "1.00": {
                 "runtime.learn.method": "BinaryCrossEntropy",
                 "minimizer.objectivedifferencetolerance": "0.01",
-                "minimizer.proxruleweight": "1.0e-2",
+                "minimizer.proxruleweight": "1.0e-1",
                 "minimizer.numinternaliterations": "500",
                 "duallcqp.regularizationparameter": "1.0e-3",
                 "gradientdescent.stepsize": "1.0e-3",

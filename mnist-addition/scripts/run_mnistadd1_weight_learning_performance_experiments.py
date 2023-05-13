@@ -408,35 +408,35 @@ BEST_NEURAL_NETWORK_HYPERPARAMETERS = {
     "BinaryCrossEntropy": {
         "0040": {
             "0.00": {
-                "dropout": "0.0"
+                "dropout": "0.1"
             },
             "0.50": {
-                "dropout": "0.0"
+                "dropout": "0.1"
             },
             "1.00": {
-                "dropout": "0.0"
+                "dropout": "0.1"
             }
         },
         "0060": {
             "0.00": {
-                "dropout": "0.0"
+                "dropout": "0.1"
             },
             "0.50": {
-                "dropout": "0.0"
+                "dropout": "0.1"
             },
             "1.00": {
-                "dropout": "0.0"
+                "dropout": "0.1"
             }
         },
         "0080": {
             "0.00": {
-                "dropout": "0.0"
+                "dropout": "0.1"
             },
             "0.50": {
-                "dropout": "0.0"
+                "dropout": "0.1"
             },
             "1.00": {
-                "dropout": "0.0"
+                "dropout": "0.1"
             }
         }
     }

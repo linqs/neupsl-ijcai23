@@ -34,10 +34,10 @@ INFERENCE_OPTION_RANGES = {
     "duallcqp.regularizationparameter": ["1.0e-3"]
 }
 
-FIRST_ORDER_WL_METHODS = ["Energy", "BinaryCrossEntropy"]
+FIRST_ORDER_WL_METHODS = ["BinaryCrossEntropy"]
 
 FIRST_ORDER_WL_METHODS_STANDARD_OPTION_RANGES = {
-    "gradientdescent.stepsize": ["1.0e-2", "1.0e-3"],
+    "gradientdescent.stepsize": ["1.0e-3"],
     "gradientdescent.negativelogregularization": ["1.0e-3"],
     "gradientdescent.negativeentropyregularization": ["0.0"]
 }
@@ -411,32 +411,32 @@ BEST_NEURAL_NETWORK_HYPERPARAMETERS = {
                 "dropout": "0.0"
             },
             "0.50": {
-                "dropout": "0.1"
+                "dropout": "0.0"
             },
             "1.00": {
-                "dropout": "0.1"
+                "dropout": "0.0"
             }
         },
         "0060": {
             "0.00": {
-                "dropout": "0.1"
+                "dropout": "0.0"
             },
             "0.50": {
-                "dropout": "0.1"
+                "dropout": "0.0"
             },
             "1.00": {
-                "dropout": "0.1"
+                "dropout": "0.0"
             }
         },
         "0080": {
             "0.00": {
-                "dropout": "0.1"
+                "dropout": "0.0"
             },
             "0.50": {
-                "dropout": "0.1"
+                "dropout": "0.0"
             },
             "1.00": {
-                "dropout": "0.1"
+                "dropout": "0.0"
             }
         }
     }

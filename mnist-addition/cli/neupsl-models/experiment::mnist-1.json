@@ -1,4 +1,14 @@
 {
+  "infer": {
+    "options": {
+      "admmreasoner.maxiterations": 10000
+    }
+  },
+  "learn": {
+    "options": {
+      "admmreasoner.maxiterations": 1000
+    }
+  },
   "options": {
     "runtime.db.intids": true,
     "runtime.log.level": "TRACE",
@@ -7,7 +17,6 @@
     "admmreasoner.computeperiod": 100,
     "admmreasoner.epsilonabs": 1.0e-6,
     "admmreasoner.epsilonrel": 1.0e-4,
-    "admmreasoner.maxiterations": 1000,
     "admmreasoner.stepsize": 1.0,
     "gradientdescent.numsteps": 2500,
     "gradientdescent.runfulliterations": true,

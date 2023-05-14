@@ -13,7 +13,7 @@ RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
 LOG_FILENAME = 'out.txt'
 ADDITIONAL_HEADERS = ['Training-Test-Accuracy', 'Test-Accuracy', 'Inference-Time']
 
-class DeepStochLogResultsParser(results_parser.AbstractResultsParser):
+class DSLResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -48,7 +48,7 @@ class DeepStochLogResultsParser(results_parser.AbstractResultsParser):
 
 
 def main():
-    DeepStochLogResultsParser(results_dir=RESULTS_DIR, log_filename=LOG_FILENAME, additional_headers=ADDITIONAL_HEADERS).parse_results()
+    DSLResultsParser(results_dir=RESULTS_DIR, log_filename=LOG_FILENAME, additional_headers=ADDITIONAL_HEADERS).parse_results()
 
 
 if __name__ == '__main__':

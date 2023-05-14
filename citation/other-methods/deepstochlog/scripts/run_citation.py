@@ -181,7 +181,7 @@ def _load_args(args):
     if len(args) != 1 or ({'h', 'help'} & {arg.lower().strip().replace('-', '') for arg in args}):
         print("USAGE: python3 {} <parameter path>".format(executable), file=sys.stderr)
         sys.exit(1)
-    return args.pop(0)
+    return args[0]
 
 
 if __name__ == "__main__":

@@ -10,6 +10,9 @@ class AbstractResultsParser(abc.ABC):
     def parse_results(self):
         results = {}
         for experiment in sorted(os.listdir(self.results_dir)):
+            if os.path.isfile(os.path.join(self.results_dir, experiment)):
+                continue
+
             log_paths = self.get_log_paths(os.path.join(self.results_dir, experiment))
             results[experiment] = {'header': self.get_headers(log_paths[0], experiment) + self.additional_headers, 'rows': []}
             for log_path in log_paths:

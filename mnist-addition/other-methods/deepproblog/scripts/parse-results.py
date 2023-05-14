@@ -21,8 +21,8 @@ class DPLResultsParser(results_parser.AbstractResultsParser):
         results = []
         with open(log_path, 'r') as file:
             for line in file:
-                if 'Categorical Accuracy:' in line:
-                    match = re.search(r'"accuracy": (\d+\.\d+)', line)
+                match = re.search(r'"accuracy": (\d+\.\d+)', line)
+                if match is not None:
                     results.append(float(match.group(1)))
 
         return results

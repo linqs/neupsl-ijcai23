@@ -87,7 +87,7 @@ def run(
 
     # get train, validation, test split.
     train_ids = torch.arange(0, g.num_nodes(), dtype=torch.int64)[g.ndata["train-mask"]].numpy()
-    valid_ids = torch.arange(0, g.num_nodes(), dtype=torch.int64)[g.ndata["val-mask"]].numpy()
+    valid_ids = torch.arange(0, g.num_nodes(), dtype=torch.int64)[g.ndata["valid-mask"]].numpy()
     test_ids = torch.arange(0, g.num_nodes(), dtype=torch.int64)[g.ndata["test-mask"]].numpy()
 
     citations = []

@@ -30,18 +30,18 @@
       "type": "DeepPredicate",
       "options": {
         "model-path": "../scripts/neupsl-model.py::MNISTAdditionModel",
-        "entity-data-map-path": "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/entity-data-map.txt",
+        "entity-data-map-path": "../data/experiment::mnist-1/split::00/train-size::0080/overlap::1.00/entity-data-map.txt",
         "entity-argument-indexes": "0",
         "class-size": 10,
-        "save-path": "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/saved-networks/nesy-trained-tf",
+        "save-path": "../data/experiment::mnist-1/split::00/train-size::0080/overlap::1.00/saved-networks/nesy-trained-tf",
         "learning-rate": 1.0e-3
       },
       "targets": {
         "learn": [
-          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-target-train.txt"
+          "../data/experiment::mnist-1/split::00/train-size::0080/overlap::1.00/image-target-train.txt"
         ],
         "infer": [
-          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-target-test.txt"
+          "../data/experiment::mnist-1/split::00/train-size::0080/overlap::1.00/image-target-test.txt"
         ]
       }
     },
@@ -56,28 +56,28 @@
       ],
       "targets": {
         "learn": [
-          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-target-train.txt"
+          "../data/experiment::mnist-1/split::00/train-size::0080/overlap::1.00/image-sum-target-train.txt"
         ],
         "infer": [
-          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-target-test.txt"
+          "../data/experiment::mnist-1/split::00/train-size::0080/overlap::1.00/image-sum-target-test.txt"
         ]
       },
       "truth": {
         "learn": [
-          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-truth-train.txt"
+          "../data/experiment::mnist-1/split::00/train-size::0080/overlap::1.00/image-sum-truth-train.txt"
         ],
         "infer": [
-          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-truth-test.txt"
+          "../data/experiment::mnist-1/split::00/train-size::0080/overlap::1.00/image-sum-truth-test.txt"
         ]
       }
     },
     "ImageSumBlock/2": {
       "observations": {
         "learn": [
-          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-block-train.txt"
+          "../data/experiment::mnist-1/split::00/train-size::0080/overlap::1.00/image-sum-block-train.txt"
         ],
         "infer": [
-          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-block-test.txt"
+          "../data/experiment::mnist-1/split::00/train-size::0080/overlap::1.00/image-sum-block-test.txt"
         ]
       }
     },

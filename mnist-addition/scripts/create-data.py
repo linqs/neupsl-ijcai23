@@ -28,7 +28,7 @@ DATASET_CONFIG = {
         "name": DATASET_MNIST_1,
         "num-digits": 1,
         "class-size": 10,
-        "num-splits": 2,
+        "num-splits": 10,
         "train-sizes": [40, 60, 80],
         "valid-size": 100,
         "test-size": 1000,
@@ -38,7 +38,7 @@ DATASET_CONFIG = {
         "name": DATASET_MNIST_2,
         "num-digits": 2,
         "class-size": 10,
-        "num-splits": 2,
+        "num-splits": 10,
         "train-sizes": [40, 60, 80],
         "valid-size": 100,
         "test-size": 1000,
@@ -272,7 +272,7 @@ def main():
                 print("Using seed %d." % config['seed'])
                 for overlap in config['overlaps']:
                     config['overlap'] = overlap
-                    out_dir = os.path.join(shared_out_dir, "split::%01d" % split, "train-size::%04d" % train_size, "overlap::%.2f" % overlap)
+                    out_dir = os.path.join(shared_out_dir, "split::%02d" % split, "train-size::%04d" % train_size, "overlap::%.2f" % overlap)
                     os.makedirs(out_dir, exist_ok=True)
 
                     if os.path.isfile(os.path.join(out_dir, CONFIG_FILENAME)):

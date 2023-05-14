@@ -11,7 +11,7 @@ import tensorflow as tf
 from models import MNISTAdditionBaseline
 from models import MNISTAddition2Baseline
 
-NUM_SPLITS = 2
+NUM_SPLITS = 10
 NUM_EPOCHS = 100
 LEARNING_RATE = 1e-3
 

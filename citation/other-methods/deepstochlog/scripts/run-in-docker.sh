@@ -1,11 +1,38 @@
 #!/bin/bash
 
-cp /home/$(whoami)/scripts/run_citation.py /home/$(whoami)/deepstochlog/run_citation.py
+readonly ROOT_DIR="/home/$(whoami)"
+readonly RESULTS_DIR="${ROOT_DIR}/results"
+readonly DATA_DIR="${ROOT_DIR}/data"
 
-cd deepstochlog
+readonly OUT_FILENAME="out.txt"
+readonly ERR_FILENAME="out.err"
 
-for split in 0 1 2 3 4; do
-  for dataset_name in citeseer cora; do
-    python3 run_citation.py ${dataset_name} ${split} > /home/$(whoami)/results/${dataset_name}/${split}/out.txt 2> /home/$(whoami)/results/${dataset_name}/${split}/out.err
-  done
-done
+function main() {
+    if [[ $# -ne 0 ]]; then
+        echo "USAGE: $0"
+        exit 1
+    fi
+
+    trap exit SIGINT
+
+    cp /home/$(whoami)/scripts/run_citation.py /home/$(whoami)/deepstochlog/run_citation.py
+    cd deepstochlog
+
+    for options_path in $(find "${DATA_DIR}" -name entity-data-map.txt | sort) ; do
+      if [[ ${options_path} == *"method::smoothed"* ]]; then
+        continue
+      fi
+
+      local param_path=$(dirname "${options_path}" | sed "s#^.*data/\(.*\)/method.*\$#\1#")
+      echo "Running ${param_path}"
+
+      if [ -f ${RESULTS_DIR}/${param_path}/${OUT_FILENAME} ]; then
+        echo "Results found for ${RESULTS_DIR}/${param_path}. Skipping..."
+        continue
+      fi
+
+      python3 run_citation.py ${param_path} > ${RESULTS_DIR}/${param_path}/${OUT_FILENAME} 2> ${RESULTS_DIR}/${param_path}/${ERR_FILENAME}
+    done
+}
+
+[[ "${BASH_SOURCE[0]}" == "${0}" ]] && main "$@"

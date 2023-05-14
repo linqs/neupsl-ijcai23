@@ -178,14 +178,18 @@ def run(
 
 def _load_args(args):
     executable = args.pop(0)
-    if (len(args) != 2 or ({'h', 'help'} & {arg.lower().strip().replace('-', '') for arg in args})):
-        print("USAGE: python3 {} <'citeseer' or 'cora'> <split>".format(executable), file=sys.stderr)
+    if len(args) != 1 or ({'h', 'help'} & {arg.lower().strip().replace('-', '') for arg in args}):
+        print("USAGE: python3 {} <parameter path>".format(executable), file=sys.stderr)
         sys.exit(1)
-    return args[0], int(args[1])
+    return args.pop(0)
 
 
 if __name__ == "__main__":
-    dataset_name, seed = _load_args(sys.argv)
+    param_path = _load_args(sys.argv)
+
+    parts = param_path.split("/")
+    dataset_name = parts[0].split("::")[1]
+    seed = int(parts[1].split("::")[1])
 
     if dataset_name == "citeseer":
         epochs = 1000

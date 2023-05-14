@@ -20,10 +20,9 @@ function main() {
 
     trap exit SIGINT
 
-    for split in 0 1 2 3 4; do
-      for dataset_name in citeseer cora; do
-        mkdir -p "${RESULTS_DIR}/${dataset_name}/${split}"
-      done
+    for options_path in $(find "${DATA_DIR}" -name entity-data-map.txt | sort) ; do
+      local param_path=$(dirname "${options_path}" | sed "s#^.*data/\(.*\)/method.*\$#\1#")
+      mkdir -p "${RESULTS_DIR}/${param_path}"
     done
 
     "${BUILD_SCRIPT}"

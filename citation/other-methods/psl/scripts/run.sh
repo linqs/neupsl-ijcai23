@@ -56,7 +56,7 @@ function run() {
 
             # Change the .data files to use the current settings.
             sed -i'' -e "s#${original_param_path}#${current_param_path}#" "${cli_dir}/${EXPERIMENT_NAME}.json"
-            local results_dir="${RESULTS_DIR}/${EXPERIMENT_NAME}/method::psl/${model_name}/${current_param_path}"
+            local results_dir="${RESULTS_DIR}/${model_name}/${current_param_path}"
 
             echo "Running '${results_dir}'."
             run_psl "${results_dir}" "${cli_dir}"

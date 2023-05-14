@@ -12,7 +12,7 @@ readonly MNIST_1_LTN_SCRIPT='single_digits_addition_ltn.py'
 readonly MNIST_2_BASELINE_SCRIPT='multi_digits_addition_baseline.py'
 readonly MNIST_2_LTN_SCRIPT='multi_digits_addition_ltn.py'
 
-readonly SPLITS=2
+readonly SPLITS=15
 readonly EPOCHS=150
 readonly TEST_SIZE=1000
 

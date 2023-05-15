@@ -77,7 +77,7 @@ TRAINED_PUZZLE_VISUAL_MODEL_TF_PATH = os.path.join(PUZZLE_MODEL_DIR, 'puzzle_vis
 UNTRAINED_PUZZLE_DIGIT_MODEL_TF_PATH = os.path.join(PUZZLE_MODEL_DIR, 'puzzle_digit_model_untrained_tf')
 TRAINED_PUZZLE_DIGIT_MODEL_TF_PATH = os.path.join(PUZZLE_MODEL_DIR, 'puzzle_digit_model_trained_tf')
 
-LABELS = list(range(1, 10))
+LABELS = list(range(0, 10))
 BINARY_LABELS = [0, 1]
 BINARY_LABEL_POSITIVE = [0, 1]
 BINARY_LABEL_NEGATIVE = [1, 0]
@@ -178,7 +178,7 @@ def loadMNIST(shuffle = True):
     trainImages = normalizeMNISTImages(trainImages)
     testImages = normalizeMNISTImages(testImages)
 
-    mnistLabels = [0] + LABELS
+    mnistLabels = LABELS
 
     # {digit: [image, ...], ...}
     digits = {label: [] for label in mnistLabels}
@@ -718,7 +718,7 @@ def buildPuzzleDigitModel(labels, subpath, neuralLearningRate,
 
 def buildDataset(suffix, labels, split, digitChooser, numPositivePuzzles, trainPercent, overlapPercent, neuralLearningRate, seed, foldType,
                  force = False, labelMapping = None):
-    subpath = SUBPATH_FORMAT.format(suffix, len(labels), numPositivePuzzles, int(trainPercent * 100), int(overlapPercent * 100), neuralLearningRate, split, foldType)
+    subpath = SUBPATH_FORMAT.format(len(labels), numPositivePuzzles, int(trainPercent * 100), int(overlapPercent * 100), neuralLearningRate, split, foldType)
 
     configPath = CONFIG_PATH.format(subpath)
     if (os.path.isfile(configPath)):

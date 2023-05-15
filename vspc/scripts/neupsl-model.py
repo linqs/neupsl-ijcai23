@@ -15,12 +15,13 @@ THIS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(os.path.join(THIS_DIR, '..', '..', 'scripts'))
 util = importlib.import_module("util")
 
-class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
+class VSPCModel(pslpython.deeppsl.model.DeepModel):
     def __init__(self):
         super().__init__()
         self._application = None
         self._model = None
         self._features = None
+        self._digit_labels = None
         self._predictions = None
         self._tape = None
 
@@ -43,28 +44,43 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
         gradients = self._tape.gradient(self._predictions, self._model.trainable_weights, output_gradients=structured_gradients)
         self._model.optimizer.apply_gradients(zip(gradients, self._model.trainable_weights))
 
-        return {}
+        # Compute the metrics scores.
+        new_output = self._model(self._features)
+
+        self._model.compiled_metrics.reset_state()
+        self._model.compiled_metrics.update_state(self._digit_labels, new_output)
+
+        results = {}
+
+        for metric in self._model.compiled_metrics.metrics:
+            results[metric.name] = float(metric.result().numpy())
+
+        return results
 
 
     def internal_predict(self, data, options = {}):
         self._prepare_data(data, options=options)
 
+        results = {}
+
         if self._application == 'inference':
             self._predictions = self._model.predict(self._features, verbose=0)
+            results = {'metrics': util.calculate_metrics(self._predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
         else:
             with tensorflow.GradientTape(persistent=True) as tape:
                 self._predictions = self._model(self._features, training=True)
                 self._tape = tape
 
-        return self._predictions, {}
+        return self._predictions, results
 
 
     def internal_eval(self, data, options = {}):
         self._prepare_data(data, options=options)
 
         predictions, _ = self.internal_predict(data, options=options)
+        results = {'metrics': util.calculate_metrics(predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
 
-        return {}
+        return results
 
 
     def internal_save(self, options = {}):
@@ -103,3 +119,18 @@ class MNISTAdditionModel(pslpython.deeppsl.model.DeepModel):
 
     def _prepare_data(self, data, options = {}):
         self._features = tensorflow.constant(numpy.asarray(data), dtype=tensorflow.float32)
+        if self._application == 'learning':
+            labels_path = os.path.join(os.path.dirname(options['entity-data-map-path']), 'digit_positive_mapped_truth.txt')
+        elif self._application == 'inference':
+            labels_path = os.path.join(os.path.dirname(options['entity-data-map-path']), 'digit_mapped_truth.txt')
+        else:
+            raise ValueError('Unknown application: ' + self._application)
+
+        labels = []
+        count = 0
+        for truth in util.load_psl_file(labels_path):
+            if count % int(options['class-size']) == 0:
+                labels.append([0] * int(options['class-size']))
+            labels[-1][int(truth[-2])] = int(truth[-1])
+            count += 1
+        self._digit_labels = tensorflow.constant(numpy.asarray(labels), dtype=tensorflow.float32)

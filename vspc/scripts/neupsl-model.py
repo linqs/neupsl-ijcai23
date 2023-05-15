@@ -50,7 +50,7 @@ class VSPCModel(pslpython.deeppsl.model.DeepModel):
         self._model.compiled_metrics.reset_state()
         self._model.compiled_metrics.update_state(self._digit_labels, new_output)
 
-        results = {}
+        results = {'loss': float(self._model.compiled_loss(tensorflow.constant(self._predictions, dtype=tensorflow.float32), self._digit_labels).numpy())}
 
         for metric in self._model.compiled_metrics.metrics:
             results[metric.name] = float(metric.result().numpy())
@@ -65,7 +65,8 @@ class VSPCModel(pslpython.deeppsl.model.DeepModel):
 
         if self._application == 'inference':
             self._predictions = self._model.predict(self._features, verbose=0)
-            results = {'metrics': util.calculate_metrics(self._predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
+            results = {'loss': float(self._model.compiled_loss(tensorflow.constant(self._predictions, dtype=tensorflow.float32), self._digit_labels).numpy()),
+                       'metrics': util.calculate_metrics(self._predictions, self._digit_labels.numpy(), ['categorical_accuracy'])}
         else:
             with tensorflow.GradientTape(persistent=True) as tape:
                 self._predictions = self._model(self._features, training=True)

@@ -1,7 +1,7 @@
 {
   "infer": {
     "options": {
-      "admmreasoner.maxiterations": 10000
+      "admmreasoner.maxiterations": 5000
     }
   },
   "learn": {
@@ -18,7 +18,7 @@
     "admmreasoner.epsilonabs": 1.0e-6,
     "admmreasoner.epsilonrel": 1.0e-4,
     "admmreasoner.stepsize": 1.0,
-    "gradientdescent.numsteps": 2500,
+    "gradientdescent.numsteps": 1000,
     "gradientdescent.runfulliterations": true,
     "gradientdescent.stepsize": 1.0e-14
   },

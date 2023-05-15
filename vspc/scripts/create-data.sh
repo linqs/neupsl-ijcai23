@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Create all the data necessary for experiments.
-# This involves repeatedly calling the setup-generation.py script.
+# This involves repeatedly calling the generator.py script.
 
 readonly THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
-readonly SETUP_SCRIPT="${THIS_DIR}/setup-generation.py"
+readonly SETUP_SCRIPT="${THIS_DIR}/generator.py"
 
 readonly SUFFIX=experiment
 readonly NUM_SPLITS='1'

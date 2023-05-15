@@ -15,7 +15,6 @@ import shutil
 import sys
 
 import numpy
-import pslpython.neupsl
 import tensorflow
 
 THIS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
@@ -23,7 +22,7 @@ THIS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 # In this path, include the format string for the subpath.
 # The subpath itself may have more subs, but only one will occur for each child.
 DATA_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', 'data', '{}'))
-SUBPATH_FORMAT = os.path.join('visual-sudoku-{}', 'puzzleDim::{:02d}', 'numPositivePuzzles::{:05d}', 'trainPercent::{:02d}', 'overlapPercent::{:02d}', 'neuralLearningRate::{:0.6f}', 'split::{:02d}', '{:s}')
+SUBPATH_FORMAT = os.path.join('experiment::vspc', 'puzzle-dim::{:02d}', 'num-positive-puzzles::{:05d}', 'train-percent::{:02d}', 'overlap-percent::{:02d}', 'neural-learning-rate::{:0.6f}', 'split::{:02d}', '{:s}')
 
 CONFIG_PATH = os.path.join(DATA_DIR, 'config.json')
 
@@ -38,7 +37,7 @@ DIGIT_MAP_PATH = os.path.join(DATA_DIR, 'digit_map.txt')
 DIGIT_PINNED_TRUTH_PATH = os.path.join(DATA_DIR, 'pinned_digit_mapped_truth.txt')
 
 # Digits from all examples.
-DIGIT_FEATURES_PATH = os.path.join(DATA_DIR, 'digit_features.txt')
+DIGIT_FEATURES_PATH = os.path.join(DATA_DIR, 'entity-data-map.txt')
 DIGIT_TARGETS_PATH = os.path.join(DATA_DIR, 'digit_targets.txt')
 DIGIT_TRUTH_PATH = os.path.join(DATA_DIR, 'digit_truth.txt')
 DIGIT_MAPPED_TRUTH_PATH = os.path.join(DATA_DIR, 'digit_mapped_truth.txt')
@@ -473,35 +472,6 @@ def testPuzzle(model, puzzles, labels):
 
     return (loss, accuracy, auc, prob)
 
-def buildDigitNetwork(inputSize, labels, neuralLearningRate):
-    layers = [
-        tensorflow.keras.layers.Input(shape=inputSize, name='input'),
-        tensorflow.keras.layers.Reshape((MNIST_DIMENSION, MNIST_DIMENSION, 1), input_shape=(inputSize,), name='01-reshape'),
-        tensorflow.keras.layers.Conv2D(filters=6, kernel_size=5, data_format='channels_last', name='03-conv2d_6_5'),
-        tensorflow.keras.layers.MaxPool2D(pool_size=(2, 2), data_format='channels_last', name='04-mp_2_2'),
-        tensorflow.keras.layers.Activation('relu', name='05-relu'),
-        tensorflow.keras.layers.Conv2D(filters=16, kernel_size=5, data_format='channels_last', name='06-conv2d_16_5'),
-        tensorflow.keras.layers.MaxPool2D(pool_size=(2, 2), data_format='channels_last', name='07-mp_2_2'),
-        tensorflow.keras.layers.Activation('relu', name='08-relu'),
-        tensorflow.keras.layers.Flatten(name='09-flatten'),
-        tensorflow.keras.layers.Dense(120, activation='relu', name='10-dense_120'),
-        tensorflow.keras.layers.Dense(84, activation='relu', name='11-dense_84'),
-        tensorflow.keras.layers.Dense(len(labels), activation='softmax', name='output'),
-    ]
-
-    model = tensorflow.keras.Sequential(layers = layers, name = 'digitNetwork')
-
-    model.compile(
-        optimizer = tensorflow.keras.optimizers.Adam(learning_rate = neuralLearningRate),
-        loss = NEURAL_LOSS,
-        metrics = NEURAL_METRICS
-    )
-
-    wrapper = pslpython.neupsl.NeuPSLWrapper(model, inputSize, len(labels))
-    wrapper.model.summary()
-
-    return wrapper
-
 def buildPuzzleVisualNetwork(digitInputSize, labels, neuralLearningRate):
     binaryLabels = BINARY_LABEL_POSITIVE
     inputSize = digitInputSize * (len(labels) ** 2)
@@ -746,50 +716,6 @@ def buildPuzzleDigitModel(labels, subpath, neuralLearningRate,
         },
     }
 
-def buildDigitModel(labels, subpath, neuralLearningRate,
-                    trainPuzzles, trainPuzzleDigits,
-                    testPuzzles, testPuzzleDigits):
-    trainDigitImages, trainDigitLabels = getDigits(labels, trainPuzzles, trainPuzzleDigits)
-    testDigitImages, testDigitLabels = getDigits(labels, testPuzzles, testPuzzleDigits)
-
-    modelWrapper = buildDigitNetwork(len(trainDigitImages[0]), labels, neuralLearningRate)
-    modelWrapper.save(UNTRAINED_DIGIT_MODEL_H5_PATH.format(subpath), UNTRAINED_DIGIT_MODEL_TF_PATH.format(subpath))
-
-    untrainedLoss, untrainedAccuracy, _ = testDigit(modelWrapper.model, testDigitImages, testDigitLabels)
-    print("Untrained Model -- Loss: %f, Accuracy: %f" % (untrainedLoss, untrainedAccuracy))
-
-    modelWrapper = buildDigitNetwork(len(trainDigitImages[0]), labels, neuralLearningRate)
-    trainHistory = modelWrapper.model.fit(trainDigitImages, trainDigitLabels, epochs = NEURAL_EPOCHS)
-
-    modelWrapper.save(TRAINED_DIGIT_MODEL_H5_PATH.format(subpath), TRAINED_DIGIT_MODEL_TF_PATH.format(subpath))
-
-    trainedLoss, trainedAccuracy, testPredictions = testDigit(modelWrapper.model, testDigitImages, testDigitLabels)
-    print("Trained Model -- Loss: %f, Accuracy: %f" % (trainedLoss, trainedAccuracy))
-
-    pretrainedModel = tensorflow.keras.models.load_model(TRAINED_DIGIT_MODEL_H5_PATH.format(subpath))
-
-    pretrainedLoss, pretrainedAccuracy, _ = testDigit(pretrainedModel, testDigitImages, testDigitLabels)
-    print("Pretrained Model -- Loss: %f, Accuracy: %f" % (pretrainedLoss, pretrainedAccuracy))
-
-    if (not math.isclose(trainedAccuracy, pretrainedAccuracy)):
-        print("ERROR: Trained and pretrained accuracy do not match.", file = sys.stderr)
-        sys.exit(2)
-
-    return {
-        'untrained': {
-            'neuralLearningRate': neuralLearningRate,
-            'loss': untrainedLoss,
-            'accuracy': untrainedAccuracy,
-        },
-        'pretrained': {
-            'epochs': NEURAL_EPOCHS,
-            'neuralLearningRate': neuralLearningRate,
-            'loss': trainedLoss,
-            'accuracy': trainedAccuracy,
-            'trainHistory': trainHistory.history,
-        },
-    }
-
 def buildDataset(suffix, labels, split, digitChooser, numPositivePuzzles, trainPercent, overlapPercent, neuralLearningRate, seed, foldType,
                  force = False, labelMapping = None):
     subpath = SUBPATH_FORMAT.format(suffix, len(labels), numPositivePuzzles, int(trainPercent * 100), int(overlapPercent * 100), neuralLearningRate, split, foldType)
@@ -813,7 +739,6 @@ def buildDataset(suffix, labels, split, digitChooser, numPositivePuzzles, trainP
     os.makedirs(DATA_DIR.format(subpath), exist_ok = True)
     os.makedirs(PUZZLE_MODEL_DIR.format(subpath), exist_ok = True)
 
-    # digitModelConfigInfo = buildDigitModel(labels, subpath, neuralLearningRate, trainPuzzles, trainPuzzleDigits, testPuzzles, testPuzzleDigits)
     puzzleVisualModelConfigInfo = buildPuzzleVisualModel(labels, subpath, neuralLearningRate, trainPuzzles, trainPuzzleLabels, trainPuzzleDigits, testPuzzles, testPuzzleLabels, testPuzzleDigits)
     puzzleDigitModelConfigInfo = buildPuzzleDigitModel(labels, subpath, neuralLearningRate, trainPuzzles, trainPuzzleLabels, trainPuzzleDigits, testPuzzles, testPuzzleLabels, testPuzzleDigits)
 
@@ -824,7 +749,6 @@ def buildDataset(suffix, labels, split, digitChooser, numPositivePuzzles, trainP
 
     config = {
         'labels': labels,
-        # 'digitModel': digitModelConfigInfo,
         'puzzleVisualModel': puzzleVisualModelConfigInfo,
         'puzzleDigitModel': puzzleDigitModelConfigInfo,
         'numPositivePuzzles': numPositivePuzzles,

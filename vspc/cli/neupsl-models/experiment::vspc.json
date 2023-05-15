@@ -1,0 +1,159 @@
+{
+  "options": {
+    "runtime.db.intids": true,
+    "runtime.log.level": "TRACE",
+    "runtime.learn.method": "Energy",
+    "categoricalevaluator.defaultpredicate": "ImageSum",
+    "admmreasoner.computeperiod": 100,
+    "admmreasoner.epsilonabs": 1.0e-6,
+    "admmreasoner.epsilonrel": 1.0e-4,
+    "admmreasoner.maxiterations": 1000,
+    "admmreasoner.stepsize": 1.0,
+    "gradientdescent.numsteps": 2500,
+    "gradientdescent.runfulliterations": true,
+    "gradientdescent.stepsize": 1.0e-14
+  },
+  "infer": {
+    "rules": [
+      "1.0: NeuralClassifier(Puzzle, X, Y, Number) = PredictedNumber(Puzzle, X, Y, Number) ^2",
+
+      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '0', '1') = 1.0",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '0', '2') = 0.0 .",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '0', '3') = 0.0 .",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '0', '4') = 0.0 .",
+
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '1', '1') = 0.0 .",
+      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '1', '2') = 1.0",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '1', '3') = 0.0 .",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '1', '4') = 0.0 .",
+
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '2', '1') = 0.0 .",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '2', '2') = 0.0 .",
+      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '2', '3') = 1.0",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '2', '4') = 0.0 .",
+
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '3', '1') = 0.0 .",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '3', '2') = 0.0 .",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '3', '3') = 0.0 .",
+      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '3', '4') = 1.0",
+
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '0', '1') = 0.0 .",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '0', '2') = 0.0 .",
+      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '0', '3') + NeuralClassifier(Puzzle, '1', '0', '4') = 1.0",
+
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '1', '1') = 0.0 .",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '1', '2') = 0.0 .",
+      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '1', '3') + NeuralClassifier(Puzzle, '1', '1', '4') = 1.0",
+
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '2', '3') = 0.0 .",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '2', '4') = 0.0 .",
+      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '2', '1') + NeuralClassifier(Puzzle, '1', '2', '2') = 1.0",
+
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '3', '3') = 0.0 .",
+      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '3', '4') = 0.0 .",
+      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '3', '1') + NeuralClassifier(Puzzle, '1', '3', '2') = 1.0",
+
+      "1.0: NeuralClassifier(Puzzle, X, Y, +Number) = 1.0",
+      "1.0: NeuralClassifier(Puzzle, +X, Y, Number) = 1.0",
+      "1.0: NeuralClassifier(Puzzle, X, +Y, Number) = 1.0",
+
+      "1.0: NeuralClassifier(Puzzle, '0', '0', Number) + NeuralClassifier(Puzzle, '0', '1', Number) + NeuralClassifier(Puzzle, '1', '0', Number) + NeuralClassifier(Puzzle, '1', '1', Number) = 1.0",
+      "1.0: NeuralClassifier(Puzzle, '2', '0', Number) + NeuralClassifier(Puzzle, '2', '1', Number) + NeuralClassifier(Puzzle, '3', '0', Number) + NeuralClassifier(Puzzle, '3', '1', Number) = 1.0",
+      "1.0: NeuralClassifier(Puzzle, '0', '2', Number) + NeuralClassifier(Puzzle, '0', '3', Number) + NeuralClassifier(Puzzle, '1', '2', Number) + NeuralClassifier(Puzzle, '1', '3', Number) = 1.0",
+      "1.0: NeuralClassifier(Puzzle, '2', '2', Number) + NeuralClassifier(Puzzle, '2', '3', Number) + NeuralClassifier(Puzzle, '3', '2', Number) + NeuralClassifier(Puzzle, '3', '3', Number) = 1.0",
+
+      "0.1: NeuralClassifier(ImageId, X, Y, Number) = 0.0 ^2"
+    ]
+  },
+  "learn": {
+    "rules": [
+      "NeuralClassifier(Image, X, Y, Num) = PredictedNumber(Image, X, Y, Num) .",
+
+      "PredictedNumber(Image, X, +Y, Num) / |Y| <= RowViolation(Image, X, Num) + 0.25 .",
+      "PredictedNumber(Image, +X, Y, Num) / |X| <= ColViolation(Image, Y, Num) + 0.25 .",
+      "RowViolation(Image, X, +Num1) + ColViolation(Image, Y, +Num2) <= Violation(Image) .",
+
+      "1.0: RowViolation(Image, X, Num) = 0.0 ^2",
+      "1.0: ColViolation(Image, X, Num) = 0.0 ^2",
+      "1.0: Violation(Image) = 0.0 ^2"
+
+    ]
+  },
+  "predicates": {
+    "NeuralClassifier/2": {
+      "type": "DeepPredicate",
+      "options": {
+        "model-path": "../scripts/neupsl-model.py::MNISTAdditionModel",
+        "entity-data-map-path": "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/entity-data-map.txt",
+        "entity-argument-indexes": "0",
+        "class-size": 10,
+        "save-path": "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/saved-networks/nesy-trained-tf",
+        "learning-rate": 1.0e-3
+      },
+      "targets": {
+        "learn": [
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-target-train.txt"
+        ],
+        "infer": [
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-target-test.txt"
+        ]
+      }
+    },
+    "ImageSum/3": {
+      "evaluations": [
+        {
+          "evaluator": "CategoricalEvaluator",
+          "options": {
+            "categoricalevaluator.categoryindexes": 2
+          }
+        }
+      ],
+      "targets": {
+        "learn": [
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-target-train.txt"
+        ],
+        "infer": [
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-target-test.txt"
+        ]
+      },
+      "truth": {
+        "learn": [
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-truth-train.txt"
+        ],
+        "infer": [
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-truth-test.txt"
+        ]
+      }
+    },
+    "ImageSumBlock/2": {
+      "observations": {
+        "learn": [
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-block-train.txt"
+        ],
+        "infer": [
+          "../data/experiment::mnist-1/split::0/train-size::0080/overlap::1.00/image-sum-block-test.txt"
+        ]
+      }
+    },
+    "NumberSum/3": {
+      "observations": {
+        "learn": [
+          "../data/experiment::mnist-1/number-sum.txt"
+        ],
+        "infer": [
+          "../data/experiment::mnist-1/number-sum.txt"
+        ]
+      }
+    },
+    "PossibleDigits/2": {
+      "observations": {
+        "learn": [
+          "../data/experiment::mnist-1/possible-digits.txt"
+        ],
+        "infer": [
+          "../data/experiment::mnist-1/possible-digits.txt"
+        ]
+      }
+    }
+  }
+}

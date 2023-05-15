@@ -10,7 +10,7 @@ readonly PSL_VERSION='3.0.0-SNAPSHOT'
 readonly JAR_PATH="${THIS_DIR}/psl-cli-${PSL_VERSION}.jar"
 readonly RUN_SCRIPT_VERSION='2.0.0'
 
-readonly BASE_NAME='mnist-vspc'
+readonly BASE_NAME='vspc'
 readonly OUTPUT_DIRECTORY="${THIS_DIR}/inferred-predicates"
 
 readonly ADDITIONAL_PSL_OPTIONS=''

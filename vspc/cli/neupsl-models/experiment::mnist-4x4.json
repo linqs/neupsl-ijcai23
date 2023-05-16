@@ -20,13 +20,13 @@
     "rules": [
       "NeuralClassifier(Image, X, Y, Num) = PredictedNumber(Image, X, Y, Num) .",
 
-      "PredictedNumber(Image, X, +Y, Num) / |Y| <= RowViolation(Image, X, Num) + 0.25 .",
-      "PredictedNumber(Image, +X, Y, Num) / |X| <= ColViolation(Image, Y, Num) + 0.25 .",
-      "RowViolation(Image, X, +Num1) + ColViolation(Image, Y, +Num2) <= Violation(Image) .",
+      "NeuralClassifier(Image, X, +Y, Num) / |Y| <= PuzzleRow(Image, X, Num) + 0.25 .",
+      "NeuralClassifier(Image, +X, Y, Num) / |X| <= PuzzleColumn(Image, Y, Num) + 0.25 .",
+      "PuzzleRow(Image, X, +Num1) + PuzzleColumn(Image, Y, +Num2) <= Puzzle(Image) .",
 
-      "1.0: RowViolation(Image, X, Num) = 0.0 ^2",
-      "1.0: ColViolation(Image, X, Num) = 0.0 ^2",
-      "1.0: Violation(Image) = 0.0 ^2"
+      "1.0: PuzzleRow(Image, X, Num) = 0.0 ^2",
+      "1.0: PuzzleColumn(Image, X, Num) = 0.0 ^2",
+      "1.0: Puzzle(Image) = 0.0 ^2"
     ]
   },
   "learn": {
@@ -51,26 +51,26 @@
       "type": "DeepPredicate",
       "options": {
         "model-path": "../scripts/neupsl-model.py::VSPCModel",
-        "entity-data-map-path": "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/learn/positive-entity-data-map-train.txt",
-        "inference::entity-data-map-path": "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/eval/entity-data-map-test.txt",
+        "entity-data-map-path": "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/entity-data-map-train.txt",
+        "inference::entity-data-map-path": "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/entity-data-map-test.txt",
         "entity-argument-indexes": "0,1,2",
         "class-size": 4,
-        "save-path": "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/saved-networks/nesy-trained-tf",
+        "save-path": "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/saved-networks/nesy-trained-tf",
         "learning-rate": 1.0e-3
       },
       "targets": {
         "learn": [
-          "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/learn/digit_positive_targets-train.txt"
+          "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/digit-targets-train.txt"
         ],
         "infer": [
-          "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/eval/digit_targets-test.txt"
+          "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/digit-targets-test.txt"
         ]
       }
     },
     "FirstPuzzle/4": {
       "observations": {
         "learn": [
-          "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/learn/first_puzzle_digit_truth.txt"
+          "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/first-puzzle-observation.txt"
         ]
       }
     },
@@ -85,16 +85,16 @@
       ],
       "targets": {
         "infer": [
-          "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/eval/digit_targets-test.txt"
+          "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/digit-targets-test.txt"
         ]
       },
       "truth": {
         "infer": [
-          "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/eval/digit_mapped_truth-test.txt"
+          "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/digit-mapped-truth-test.txt"
         ]
       }
     },
-    "Violation/1": {
+    "Puzzle/1": {
       "evaluations": [
         {
           "evaluator": "DiscreteEvaluator",
@@ -111,26 +111,26 @@
       ],
       "targets": {
         "infer": [
-          "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/eval/violation_targets-test.txt"
+          "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/puzzle-targets.txt"
         ]
       },
       "truth": {
         "infer": [
-          "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/eval/violation_truth-test.txt"
+          "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/puzzle-truth.txt"
         ]
       }
     },
-    "RowViolation/3": {
+    "PuzzleRow/3": {
       "targets": {
         "infer": [
-          "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/eval/row_col_violation_targets-test.txt"
+          "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/row-column-targets.txt"
         ]
       }
     },
-    "ColViolation/3": {
+    "PuzzleColumn/3": {
       "targets": {
         "infer": [
-          "../data/experiment::mnist-4x4/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/eval/row_col_violation_targets-test.txt"
+          "../data/experiment::mnist-4x4/split::00/positive-train-size::0002/overlap-percent::0.00/row-column-targets.txt"
         ]
       }
     }

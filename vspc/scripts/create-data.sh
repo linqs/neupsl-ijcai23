@@ -10,32 +10,27 @@ readonly SUFFIX=experiment
 readonly NUM_SPLITS='10'
 
 readonly DIMENSIONS='4'
-readonly NUM_PUZZLES='002 004 008 016 032 064'
-readonly NEURAL_LEARNING_RATES='1e-3'
-readonly OVERLAP_PERCENTS='0.00 0.50 0.75'
-readonly TRAIN_PERCENTS='0.50'
+readonly NUM_POSITIVE_TRAIN_PUZZLES='002 004 008'
+readonly NUM_POSITIVE_TEST_PUZZLES='050'
+readonly OVERLAP='0.00 1.00 3.00'
 
 function main() {
 	set -e
 	trap exit SIGINT
 
     for dimension in ${DIMENSIONS} ; do
-        for numPuzzles in ${NUM_PUZZLES} ; do
-            for neuralLearningRate in ${NEURAL_LEARNING_RATES} ; do
-                for overlapPercent in ${OVERLAP_PERCENTS} ; do
-                    for trainPercent in ${TRAIN_PERCENTS} ; do
-                        "${SETUP_SCRIPT}" \
-                            --dimension "${dimension}" \
-                            --neural-learning-rate "${neuralLearningRate}" \
-                            --num-puzzles "${numPuzzles}" \
-                            --overlap-percent "${overlapPercent}" \
-                            --splits ${NUM_SPLITS} \
-                            --suffix "${SUFFIX}" \
-                            --train-percent "${trainPercent}"
-                    done
-                done
+      for num_positive_train_puzzles in ${NUM_POSITIVE_TRAIN_PUZZLES} ; do
+        for num_positive_test_puzzles in ${NUM_POSITIVE_TEST_PUZZLES} ; do
+          for overlap in ${OVERLAP} ; do
+            "${SETUP_SCRIPT}" \
+                --dimension "${dimension}" \
+                --num-positive-train-puzzles "${num_positive_train_puzzles}" \
+                --num-positive-test-puzzles "${num_positive_test_puzzles}" \
+                --overlap "${overlap}" \
+                --splits ${NUM_SPLITS}
             done
         done
+      done
     done
 }
 

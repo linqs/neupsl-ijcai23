@@ -121,9 +121,9 @@ class VSPCModel(pslpython.deeppsl.model.DeepModel):
     def _prepare_data(self, data, options = {}):
         self._features = tensorflow.constant(numpy.asarray(data), dtype=tensorflow.float32)
         if self._application == 'learning':
-            labels_path = os.path.join(os.path.dirname(options['entity-data-map-path']), 'digit_positive_mapped_truth-train.txt')
+            labels_path = os.path.join(os.path.dirname(options['entity-data-map-path']), 'digit-mapped-truth-train.txt')
         elif self._application == 'inference':
-            labels_path = os.path.join(os.path.dirname(options['entity-data-map-path']), 'digit_mapped_truth-test.txt')
+            labels_path = os.path.join(os.path.dirname(options['entity-data-map-path']), 'digit-mapped-truth-test.txt')
         else:
             raise ValueError('Unknown application: ' + self._application)
 

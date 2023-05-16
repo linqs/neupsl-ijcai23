@@ -53,17 +53,22 @@ function run() {
 
         local model_name=$(echo ${model} | sed "s/.json//")
 
-        for options_path in $(find "${data_dir}/${model_name}" -name entity-data-map.txt | sort) ; do
+        local name_identifier="entity-data-map.txt"
+        if [[ ${experiment} == "vspc" ]]; then
+          name_identifier="entity-data-map-test.txt"
+        fi
+
+        for options_path in $(find "${data_dir}/${model_name}" -name ${name_identifier} | sort) ; do
             cp ${neupsl_models_dir}/${model} ${cli_dir}/${experiment}.json
 
-            local file_identifier="entity-data-map.txt"
-
+            local file_identifier=${name_identifier}
             if [[ ${experiment} == "vspc" ]]; then
-              if [[ ${options_path} == *"/learn/${file_identifier}"* ]]; then
+              if [[ ${options_path} == *"/learn/entity-data-map"* || ${options_path} == *"/test/entity-data-map-train"* ]]; then
+                echo "Skipping '${options_path}'."
                 continue
               fi
               options_path=$(dirname $(dirname "${options_path}"))/${file_identifier}
-              file_identifier="eval/entity-data-map.txt"
+              file_identifier="eval/entity-data-map-test.txt"
             fi
 
             local original_param_path=$(grep ${file_identifier} "${cli_dir}/${experiment}.json" | sed "s#^.*data/${model_name}/\(.*\)/${file_identifier}.*\$#\1#")

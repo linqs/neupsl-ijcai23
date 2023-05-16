@@ -10,7 +10,7 @@ readonly SUFFIX=experiment
 readonly NUM_SPLITS='10'
 
 readonly DIMENSIONS='4'
-readonly NUM_PUZZLES='004 008 016 032 064'
+readonly NUM_PUZZLES='002 004 008 016 032 064'
 readonly NEURAL_LEARNING_RATES='1e-3'
 readonly OVERLAP_PERCENTS='0.00 0.50 0.75'
 readonly TRAIN_PERCENTS='0.50'

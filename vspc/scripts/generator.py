@@ -90,6 +90,7 @@ NEURAL_EPOCHS = 100
 NEURAL_LOSS = 'KLDivergence'
 NEURAL_METRICS = ['categorical_accuracy']
 DEFAULT_NEURAL_LEARNING_RATE = 1.0e-3
+NUM_POSITIVE_TEST_PUZZLES = 50
 VERBOSE = 0
 
 # The chances to continue the respective corruption.
@@ -127,7 +128,7 @@ def createDigitChoosers(labels, numPositivePuzzles, overlapPercent):
 
     # We know exactly how many of each digit we will need right away:
     # count * 2 (learn/eval) * 2 (positive/negative) * |labels|
-    digitCount = numPositivePuzzles * 2 * 2 * len(labels)
+    digitCount = numPositivePuzzles * NUM_POSITIVE_TEST_PUZZLES * 2 * len(labels)
 
     # Incorporating the overlap tells us how many unique digits we need.
     uniqueDigitCount = int(digitCount * (1.0 - overlapPercent))
@@ -341,6 +342,37 @@ def getDigits(labels, puzzleImages, puzzleLabels):
                 digitLabels.append(onehot(labels, puzzleLabels[i][row][col]))
 
     return numpy.stack(digitImages), numpy.stack(digitLabels)
+
+def get_puzzle_digits(puzzles, puzzle_labels, puzzle_digits, labels, start_index, only_positive_puzzles):
+    digitTargets = []
+    digitTruths = []
+    digitFeatures = []
+
+    rowViolations = []
+    violationTargets = []
+    violationTruths = []
+
+    for index in range(len(puzzles)):
+        if only_positive_puzzles and puzzle_labels[index].tolist() != BINARY_LABEL_POSITIVE:
+            continue
+
+        puzzleId = start_index + index
+
+        violationTargets.append((puzzleId, ))
+        violationTruths.append((puzzleId, int(puzzle_labels[index].tolist() != BINARY_LABEL_POSITIVE)))
+
+        for row in range(len(puzzles[index])):
+            for digit in labels:
+                rowViolations.append((puzzleId, row, digit))
+
+            for col in range(len(puzzles[index][row])):
+                digitFeatures.append([puzzleId, row, col] + puzzles[index][row][col].tolist())
+
+                for digit in labels:
+                    digitTargets.append([puzzleId, row, col, digit])
+                    digitTruths.append([puzzleId, row, col, digit, int(digit == puzzle_digits[index][row][col])])
+
+    return digitTargets, digitTruths, digitFeatures, rowViolations, violationTargets, violationTruths
 
 def getPuzzleDigits(labels, onlyPositiveExamples,
                     trainPuzzles, trainPuzzleLabels, trainPuzzleDigits,
@@ -561,40 +593,9 @@ def writeData(
 
     writeFile(DIGIT_LABELS_PATH.format(subpath), [[label] for label in labels])
 
-    # All examples.
-    digitTargets, digitTruths, digitFeatures, rowViolations, violationTargets, violationTruths = getPuzzleDigits(labels, False,
-                                                                                                                 trainPuzzles, trainPuzzleLabels, trainPuzzleDigits, testPuzzles, testPuzzleLabels, testPuzzleDigits)
-
-    allDigitTruths = digitTruths
-
-    writeFile(DIGIT_TARGETS_PATH.format(subpath), digitTargets)
-    writeFile(DIGIT_TRUTH_PATH.format(subpath), digitTruths)
-    writeFile(DIGIT_FEATURES_PATH.format(subpath), digitFeatures)
-
-    writeFile(ROW_VIOLATIONS_PATH.format(subpath), rowViolations)
-    writeFile(VIOLATIONS_TARGETS_PATH.format(subpath), violationTargets)
-    writeFile(VIOLATIONS_TRUTH_PATH.format(subpath), violationTruths)
-
-    # Only positive examples.
-    digitTargets, digitTruths, digitFeatures, rowViolations, violationTargets, violationTruths = getPuzzleDigits(labels, True,
-                                                                                                                 trainPuzzles, trainPuzzleLabels, trainPuzzleDigits, testPuzzles, testPuzzleLabels, testPuzzleDigits)
-
-    positiveDigitTruths = digitTruths
-
-    writeFile(DIGIT_POSITIVE_TARGETS_PATH.format(subpath), digitTargets)
-    writeFile(DIGIT_POSITIVE_TRUTH_PATH.format(subpath), digitTruths)
-    writeFile(DIGIT_POSITIVE_FEATURES_PATH.format(subpath), digitFeatures)
-
-    writeFile(ROW_VIOLATIONS_POSITIVE_PATH.format(subpath), rowViolations)
-    writeFile(VIOLATIONS_POSITIVE_TARGETS_PATH.format(subpath), violationTargets)
-    writeFile(VIOLATIONS_POSITIVE_TRUTH_PATH.format(subpath), violationTruths)
-
-    # Puzzle information.
-
+    digitTargets, _, _, _, _, _ = getPuzzleDigits(labels, True, trainPuzzles, trainPuzzleLabels, trainPuzzleDigits, testPuzzles, testPuzzleLabels, testPuzzleDigits)
     puzzleTrainFeatures, puzzleTrainDigits = getPuzzleFeatures(labels, trainPuzzles, trainPuzzleDigits)
     puzzleTestFeatures, puzzleTestDigits = getPuzzleFeatures(labels, testPuzzles, testPuzzleDigits)
-
-    positivePuzzleTrainDigits = puzzleTrainDigits
 
     writeFile(PUZZLE_IDS_PATH.format(subpath), [[i] for i in range(len(trainPuzzles) + len(testPuzzles))])
     writeFile(PUZZLE_POSITIVE_IDS_PATH.format(subpath), [[digitTarget[0]] for digitTarget in digitTargets])
@@ -619,35 +620,63 @@ def writeData(
     if (newMapping):
         labelMapping = {}
         for i in range(len(labels)):
-            labelMapping[int(positivePuzzleTrainDigits[0][i])] = int(labels[i])
+            labelMapping[int(puzzleTrainDigits[0][i])] = int(labels[i])
 
-    for digitTruth in allDigitTruths:
-        digitTruth[3] = labelMapping[digitTruth[3]]
+        writeFile(DIGIT_MAP_PATH.format(subpath), [(key, value) for (key, value) in labelMapping.items()])
 
-    for digitTruth in positiveDigitTruths:
-        digitTruth[3] = labelMapping[digitTruth[3]]
+    partition_data = {
+        'train': [trainPuzzles, trainPuzzleLabels, trainPuzzleDigits, labels, 0],
+        'test': [testPuzzles, testPuzzleLabels, testPuzzleDigits, labels, len(trainPuzzles)]
+    }
 
-    writeFile(DIGIT_MAP_PATH.format(subpath), [(key, value) for (key, value) in labelMapping.items()])
-    writeFile(DIGIT_MAPPED_TRUTH_PATH.format(subpath), allDigitTruths)
-    writeFile(DIGIT_POSITIVE_MAPPED_TRUTH_PATH.format(subpath), positiveDigitTruths)
+    for partition in partition_data:
+        puzzles, puzzleLabels, puzzleDigits, labels, offset = partition_data[partition]
+        # All examples.
+        digitTargets, digitTruths, digitFeatures, rowViolations, violationTargets, violationTruths = get_puzzle_digits(puzzles, puzzleLabels, puzzleDigits, labels, offset, False)
 
-    # Write truth data for the first pinned digits (but only when the mapping is first created).
+        writeFile(DIGIT_TARGETS_PATH.format(subpath)[:-4] + "-" + partition + ".txt", digitTargets)
+        writeFile(DIGIT_TRUTH_PATH.format(subpath)[:-4] + "-" + partition + ".txt", digitTruths)
+        writeFile(DIGIT_FEATURES_PATH.format(subpath)[:-4] + "-" + partition + ".txt", digitFeatures)
 
-    if (newMapping):
-        pinnedTruthDigits = []
+        writeFile(ROW_VIOLATIONS_PATH.format(subpath)[:-4] + "-" + partition + ".txt", rowViolations)
+        writeFile(VIOLATIONS_TARGETS_PATH.format(subpath)[:-4] + "-" + partition + ".txt", violationTargets)
+        writeFile(VIOLATIONS_TRUTH_PATH.format(subpath)[:-4] + "-" + partition + ".txt", violationTruths)
 
-        for col in range(len(labels)):
-            for labelIndex in range(len(labels)):
-                pinnedTruthDigits.append((0, 0, col, labels[labelIndex], int(col == labelIndex)))
+        for digitTruth in digitTruths:
+            digitTruth[3] = labelMapping[digitTruth[3]]
+        writeFile(DIGIT_MAPPED_TRUTH_PATH.format(subpath)[:-4] + "-" + partition + ".txt", digitTruths)
 
-        writeFile(DIGIT_PINNED_TRUTH_PATH.format(subpath), pinnedTruthDigits)
+        # Only positive examples.
+        digitTargets, digitTruths, digitFeatures, rowViolations, violationTargets, violationTruths = get_puzzle_digits(puzzles, puzzleLabels, puzzleDigits, labels, offset, True)
 
-        first_puzzle_digit_truths = []
-        for col in range(len(labels)):
-            for labelIndex in range(len(labels)):
-                first_puzzle_digit_truths.append((digitTargets[0][0], 0, col, labelIndex, int(col == labelIndex)))
+        writeFile(DIGIT_POSITIVE_TARGETS_PATH.format(subpath)[:-4] + "-" + partition + ".txt", digitTargets)
+        writeFile(DIGIT_POSITIVE_TRUTH_PATH.format(subpath)[:-4] + "-" + partition + ".txt", digitTruths)
+        writeFile(DIGIT_POSITIVE_FEATURES_PATH.format(subpath)[:-4] + "-" + partition + ".txt", digitFeatures)
 
-        writeFile(FIRST_PUZZLE_DIGIT_TRUTH_PATH.format(subpath), first_puzzle_digit_truths)
+        writeFile(ROW_VIOLATIONS_POSITIVE_PATH.format(subpath)[:-4] + "-" + partition + ".txt", rowViolations)
+        writeFile(VIOLATIONS_POSITIVE_TARGETS_PATH.format(subpath)[:-4] + "-" + partition + ".txt", violationTargets)
+        writeFile(VIOLATIONS_POSITIVE_TRUTH_PATH.format(subpath)[:-4] + "-" + partition + ".txt", violationTruths)
+
+        for digitTruth in digitTruths:
+            digitTruth[3] = labelMapping[digitTruth[3]]
+        writeFile(DIGIT_POSITIVE_MAPPED_TRUTH_PATH.format(subpath)[:-4] + "-" + partition + ".txt", digitTruths)
+
+        # Write truth data for the first pinned digits (but only when the mapping is first created).
+
+        if (newMapping) and partition == 'train':
+            pinnedTruthDigits = []
+            for col in range(len(labels)):
+                for labelIndex in range(len(labels)):
+                    pinnedTruthDigits.append((0, 0, col, labels[labelIndex], int(col == labelIndex)))
+
+            writeFile(DIGIT_PINNED_TRUTH_PATH.format(subpath), pinnedTruthDigits)
+
+            first_puzzle_digit_truths = []
+            for col in range(len(labels)):
+                for labelIndex in range(len(labels)):
+                    first_puzzle_digit_truths.append((digitTargets[0][0], 0, col, labelIndex, int(col == labelIndex)))
+
+            writeFile(FIRST_PUZZLE_DIGIT_TRUTH_PATH.format(subpath), first_puzzle_digit_truths)
 
     return labelMapping
 
@@ -735,8 +764,8 @@ def buildDataset(suffix, labels, split, digitChooser, numPositivePuzzles, trainP
         shutil.rmtree(DATA_DIR.format(subpath))
     print("Generating data defined in: " + configPath)
 
-    numTrainPuzzles = int(numPositivePuzzles * trainPercent)
-    numTestPuzzles = numPositivePuzzles - numTrainPuzzles
+    numTrainPuzzles = numPositivePuzzles
+    numTestPuzzles = NUM_POSITIVE_TEST_PUZZLES
 
     trainPuzzles, trainPuzzleLabels, trainPuzzleDigits, trainPuzzleNotes = generatePuzzles(digitChooser, labels, numTrainPuzzles)
     testPuzzles, testPuzzleLabels, testPuzzleDigits, testPuzzleNotes = generatePuzzles(digitChooser, labels, numTestPuzzles)

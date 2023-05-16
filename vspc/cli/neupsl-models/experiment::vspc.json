@@ -3,6 +3,7 @@
     "runtime.db.intids": true,
     "runtime.log.level": "TRACE",
     "runtime.learn.method": "Energy",
+    "runtime.inference.clearrules": true,
     "categoricalevaluator.defaultpredicate": "ImageSum",
     "admmreasoner.computeperiod": 100,
     "admmreasoner.epsilonabs": 1.0e-6,
@@ -30,46 +31,10 @@
   },
   "learn": {
     "options": {
-      "admmreasoner.maxiterations": 100
+      "admmreasoner.maxiterations": 1000
     },
     "rules": [
-      "1.0: NeuralClassifier(Puzzle, X, Y, Number) = PredictedNumber(Puzzle, X, Y, Number) ^2",
-
-      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '0', '0') = 1.0",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '0', '1') = 0.0 .",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '0', '2') = 0.0 .",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '0', '3') = 0.0 .",
-
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '1', '0') = 0.0 .",
-      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '1', '1') = 1.0",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '1', '2') = 0.0 .",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '1', '3') = 0.0 .",
-
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '2', '0') = 0.0 .",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '2', '1') = 0.0 .",
-      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '2', '2') = 1.0",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '2', '3') = 0.0 .",
-
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '3', '0') = 0.0 .",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '3', '1') = 0.0 .",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '3', '2') = 0.0 .",
-      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '0', '3', '3') = 1.0",
-
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '0', '0') = 0.0 .",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '0', '1') = 0.0 .",
-      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '0', '2') + NeuralClassifier(Puzzle, '1', '0', '3') = 1.0",
-
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '1', '0') = 0.0 .",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '1', '1') = 0.0 .",
-      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '1', '2') + NeuralClassifier(Puzzle, '1', '1', '3') = 1.0",
-
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '2', '2') = 0.0 .",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '2', '3') = 0.0 .",
-      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '2', '0') + NeuralClassifier(Puzzle, '1', '2', '1') = 1.0",
-
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '3', '2') = 0.0 .",
-      "0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '3', '3') = 0.0 .",
-      "1.0: 0.0 * FirstPuzzle(Puzzle) + NeuralClassifier(Puzzle, '1', '3', '0') + NeuralClassifier(Puzzle, '1', '3', '1') = 1.0",
+      "1000.0: FirstPuzzle(Puzzle, X, Y, Number) - NeuralClassifier(Puzzle, X, Y, Number) = 0.0",
 
       "1.0: NeuralClassifier(Puzzle, X, Y, +Number) = 1.0",
       "1.0: NeuralClassifier(Puzzle, +X, Y, Number) = 1.0",
@@ -78,9 +43,7 @@
       "1.0: NeuralClassifier(Puzzle, '0', '0', Number) + NeuralClassifier(Puzzle, '0', '1', Number) + NeuralClassifier(Puzzle, '1', '0', Number) + NeuralClassifier(Puzzle, '1', '1', Number) = 1.0",
       "1.0: NeuralClassifier(Puzzle, '2', '0', Number) + NeuralClassifier(Puzzle, '2', '1', Number) + NeuralClassifier(Puzzle, '3', '0', Number) + NeuralClassifier(Puzzle, '3', '1', Number) = 1.0",
       "1.0: NeuralClassifier(Puzzle, '0', '2', Number) + NeuralClassifier(Puzzle, '0', '3', Number) + NeuralClassifier(Puzzle, '1', '2', Number) + NeuralClassifier(Puzzle, '1', '3', Number) = 1.0",
-      "1.0: NeuralClassifier(Puzzle, '2', '2', Number) + NeuralClassifier(Puzzle, '2', '3', Number) + NeuralClassifier(Puzzle, '3', '2', Number) + NeuralClassifier(Puzzle, '3', '3', Number) = 1.0",
-
-      "0.1: NeuralClassifier(ImageId, X, Y, Number) = 0.0 ^2"
+      "1.0: NeuralClassifier(Puzzle, '2', '2', Number) + NeuralClassifier(Puzzle, '2', '3', Number) + NeuralClassifier(Puzzle, '3', '2', Number) + NeuralClassifier(Puzzle, '3', '3', Number) = 1.0"
     ]
   },
   "predicates": {
@@ -88,7 +51,7 @@
       "type": "DeepPredicate",
       "options": {
         "model-path": "../scripts/neupsl-model.py::VSPCModel",
-        "entity-data-map-path": "../data/experiment::vspc/puzzle-dim::04/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/learn/entity-data-map.txt",
+        "entity-data-map-path": "../data/experiment::vspc/puzzle-dim::04/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/learn/positive-entity-data-map.txt",
         "inference::entity-data-map-path": "../data/experiment::vspc/puzzle-dim::04/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/eval/entity-data-map.txt",
         "entity-argument-indexes": "0,1,2",
         "class-size": 4,
@@ -137,6 +100,12 @@
           "options": {
             "discreteevaluator.threshold": 0.2
           }
+        },
+        {
+          "evaluator": "AUCEvaluator",
+          "options": {
+            "aucevaluator.threshold": 0.2
+          }
         }
       ],
       "targets": {
@@ -173,13 +142,10 @@
         ]
       }
     },
-    "FirstPuzzle/1": {
+    "FirstPuzzle/4": {
       "observations": {
         "learn": [
-          "../data/experiment::vspc/puzzle-dim::04/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/learn/first_positive_puzzle.txt"
-        ],
-        "infer": [
-          "../data/experiment::vspc/puzzle-dim::04/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/eval/first_puzzle.txt"
+          "../data/experiment::vspc/puzzle-dim::04/num-positive-puzzles::00004/train-percent::50/overlap-percent::00/neural-learning-rate::0.001000/split::00/learn/first_puzzle_digit_truth.txt"
         ]
       }
     }

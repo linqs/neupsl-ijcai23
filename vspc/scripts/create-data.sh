@@ -7,7 +7,7 @@ readonly THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 readonly SETUP_SCRIPT="${THIS_DIR}/generator.py"
 
 readonly SUFFIX=experiment
-readonly NUM_SPLITS='1'
+readonly NUM_SPLITS='10'
 
 readonly DIMENSIONS='4'
 readonly NUM_PUZZLES='004 008 016 032 064'

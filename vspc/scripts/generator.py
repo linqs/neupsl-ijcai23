@@ -30,6 +30,7 @@ PUZZLE_IDS_PATH = os.path.join(DATA_DIR, 'puzzle.txt')
 PUZZLE_POSITIVE_IDS_PATH = os.path.join(DATA_DIR, 'puzzle_positive.txt')
 PUZZLE_FIRST_ID_PATH = os.path.join(DATA_DIR, 'first_puzzle.txt')
 PUZZLE_POSITIVE_FIRST_ID_PATH = os.path.join(DATA_DIR, 'first_positive_puzzle.txt')
+FIRST_PUZZLE_DIGIT_TRUTH_PATH = os.path.join(DATA_DIR, 'first_puzzle_digit_truth.txt')
 BLOCKS_PATH = os.path.join(DATA_DIR, 'block.txt')
 
 DIGIT_LABELS_PATH = os.path.join(DATA_DIR, 'digit_labels.txt')
@@ -43,7 +44,7 @@ DIGIT_TRUTH_PATH = os.path.join(DATA_DIR, 'digit_truth.txt')
 DIGIT_MAPPED_TRUTH_PATH = os.path.join(DATA_DIR, 'digit_mapped_truth.txt')
 
 # Only digits from positive examples.
-DIGIT_POSITIVE_FEATURES_PATH = os.path.join(DATA_DIR, 'digit_positive_features.txt')
+DIGIT_POSITIVE_FEATURES_PATH = os.path.join(DATA_DIR, 'positive-entity-data-map.txt')
 DIGIT_POSITIVE_TARGETS_PATH = os.path.join(DATA_DIR, 'digit_positive_targets.txt')
 DIGIT_POSITIVE_TRUTH_PATH = os.path.join(DATA_DIR, 'digit_positive_truth.txt')
 DIGIT_POSITIVE_MAPPED_TRUTH_PATH = os.path.join(DATA_DIR, 'digit_positive_mapped_truth.txt')
@@ -643,6 +644,13 @@ def writeData(
                 pinnedTruthDigits.append((0, 0, col, labels[labelIndex], int(col == labelIndex)))
 
         writeFile(DIGIT_PINNED_TRUTH_PATH.format(subpath), pinnedTruthDigits)
+
+        first_puzzle_digit_truths = []
+        for col in range(len(labels)):
+            for labelIndex in range(len(labels)):
+                first_puzzle_digit_truths.append((digitTargets[0][0], 0, col, labelIndex, int(col == labelIndex)))
+
+        writeFile(FIRST_PUZZLE_DIGIT_TRUTH_PATH.format(subpath), first_puzzle_digit_truths)
 
     return labelMapping
 

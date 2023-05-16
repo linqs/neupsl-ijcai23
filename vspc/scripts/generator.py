@@ -22,7 +22,7 @@ THIS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 # In this path, include the format string for the subpath.
 # The subpath itself may have more subs, but only one will occur for each child.
 DATA_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', 'data', '{}'))
-SUBPATH_FORMAT = os.path.join('experiment::vspc', 'puzzle-dim::{:02d}', 'num-positive-puzzles::{:05d}', 'train-percent::{:02d}', 'overlap-percent::{:02d}', 'neural-learning-rate::{:0.6f}', 'split::{:02d}', '{:s}')
+SUBPATH_FORMAT = os.path.join('experiment::mnist-{:01d}x{:01d}', 'num-positive-puzzles::{:05d}', 'train-percent::{:02d}', 'overlap-percent::{:02d}', 'neural-learning-rate::{:0.6f}', 'split::{:02d}', '{:s}')
 
 CONFIG_PATH = os.path.join(DATA_DIR, 'config.json')
 
@@ -90,6 +90,7 @@ NEURAL_EPOCHS = 100
 NEURAL_LOSS = 'KLDivergence'
 NEURAL_METRICS = ['categorical_accuracy']
 DEFAULT_NEURAL_LEARNING_RATE = 1.0e-3
+VERBOSE = 0
 
 # The chances to continue the respective corruption.
 PUZZLE_CORRUPTION_REPLACE_CHANCE = 0.50
@@ -502,8 +503,6 @@ def buildPuzzleVisualNetwork(digitInputSize, labels, neuralLearningRate):
         metrics = ['categorical_accuracy', tensorflow.keras.metrics.AUC()],
     )
 
-    model.summary()
-
     return model
 
 def buildPuzzleDigitNetwork(labels, neuralLearningRate):
@@ -525,8 +524,6 @@ def buildPuzzleDigitNetwork(labels, neuralLearningRate):
         loss = 'binary_crossentropy',
         metrics = ['categorical_accuracy', tensorflow.keras.metrics.AUC()],
     )
-
-    model.summary()
 
     return model
 
@@ -666,7 +663,7 @@ def buildPuzzleVisualModel(labels, subpath, neuralLearningRate,
     print("Untrained Puzzle Visual Model -- Loss: %f, Accuracy: %f, AUROC: %f" % (untrainedLoss, untrainedAccuracy, untrainedAUC))
     puzzleModel.save(UNTRAINED_PUZZLE_VISUAL_MODEL_TF_PATH.format(subpath), save_format = 'tf', include_optimizer = True)
 
-    trainHistory = puzzleModel.fit(puzzleTrainFeatures, trainPuzzleLabels, epochs = NEURAL_EPOCHS)
+    trainHistory = puzzleModel.fit(puzzleTrainFeatures, trainPuzzleLabels, epochs = NEURAL_EPOCHS, verbose=VERBOSE)
 
     trainedLoss, trainedAccuracy, trainedAUC, _ = testPuzzle(puzzleModel, puzzleTestFeatures, testPuzzleLabels)
     print("Trained Puzzle Visual Model -- Loss: %f, Accuracy: %f, AUROC: %f" % (trainedLoss, trainedAccuracy, trainedAUC))
@@ -701,7 +698,7 @@ def buildPuzzleDigitModel(labels, subpath, neuralLearningRate,
     print("Untrained Puzzle Model -- Loss: %f, Accuracy: %f, AUROC: %f" % (untrainedLoss, untrainedAccuracy, untrainedAUC))
     puzzleModel.save(UNTRAINED_PUZZLE_DIGIT_MODEL_TF_PATH.format(subpath), save_format = 'tf', include_optimizer = True)
 
-    trainHistory = puzzleModel.fit(puzzleTrainDigits, trainPuzzleLabels, epochs = NEURAL_EPOCHS)
+    trainHistory = puzzleModel.fit(puzzleTrainDigits, trainPuzzleLabels, epochs = NEURAL_EPOCHS, verbose=VERBOSE)
 
     trainedLoss, trainedAccuracy, trainedAUC, _ = testPuzzle(puzzleModel, puzzleTestDigits, testPuzzleLabels)
     print("Trained Puzzle Model -- Loss: %f, Accuracy: %f, AUROC: %f" % (trainedLoss, trainedAccuracy, trainedAUC))
@@ -726,7 +723,7 @@ def buildPuzzleDigitModel(labels, subpath, neuralLearningRate,
 
 def buildDataset(suffix, labels, split, digitChooser, numPositivePuzzles, trainPercent, overlapPercent, neuralLearningRate, seed, foldType,
                  force = False, labelMapping = None):
-    subpath = SUBPATH_FORMAT.format(len(labels), numPositivePuzzles, int(trainPercent * 100), int(overlapPercent * 100), neuralLearningRate, split, foldType)
+    subpath = SUBPATH_FORMAT.format(len(labels), len(labels), numPositivePuzzles, int(trainPercent * 100), int(overlapPercent * 100), neuralLearningRate, split, foldType)
 
     configPath = CONFIG_PATH.format(subpath)
     if (os.path.isfile(configPath)):

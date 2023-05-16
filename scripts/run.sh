@@ -56,7 +56,17 @@ function run() {
         for options_path in $(find "${data_dir}/${model_name}" -name entity-data-map.txt | sort) ; do
             cp ${neupsl_models_dir}/${model} ${cli_dir}/${experiment}.json
 
-            local original_param_path=$(grep "entity-data-map.txt" "${cli_dir}/${experiment}.json" | sed "s#^.*data/${model_name}/\(.*\)/entity-data-map.txt.*\$#\1#")
+            local file_identifier="entity-data-map.txt"
+
+            if [[ ${experiment} == "vspc" ]]; then
+              if [[ ${options_path} == *"/learn/${file_identifier}"* ]]; then
+                continue
+              fi
+              options_path=$(dirname $(dirname "${options_path}"))/${file_identifier}
+              file_identifier="eval/entity-data-map.txt"
+            fi
+
+            local original_param_path=$(grep ${file_identifier} "${cli_dir}/${experiment}.json" | sed "s#^.*data/${model_name}/\(.*\)/${file_identifier}.*\$#\1#")
             local current_param_path=$(dirname "${options_path}" | sed "s#^.*data/${model_name}/##")
 
             # Change the .data files to use the current settings.

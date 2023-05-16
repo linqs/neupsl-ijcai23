@@ -9,7 +9,12 @@ THIS_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
 
 LOG_FILENAME = 'out.txt'
-ADDITIONAL_HEADERS = ['Categorical-Accuracy']
+ADDITIONAL_HEADERS = []
+SPECIALIZED_HEADERS = {
+    'citation': ['Categorical-Accuracy'],
+    'mnist-addition': ['Categorical-Accuracy'],
+    'vspc': ['Puzzle-Accuracy', 'Puzzle-AUROC', 'Digit-Categorical-Accuracy']
+}
 
 class NeuPSLResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
@@ -27,7 +32,7 @@ class NeuPSLResultsParser(results_parser.AbstractResultsParser):
 
 
 def main():
-    NeuPSLResultsParser(results_dir=RESULTS_DIR, log_filename=LOG_FILENAME, additional_headers=ADDITIONAL_HEADERS).parse_results()
+    NeuPSLResultsParser(results_dir=RESULTS_DIR, log_filename=LOG_FILENAME, additional_headers=ADDITIONAL_HEADERS, specialized_headers=SPECIALIZED_HEADERS).parse_results()
 
 
 if __name__ == '__main__':

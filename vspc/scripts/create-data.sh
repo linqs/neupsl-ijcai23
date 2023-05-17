@@ -6,14 +6,12 @@
 readonly THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 readonly SETUP_SCRIPT="${THIS_DIR}/generator.py"
 
-readonly SUFFIX=experiment
-readonly NUM_SPLITS='10'
-
 readonly DIMENSIONS='4'
 readonly NUM_POSITIVE_TRAIN_PUZZLES='002 004 008'
 readonly NUM_POSITIVE_TEST_PUZZLES='050'
 readonly NUM_POSITIVE_VALID_PUZZLES='025'
 readonly OVERLAP='0.00 1.00 3.00'
+readonly NUM_SPLITS='10'
 
 function main() {
 	set -e

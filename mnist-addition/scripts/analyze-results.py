@@ -99,26 +99,34 @@ def print_mean_std(results, name):
         print("Train Size: %d Overlap: %.2f Categorical Accuracy: %.2f \u00B1 %.2f" % (int(key[0]), float(key[1]), 100 * results[key]['mean'], 100 * results[key]['std']))
 
 
+def fix_ltn(ltn_results):
+    for experiment in ltn_results:
+        for index in range(len(ltn_results[experiment]['rows'])):
+            ltn_results[experiment]['rows'][index][2] = "%04d" % (2 * int(ltn_results[experiment]['rows'][index][0].split('-')[1]) * int(ltn_results[experiment]['rows'][index][2]))
+            ltn_results[experiment]['rows'][index][3] = "%.2f" % float(ltn_results[experiment]['rows'][index][3])
+    return ltn_results
+
 def main():
     raw_cnn_results = util.load_json_file(CNN_RESULTS)
     raw_dpl_results = util.load_json_file(DPL_RESULTS)
-    # raw_ltn_results = util.load_json_file(LTN_RESULTS)
-    raw_ltn_results = None
+    raw_ltn_results = fix_ltn(util.load_json_file(LTN_RESULTS))
     raw_neupsl_results = util.load_json_file(NEUPSL_RESULTS)
 
     cnn_mnist_1_results = parse_raw_results(raw_cnn_results['experiment::mnist-1']['rows'], raw_cnn_results['experiment::mnist-1']['header'], 1, 3, 3)
     dpl_mnist_1_results = parse_raw_results(raw_dpl_results['experiment::mnist-1']['rows'], raw_dpl_results['experiment::mnist-1']['header'], 1, 3, 3)
+    ltn_mnist_1_results = parse_raw_results(raw_ltn_results['method::ltn']['rows'], raw_ltn_results['method::ltn']['header'], 2, 4, 4, ignore_rows_with_entries=['mnist-2'], ignore_rows_with_entry_indexies=[0])
     neupsl_mnist_1_results = parse_raw_results(raw_neupsl_results['mnist-addition']['rows'], raw_neupsl_results['mnist-addition']['header'], 3, 5, 5, ignore_rows_with_entries=['mnist-2'], ignore_rows_with_entry_indexies=[1])
 
     print_mean_std(cnn_mnist_1_results, "CNN MNIST-1 Results:")
     print_mean_std(dpl_mnist_1_results, "DPL MNIST-1 Results:")
+    print_mean_std(ltn_mnist_1_results, "LTN MNIST-1 Results:")
     print_mean_std(neupsl_mnist_1_results, "NeuPSL MNIST-1 Results:")
 
     minor_xtick_labels = ["20", "30", "40", "30", "45", "60", "40", "60", "80"]
     major_xtick_labels = ["Number of Puzzles \n" + r"$\mathbf{40 \, Unique MNIST \, Images}$",
                           "Number of Puzzles \n" + r"$\mathbf{60 \, Unique MNIST \, Images}$",
                           "Number of Puzzles \n" + r"$\mathbf{80 \, Unique MNIST \, Images}$"]
-    plot_results(cnn_mnist_1_results, dpl_mnist_1_results, cnn_mnist_1_results, neupsl_mnist_1_results, minor_xtick_labels, major_xtick_labels, "MNIST Addition 1")
+    plot_results(cnn_mnist_1_results, dpl_mnist_1_results, ltn_mnist_1_results, neupsl_mnist_1_results, minor_xtick_labels, major_xtick_labels, "MNIST Addition 1")
 
     cnn_mnist_2_results = parse_raw_results(raw_cnn_results['experiment::mnist-2']['rows'], raw_cnn_results['experiment::mnist-2']['header'], 1, 3, 3)
     dpl_mnist_2_results = parse_raw_results(raw_dpl_results['experiment::mnist-2']['rows'], raw_dpl_results['experiment::mnist-2']['header'], 1, 3, 3)
@@ -132,7 +140,7 @@ def main():
     major_xtick_labels = ["Number of Puzzles \n" + r"$\mathbf{40 \, Unique MNIST \, Images}$",
                           "Number of Puzzles \n" + r"$\mathbf{60 \, Unique MNIST \, Images}$",
                           "Number of Puzzles \n" + r"$\mathbf{80 \, Unique MNIST \, Images}$"]
-    plot_results(cnn_mnist_2_results, dpl_mnist_2_results, cnn_mnist_2_results, neupsl_mnist_2_results, minor_xtick_labels, major_xtick_labels, "MNIST Addition 1")
+    plot_results(cnn_mnist_2_results, dpl_mnist_2_results, cnn_mnist_2_results, neupsl_mnist_2_results, minor_xtick_labels, major_xtick_labels, "MNIST Addition 2")
 
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ readonly SPLITS=15
 readonly EPOCHS=150
 readonly TEST_SIZE=1000
 
-readonly OVERLAPS='0.0 0.5 1.0'
+readonly OVERLAPS='0.00 0.50 1.00'
 
 readonly MNIST_1_SIZES='20 30 40'
 readonly MNIST_2_SIZES='10 15 20'
@@ -58,8 +58,9 @@ function run_mnist() {
 
     for split in $(seq 0 ${SPLITS}) ; do
         for size in ${sizes} ; do
+            digit_size=`printf "%04d" $((${size} * 2 * ${mnistType}))`
             for overlap in ${OVERLAPS} ; do
-                local outDir="${BASE_OUT_DIR}/method::${method}/experiment::mnist-${mnistType}/split::${split}/train-size::${size}/overlap::${overlap}/"
+                local outDir="${BASE_OUT_DIR}/method::${method}/experiment::mnist-${mnistType}/split::${split}/train-size::${digit_size}/overlap::${overlap}/"
                 local options="--epochs ${EPOCHS} --n-examples-test ${TEST_SIZE} --n-examples-train ${size} --overlap ${overlap}"
 
                 echo "Running ${outDir}."

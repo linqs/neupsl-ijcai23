@@ -18,40 +18,43 @@ LTN_RESULTS = os.path.join(THIS_DIR, '..', 'other-methods', 'ltn', 'scripts', 'r
 NEUPSL_RESULTS = os.path.join(THIS_DIR, '..', '..', 'scripts', 'results.json')
 
 Y_LIM = 0.0
-BUFFER = 0.25
+BUFFER = 0.20
 TICK_OFFSET = 1.0e-3
 BAR_WIDTH = 0.5
-GROUP_SIZE = 3 * BAR_WIDTH + BUFFER
+GROUP_SIZE = 4 * BAR_WIDTH + BUFFER
 
+LEGEND_KEYS = ['CNN', 'LTN', 'DeepProbLog','NeuPSL']
+Y_LABEL = 'Categorical Accuracy'
+
+CNN_COLOR = 'forestgreen'
+DPL_COLOR = 'tomato'
+LTN_COLOR = 'mediumorchid'
 NEUPSL_COLOR = 'mediumslateblue'
-BASELINE_DIGIT_COLOR = 'tomato'
-BASELINE_VISUAL_COLOR = 'forestgreen'
 
 
-def plot_results(cnn_digit_results, cnn_visual_results, neupsl_results):
+def plot_results(cnn_results, dpl_results, ltn_results, neupsl_results, minor_xtick_labels, major_xtick_labels, title):
     fig, ax = plt.subplots(figsize=(12, 3))
 
     index = 0
     for key in neupsl_results:
-        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (0 + index // 3), cnn_visual_results[key]['mean'], BAR_WIDTH, yerr=cnn_visual_results[key]['std'], capsize=2, color=BASELINE_VISUAL_COLOR, edgecolor='black')
-        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (1 + index // 3), cnn_digit_results[key]['mean'], BAR_WIDTH, yerr=cnn_digit_results[key]['std'], capsize=2, color=BASELINE_DIGIT_COLOR, edgecolor='black')
-        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (2 + index // 3), neupsl_results[key]['mean'], BAR_WIDTH, yerr=neupsl_results[key]['std'], capsize=2, color=NEUPSL_COLOR, edgecolor='black')
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (0 + index // 3), cnn_results[key]['mean'], BAR_WIDTH, yerr=cnn_results[key]['std'], capsize=2, color=CNN_COLOR, edgecolor='black')
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (1 + index // 3), ltn_results[key]['mean'], BAR_WIDTH, yerr=ltn_results[key]['std'], capsize=2, color=LTN_COLOR, edgecolor='black')
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (2 + index // 3), dpl_results[key]['mean'], BAR_WIDTH, yerr=dpl_results[key]['std'], capsize=2, color=DPL_COLOR, edgecolor='black')
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (3 + index // 3), neupsl_results[key]['mean'], BAR_WIDTH, yerr=neupsl_results[key]['std'], capsize=2, color=NEUPSL_COLOR, edgecolor='black')
         index += 1
 
-    ax.legend(['CNN-Visual', 'CNN-Digit', 'NeuPSL'])
+    ax.legend(LEGEND_KEYS)
 
-    ax.set_xticks([index * GROUP_SIZE + BAR_WIDTH * (1 + index // 3) + TICK_OFFSET for index in range(len(neupsl_results))], minor=True)
-    ax.set_xticklabels(["4", "8", "16", "8", "16", "32", "16", "32", "64",], minor=True)
+    ax.set_xticks([index * GROUP_SIZE + BAR_WIDTH * (1.5 + index // 3) + TICK_OFFSET for index in range(len(neupsl_results))], minor=True)
+    ax.set_xticklabels(minor_xtick_labels, minor=True)
 
-    ax.set_xticks([GROUP_SIZE + BAR_WIDTH, 4 * GROUP_SIZE + 2 * BAR_WIDTH, 7 * GROUP_SIZE + 3 * BAR_WIDTH], minor=False)
-    ax.set_xticklabels(["Number of Puzzles \n" + r"$\mathbf{64 \, Unique MNIST \, Images}$",
-                        "Number of Puzzles \n" + r"$\mathbf{128 \, Unique MNIST \, Images}$",
-                        "Number of Puzzles \n" + r"$\mathbf{256 \, Unique MNIST \, Images}$"], minor=False)
+    ax.set_xticks([GROUP_SIZE + 1.5 * BAR_WIDTH, 4 * GROUP_SIZE + 2.5 * BAR_WIDTH, 7 * GROUP_SIZE + 3.5 * BAR_WIDTH], minor=False)
+    ax.set_xticklabels(major_xtick_labels, minor=False)
     ax.tick_params(axis='x', which='major', pad=20, size=0)
     ax.set_ylim(Y_LIM)
 
-    ax.set_ylabel("Accuracy")
-    ax.set_title("Visual-Sudoku-Classification")
+    ax.set_ylabel(Y_LABEL)
+    ax.set_title(title)
 
     plt.axvline(x = 3 * GROUP_SIZE + 0 * BAR_WIDTH - BUFFER / 2, color='black', linewidth=1)
     plt.axvline(x = 6 * GROUP_SIZE + 1 * BAR_WIDTH - BUFFER / 2, color='black', linewidth=1)
@@ -97,28 +100,39 @@ def print_mean_std(results, name):
 
 
 def main():
-    # raw_cnn_results = util.load_json_file(CNN_RESULTS)
-    raw_cnn_resluts = None
+    raw_cnn_results = util.load_json_file(CNN_RESULTS)
     raw_dpl_results = util.load_json_file(DPL_RESULTS)
     # raw_ltn_results = util.load_json_file(LTN_RESULTS)
     raw_ltn_results = None
     raw_neupsl_results = util.load_json_file(NEUPSL_RESULTS)
 
+    cnn_mnist_1_results = parse_raw_results(raw_cnn_results['experiment::mnist-1']['rows'], raw_cnn_results['experiment::mnist-1']['header'], 1, 3, 3)
     dpl_mnist_1_results = parse_raw_results(raw_dpl_results['experiment::mnist-1']['rows'], raw_dpl_results['experiment::mnist-1']['header'], 1, 3, 3)
     neupsl_mnist_1_results = parse_raw_results(raw_neupsl_results['mnist-addition']['rows'], raw_neupsl_results['mnist-addition']['header'], 3, 5, 5, ignore_rows_with_entries=['mnist-2'], ignore_rows_with_entry_indexies=[1])
 
+    print_mean_std(cnn_mnist_1_results, "CNN MNIST-1 Results:")
     print_mean_std(dpl_mnist_1_results, "DPL MNIST-1 Results:")
     print_mean_std(neupsl_mnist_1_results, "NeuPSL MNIST-1 Results:")
 
-    plot_results(dpl_mnist_1_results, neupsl_mnist_1_results, neupsl_mnist_1_results)
+    minor_xtick_labels = ["20", "30", "40", "30", "45", "60", "40", "60", "80"]
+    major_xtick_labels = ["Number of Puzzles \n" + r"$\mathbf{40 \, Unique MNIST \, Images}$",
+                          "Number of Puzzles \n" + r"$\mathbf{60 \, Unique MNIST \, Images}$",
+                          "Number of Puzzles \n" + r"$\mathbf{80 \, Unique MNIST \, Images}$"]
+    plot_results(cnn_mnist_1_results, dpl_mnist_1_results, cnn_mnist_1_results, neupsl_mnist_1_results, minor_xtick_labels, major_xtick_labels, "MNIST Addition 1")
 
+    cnn_mnist_2_results = parse_raw_results(raw_cnn_results['experiment::mnist-2']['rows'], raw_cnn_results['experiment::mnist-2']['header'], 1, 3, 3)
     dpl_mnist_2_results = parse_raw_results(raw_dpl_results['experiment::mnist-2']['rows'], raw_dpl_results['experiment::mnist-2']['header'], 1, 3, 3)
     neupsl_mnist_2_results = parse_raw_results(raw_neupsl_results['mnist-addition']['rows'], raw_neupsl_results['mnist-addition']['header'], 3, 5, 5, ignore_rows_with_entries=['mnist-1'], ignore_rows_with_entry_indexies=[1])
 
-    print_mean_std(dpl_mnist_1_results, "DPL MNIST-2 Results:")
-    print_mean_std(neupsl_mnist_1_results, "NeuPSL MNIST-2 Results:")
+    print_mean_std(cnn_mnist_2_results, "CNN MNIST-2 Results:")
+    print_mean_std(dpl_mnist_2_results, "DPL MNIST-2 Results:")
+    print_mean_std(neupsl_mnist_2_results, "NeuPSL MNIST-2 Results:")
 
-    plot_results(dpl_mnist_2_results, neupsl_mnist_2_results, neupsl_mnist_2_results)
+    minor_xtick_labels = ["10", "15", "20", "15", "22", "30", "20", "30", "40"]
+    major_xtick_labels = ["Number of Puzzles \n" + r"$\mathbf{40 \, Unique MNIST \, Images}$",
+                          "Number of Puzzles \n" + r"$\mathbf{60 \, Unique MNIST \, Images}$",
+                          "Number of Puzzles \n" + r"$\mathbf{80 \, Unique MNIST \, Images}$"]
+    plot_results(cnn_mnist_2_results, dpl_mnist_2_results, cnn_mnist_2_results, neupsl_mnist_2_results, minor_xtick_labels, major_xtick_labels, "MNIST Addition 1")
 
 
 if __name__ == '__main__':

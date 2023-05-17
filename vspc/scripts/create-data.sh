@@ -17,23 +17,23 @@ function main() {
 	set -e
 	trap exit SIGINT
 
-    for dimension in ${DIMENSIONS} ; do
-      for num_positive_train_puzzles in ${NUM_POSITIVE_TRAIN_PUZZLES} ; do
-        for num_positive_test_puzzles in ${NUM_POSITIVE_TEST_PUZZLES} ; do
-          for num_positive_valid_puzzles in ${NUM_POSITIVE_VALID_PUZZLES} ; do
-            for overlap in ${OVERLAP} ; do
-              "${SETUP_SCRIPT}" \
-                  --dimension "${dimension}" \
-                  --num-positive-train-puzzles "${num_positive_train_puzzles}" \
-                  --num-positive-test-puzzles "${num_positive_test_puzzles}" \
-                  --num-positive-valid-puzzles "${num_positive_valid_puzzles}" \
-                  --overlap "${overlap}" \
-                  --splits ${NUM_SPLITS}
-            done
+  for dimension in ${DIMENSIONS} ; do
+    for num_positive_train_puzzles in ${NUM_POSITIVE_TRAIN_PUZZLES} ; do
+      for num_positive_test_puzzles in ${NUM_POSITIVE_TEST_PUZZLES} ; do
+        for num_positive_valid_puzzles in ${NUM_POSITIVE_VALID_PUZZLES} ; do
+          for overlap in ${OVERLAP} ; do
+            "${SETUP_SCRIPT}" \
+                --dimension "${dimension}" \
+                --num-positive-train-puzzles "${num_positive_train_puzzles}" \
+                --num-positive-test-puzzles "${num_positive_test_puzzles}" \
+                --num-positive-valid-puzzles "${num_positive_valid_puzzles}" \
+                --overlap "${overlap}" \
+                --splits ${NUM_SPLITS}
           done
         done
       done
     done
+  done
 }
 
 main "$@"

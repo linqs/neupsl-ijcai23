@@ -31,3 +31,4 @@ out*.err
 inferred-predicates/
 results/
 data/
+results.json

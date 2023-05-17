@@ -8,6 +8,7 @@ THIS_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
 sys.path.append(os.path.join(THIS_DIR, '..', '..', '..', '..', 'scripts'))
 results_parser = importlib.import_module('results-parser')
+util = importlib.import_module("util")
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
 LOG_FILENAME = 'config.json'
@@ -29,8 +30,11 @@ class GNNResultsParser(results_parser.AbstractResultsParser):
 
 
 def main():
-    GNNResultsParser(results_dir=RESULTS_DIR, log_filename=LOG_FILENAME, additional_headers=ADDITIONAL_HEADERS).parse_results()
+    gnn_results_parser = GNNResultsParser(results_dir=RESULTS_DIR, log_filename=LOG_FILENAME, additional_headers=ADDITIONAL_HEADERS)
+    results = gnn_results_parser.parse_results()
+    gnn_results_parser.print_results(results)
 
+    util.write_json_file('results.json', results)
 
 if __name__ == '__main__':
     main()

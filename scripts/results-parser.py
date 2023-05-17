@@ -22,7 +22,7 @@ class AbstractResultsParser(abc.ABC):
                 parts = os.path.dirname(log_path.split(experiment + "/")[1]).split("/")
                 results[experiment]['rows'].append([row.split("::")[1] for row in parts] + self.parse_log_path(log_path))
 
-        self.print_results(results)
+        return results
 
     def get_log_paths(self, path):
         log_paths = []

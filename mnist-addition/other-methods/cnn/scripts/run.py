@@ -2,6 +2,7 @@ import importlib
 import sys
 
 import os
+import time
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
@@ -56,12 +57,16 @@ def load_dataset(path, label_size):
     return train_features, train_labels, test_features, test_labels
 
 
-def test_eval(model, data, labels, output_path=None):
+def test_eval(model, data, labels, train_time, output_path=None):
+    test_start_time = time.time()
     loss, accuracy = model.evaluate(data, labels)
+    test_end_time = time.time()
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, 'w') as output:
-        output.write("Loss: {}".format(loss))
-        output.write("IMAGESUM -- Categorical Accuracy: {}".format(accuracy))
+        output.write("Loss: {}\n".format(loss))
+        output.write("Categorical Accuracy: {}".format(accuracy))
+        output.write("Inference Time: {}".format(test_end_time - test_start_time))
+        output.write("Train Time: {}".format(train_time))
 
 
 def main():
@@ -77,10 +82,13 @@ def main():
                 out_dir = os.path.join(DATA_PATH, "experiment::mnist-1/split::{:02d}/train-size::{:04d}/overlap::{:.2f}".format(split, training_size, overlap))
                 train_x, train_y, eval_x, eval_y = load_dataset(out_dir, 19)
 
+                train_start_time = time.time()
                 model.fit(train_x, train_y, batch_size=32, epochs=NUM_EPOCHS)
+                train_end_time = time.time()
                 test_eval(
                     model,
                     eval_x, eval_y,
+                    train_end_time - train_start_time,
                     os.path.join(RESULTS_PATH, "experiment::mnist-1/split::{:02d}/train-size::{:04d}/overlap::{:.2f}/out.txt".format(split, training_size, overlap))
                 )
 
@@ -96,10 +104,13 @@ def main():
                 out_dir = os.path.join(DATA_PATH, "experiment::mnist-2/split::{:02d}/train-size::{:04d}/overlap::{:.2f}".format(split, training_size, overlap))
                 train_x, train_y, eval_x, eval_y = load_dataset(out_dir, 199)
 
+                train_start_time = time.time()
                 model.fit(train_x, train_y, batch_size=32, epochs=NUM_EPOCHS)
+                train_end_time = time.time()
                 test_eval(
                     model,
                     eval_x, eval_y,
+                    train_end_time - train_start_time,
                     os.path.join(RESULTS_PATH, "experiment::mnist-2/split::{:02d}/train-size::{:04d}/overlap::{:.2f}/out.txt".format(split, training_size, overlap))
                 )
 

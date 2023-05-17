@@ -64,8 +64,8 @@ def test_eval(model, data, labels, train_time, output_path=None):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, 'w') as output:
         output.write("Loss: {}\n".format(loss))
-        output.write("Categorical Accuracy: {}".format(accuracy))
-        output.write("Inference Time: {}".format(test_end_time - test_start_time))
+        output.write("Categorical Accuracy: {}\n".format(accuracy))
+        output.write("Inference Time: {}\n".format(test_end_time - test_start_time))
         output.write("Train Time: {}".format(train_time))
 
 

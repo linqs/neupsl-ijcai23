@@ -11,7 +11,9 @@ python3 parse-results.py
 # Citation
 # ---------------------------
 
-cd ../citation/other-methods/deepstochlog/scripts
+cd ../citation/other-methods/cnn/scripts
+python3 parse-results.py
+cd ../../deepstochlog/scripts
 python3 parse-results.py
 cd ../../gnn/scripts
 python3 parse-results.py

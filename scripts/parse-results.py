@@ -12,9 +12,9 @@ util = importlib.import_module("util")
 LOG_FILENAME = 'out.txt'
 ADDITIONAL_HEADERS = []
 SPECIALIZED_HEADERS = {
-    'citation': ['Categorical-Accuracy'],
-    'mnist-addition': ['Categorical-Accuracy'],
-    'vspc': ['Puzzle-Accuracy', 'Puzzle-AUROC', 'Digit-Categorical-Accuracy']
+    'citation': ['Categorical-Accuracy', 'Inference-Runtime'],
+    'mnist-addition': ['Categorical-Accuracy', 'Inference-Runtime'],
+    'vspc': ['Puzzle-Accuracy', 'Puzzle-AUROC', 'Digit-Categorical-Accuracy', 'Inference-Runtime']
 }
 
 class NeuPSLResultsParser(results_parser.AbstractResultsParser):
@@ -23,12 +23,30 @@ class NeuPSLResultsParser(results_parser.AbstractResultsParser):
 
     def parse_log_path(self, log_path):
         results = []
+
+        inference_start = -1
+        inference_end = -1
+        capture_inference_time = False
+
         with open(log_path, 'r') as file:
             for line in file:
                 if 'Evaluation results' in line:
                     match = re.search(r': ([\d\.]+)', line)
                     results.append(float(match.group(1)))
 
+                if 'Found value true for option runtime.inference' in line:
+                    capture_inference_time = True
+
+                if capture_inference_time:
+                    match = re.search(r'^(\d+).*Beginning inference\.', line)
+                    if match is not None:
+                        inference_start = int(match.group(1))
+
+                    match = re.search(r'^(\d+).*Inference complete\.', line)
+                    if match is not None:
+                        inference_end = int(match.group(1))
+
+        results.append((inference_end - inference_start) / 1000)
         return results
 
 

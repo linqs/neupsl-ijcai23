@@ -12,7 +12,7 @@ util = importlib.import_module("util")
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
 LOG_FILENAME = 'out.txt'
-ADDITIONAL_HEADERS = ['Categorical-Accuracy']
+ADDITIONAL_HEADERS = ['Categorical-Accuracy', 'Inference-Runtime']
 
 class PSLResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
@@ -20,12 +20,25 @@ class PSLResultsParser(results_parser.AbstractResultsParser):
 
     def parse_log_path(self, log_path):
         results = []
+
+        inference_start = -1
+        inference_end = -1
+
         with open(log_path, 'r') as file:
             for line in file:
-                if 'Categorical Accuracy:' in line:
-                    match = re.search(r'Categorical Accuracy: (\d+\.\d+)', line)
+                match = re.search(r'Categorical Accuracy: (\d+\.\d+)', line)
+                if match is not None:
                     results.append(float(match.group(1)))
 
+                match = re.search(r'^(\d+).*Beginning inference\.', line)
+                if match is not None:
+                    inference_start = int(match.group(1))
+
+                match = re.search(r'^(\d+).*Inference complete\.', line)
+                if match is not None:
+                    inference_end = int(match.group(1))
+
+        results.append((inference_end - inference_start) / 1000)
         return results
 
 

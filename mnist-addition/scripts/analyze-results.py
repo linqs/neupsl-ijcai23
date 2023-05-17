@@ -33,7 +33,7 @@ NEUPSL_COLOR = 'mediumslateblue'
 
 
 def plot_results(cnn_results, dpl_results, ltn_results, neupsl_results, minor_xtick_labels, major_xtick_labels, title):
-    fig, ax = plt.subplots(figsize=(12, 3))
+    fig, ax = plt.subplots(figsize=(12, 2.5))
 
     index = 0
     for key in neupsl_results:

@@ -12,7 +12,7 @@ util = importlib.import_module("util")
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
 LOG_FILENAME = 'out.txt'
-ADDITIONAL_HEADERS = ['Training-Test-Accuracy', 'Test-Accuracy', 'Inference-Time']
+ADDITIONAL_HEADERS = ['Training-Test-Accuracy', 'Test-Accuracy', 'Inference-Runtime']
 
 class DSLResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):

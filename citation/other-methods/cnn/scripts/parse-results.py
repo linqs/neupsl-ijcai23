@@ -12,7 +12,7 @@ util = importlib.import_module("util")
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', '..', '..', 'data')
 LOG_FILENAME = 'config.json'
-ADDITIONAL_HEADERS = ['Categorical-Accuracy']
+ADDITIONAL_HEADERS = ['Categorical-Accuracy', 'Inference-Runtime']
 
 class PSLResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
@@ -23,13 +23,19 @@ class PSLResultsParser(results_parser.AbstractResultsParser):
             return None
 
         results = []
+        inference_runtime = -1
+
         with open(log_path, 'r') as file:
             for line in file:
-
-                if '"test-accuracy":' in line:
-                    match = re.search(r'"test-accuracy": (\d+\.\d+)', line)
+                match = re.search(r'"test-accuracy": (\d+\.\d+)', line)
+                if match is not None:
                     results.append(float(match.group(1)))
 
+                match = re.search(r'"inference-test-time": (\d+\.\d+)', line)
+                if match is not None:
+                    inference_runtime = float(match.group(1))
+
+        results.append(inference_runtime)
         return results
 
 

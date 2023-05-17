@@ -12,11 +12,12 @@ THIS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(os.path.join(THIS_DIR, '..', '..', 'scripts'))
 util = importlib.import_module("util")
 
-CNN_DIGIT_RESULTS = os.path.join(THIS_DIR, '..', 'other-methods', 'cnn-digit', 'scripts', 'results.json')
-CNN_VISUAL_RESULTS = os.path.join(THIS_DIR, '..', 'other-methods', 'cnn-visual', 'scripts', 'results.json')
+CNN_RESULTS = os.path.join(THIS_DIR, '..', 'other-methods', 'cnn', 'scripts', 'results.json')
+DPL_RESULTS = os.path.join(THIS_DIR, '..', 'other-methods', 'deepproblog', 'scripts', 'results.json')
+LTN_RESULTS = os.path.join(THIS_DIR, '..', 'other-methods', 'ltn', 'scripts', 'results.json')
 NEUPSL_RESULTS = os.path.join(THIS_DIR, '..', '..', 'scripts', 'results.json')
 
-Y_LIM = 0.45
+Y_LIM = 0.0
 BUFFER = 0.25
 TICK_OFFSET = 1.0e-3
 BAR_WIDTH = 0.5
@@ -96,19 +97,28 @@ def print_mean_std(results, name):
 
 
 def main():
-    raw_cnn_digit_results = util.load_json_file(CNN_DIGIT_RESULTS)
-    raw_cnn_visual_results = util.load_json_file(CNN_VISUAL_RESULTS)
+    # raw_cnn_results = util.load_json_file(CNN_RESULTS)
+    raw_cnn_resluts = None
+    raw_dpl_results = util.load_json_file(DPL_RESULTS)
+    # raw_ltn_results = util.load_json_file(LTN_RESULTS)
+    raw_ltn_results = None
     raw_neupsl_results = util.load_json_file(NEUPSL_RESULTS)
 
-    cnn_digit_results = parse_raw_results(raw_cnn_digit_results['experiment::mnist-4x4']['rows'], raw_cnn_digit_results['experiment::mnist-4x4']['header'], 1, 3, 3)
-    cnn_visual_results = parse_raw_results(raw_cnn_visual_results['experiment::mnist-4x4']['rows'], raw_cnn_visual_results['experiment::mnist-4x4']['header'], 1, 3, 3)
-    neupsl_results = parse_raw_results(raw_neupsl_results['vspc']['rows'], raw_neupsl_results['vspc']['header'], 3, 5, 5)
+    dpl_mnist_1_results = parse_raw_results(raw_dpl_results['experiment::mnist-1']['rows'], raw_dpl_results['experiment::mnist-1']['header'], 1, 3, 3)
+    neupsl_mnist_1_results = parse_raw_results(raw_neupsl_results['mnist-addition']['rows'], raw_neupsl_results['mnist-addition']['header'], 3, 5, 5, ignore_rows_with_entries=['mnist-2'], ignore_rows_with_entry_indexies=[1])
 
-    print_mean_std(cnn_digit_results, "CNN-Digit Results:")
-    print_mean_std(cnn_visual_results, "CNN-Visual Results:")
-    print_mean_std(neupsl_results, "NeuPSL Results:")
+    print_mean_std(dpl_mnist_1_results, "DPL MNIST-1 Results:")
+    print_mean_std(neupsl_mnist_1_results, "NeuPSL MNIST-1 Results:")
 
-    plot_results(cnn_digit_results, cnn_visual_results, neupsl_results)
+    plot_results(dpl_mnist_1_results, neupsl_mnist_1_results, neupsl_mnist_1_results)
+
+    dpl_mnist_2_results = parse_raw_results(raw_dpl_results['experiment::mnist-2']['rows'], raw_dpl_results['experiment::mnist-2']['header'], 1, 3, 3)
+    neupsl_mnist_2_results = parse_raw_results(raw_neupsl_results['mnist-addition']['rows'], raw_neupsl_results['mnist-addition']['header'], 3, 5, 5, ignore_rows_with_entries=['mnist-1'], ignore_rows_with_entry_indexies=[1])
+
+    print_mean_std(dpl_mnist_1_results, "DPL MNIST-2 Results:")
+    print_mean_std(neupsl_mnist_1_results, "NeuPSL MNIST-2 Results:")
+
+    plot_results(dpl_mnist_2_results, neupsl_mnist_2_results, neupsl_mnist_2_results)
 
 
 if __name__ == '__main__':

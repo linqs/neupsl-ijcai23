@@ -74,7 +74,7 @@ def main():
                 loss_fun = tf.keras.losses.CategoricalCrossentropy(from_logits=True)
                 model.compile(optimizer=optimizer, loss=loss_fun, metrics=['accuracy'])
 
-                out_dir = os.path.join(DATA_PATH, "experiment::mnist-1/split::{:01d}/train-size::{:04d}/overlap::{:.2f}".format(split, training_size, overlap))
+                out_dir = os.path.join(DATA_PATH, "experiment::mnist-1/split::{:02d}/train-size::{:04d}/overlap::{:.2f}".format(split, training_size, overlap))
                 train_x, train_y, eval_x, eval_y = load_dataset(out_dir, 19)
 
                 model.fit(train_x, train_y, batch_size=32, epochs=NUM_EPOCHS)
@@ -93,14 +93,14 @@ def main():
                 loss_fun = tf.keras.losses.CategoricalCrossentropy(from_logits=True)
                 model.compile(optimizer=optimizer, loss=loss_fun, metrics=['accuracy'])
 
-                out_dir = os.path.join(DATA_PATH, "experiment::mnist-2/split::{:01d}/train-size::{:04d}/overlap::{:.2f}".format(split, training_size, overlap))
+                out_dir = os.path.join(DATA_PATH, "experiment::mnist-2/split::{:02d}/train-size::{:04d}/overlap::{:.2f}".format(split, training_size, overlap))
                 train_x, train_y, eval_x, eval_y = load_dataset(out_dir, 199)
 
                 model.fit(train_x, train_y, batch_size=32, epochs=NUM_EPOCHS)
                 test_eval(
                     model,
                     eval_x, eval_y,
-                    os.path.join(RESULTS_PATH, "experiment::mnist-2/split::{:01d}/train-size::{:04d}/overlap::{:.2f}/out.txt".format(split, training_size, overlap))
+                    os.path.join(RESULTS_PATH, "experiment::mnist-2/split::{:02d}/train-size::{:04d}/overlap::{:.2f}/out.txt".format(split, training_size, overlap))
                 )
 
 

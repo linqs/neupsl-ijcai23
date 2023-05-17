@@ -20,7 +20,9 @@ class AbstractResultsParser(abc.ABC):
                 results[experiment]['header'] += self.specialized_headers[experiment]
             for log_path in log_paths:
                 parts = os.path.dirname(log_path.split(experiment + "/")[1]).split("/")
-                results[experiment]['rows'].append([row.split("::")[1] for row in parts] + self.parse_log_path(log_path))
+                parsed_results = self.parse_log_path(log_path)
+                if parsed_results is not None:
+                    results[experiment]['rows'].append([row.split("::")[-1] for row in parts] + parsed_results)
 
         return results
 

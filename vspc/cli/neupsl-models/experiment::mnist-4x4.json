@@ -34,7 +34,7 @@
       "admmreasoner.maxiterations": 1000
     },
     "rules": [
-      "500.0: FirstPuzzle(Puzzle, X, Y, Number) - NeuralClassifier(Puzzle, X, Y, Number) = 0.0",
+      "1000.0: FirstPuzzle(Puzzle, X, Y, Number) - NeuralClassifier(Puzzle, X, Y, Number) = 0.0",
 
       "1.0: NeuralClassifier(Puzzle, X, Y, +Number) = 1.0",
       "1.0: NeuralClassifier(Puzzle, +X, Y, Number) = 1.0",

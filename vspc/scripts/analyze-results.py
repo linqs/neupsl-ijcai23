@@ -31,25 +31,28 @@ def plot_results(cnn_digit_results, cnn_visual_results, neupsl_results):
 
     index = 0
     for key in neupsl_results:
-        ax.bar(index * GROUP_SIZE + 0 * BAR_WIDTH, cnn_visual_results[key]['mean'], BAR_WIDTH, yerr=cnn_visual_results[key]['std'], capsize=2, color=BASELINE_VISUAL_COLOR, edgecolor='black')
-        ax.bar(index * GROUP_SIZE + 1 * BAR_WIDTH, cnn_digit_results[key]['mean'], BAR_WIDTH, yerr=cnn_digit_results[key]['std'], capsize=2, color=BASELINE_DIGIT_COLOR, edgecolor='black')
-        ax.bar(index * GROUP_SIZE + 2 * BAR_WIDTH, neupsl_results[key]['mean'], BAR_WIDTH, yerr=neupsl_results[key]['std'], capsize=2, color=NEUPSL_COLOR, edgecolor='black')
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (0 + index // 3), cnn_visual_results[key]['mean'], BAR_WIDTH, yerr=cnn_visual_results[key]['std'], capsize=2, color=BASELINE_VISUAL_COLOR, edgecolor='black')
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (1 + index // 3), cnn_digit_results[key]['mean'], BAR_WIDTH, yerr=cnn_digit_results[key]['std'], capsize=2, color=BASELINE_DIGIT_COLOR, edgecolor='black')
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (2 + index // 3), neupsl_results[key]['mean'], BAR_WIDTH, yerr=neupsl_results[key]['std'], capsize=2, color=NEUPSL_COLOR, edgecolor='black')
         index += 1
 
     ax.legend(['CNN-Visual', 'CNN-Digit', 'NeuPSL'])
 
-    ax.set_xticks([index * GROUP_SIZE + BAR_WIDTH + TICK_OFFSET for index in range(len(neupsl_results))], minor=True)
+    ax.set_xticks([index * GROUP_SIZE + BAR_WIDTH * (1 + index // 3) + TICK_OFFSET for index in range(len(neupsl_results))], minor=True)
     ax.set_xticklabels(["4", "8", "16", "8", "16", "32", "16", "32", "64",], minor=True)
 
-    ax.set_xticks([GROUP_SIZE + BAR_WIDTH, 4 * GROUP_SIZE + BAR_WIDTH, 7 * GROUP_SIZE + BAR_WIDTH], minor=False)
-    ax.set_xticklabels(["Number of Puzzles \n" + r"~$\mathbf{64 \, Unique MNIST \, Images}$",
-                        "Number of Puzzles \n" + r"~$\mathbf{128 \, Unique MNIST \, Images}$",
-                        "Number of Puzzles \n" + r"~$\mathbf{256 \, Unique MNIST \, Images}$"], minor=False)
+    ax.set_xticks([GROUP_SIZE + BAR_WIDTH, 4 * GROUP_SIZE + 2 * BAR_WIDTH, 7 * GROUP_SIZE + 3 * BAR_WIDTH], minor=False)
+    ax.set_xticklabels(["Number of Puzzles \n" + r"$\mathbf{64 \, Unique MNIST \, Images}$",
+                        "Number of Puzzles \n" + r"$\mathbf{128 \, Unique MNIST \, Images}$",
+                        "Number of Puzzles \n" + r"$\mathbf{256 \, Unique MNIST \, Images}$"], minor=False)
     ax.tick_params(axis='x', which='major', pad=20, size=0)
     ax.set_ylim(0.45)
 
     ax.set_ylabel("Accuracy")
     ax.set_title("Visual-Sudoku-Classification")
+
+    plt.axvline(x = 3 * GROUP_SIZE + 0 * BAR_WIDTH - BUFFER / 2, color='black', linewidth=1)
+    plt.axvline(x = 6 * GROUP_SIZE + 1 * BAR_WIDTH - BUFFER / 2, color='black', linewidth=1)
 
     fig.tight_layout()
     plt.show()

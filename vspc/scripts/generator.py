@@ -39,6 +39,8 @@ ROW_COLUMN_TARGETS_PATH = os.path.join(DATA_DIR, 'row-column-targets.txt')
 PUZZLE_TARGETS_PATH = os.path.join(DATA_DIR, 'puzzle-targets.txt')
 PUZZLE_TRUTH_PATH = os.path.join(DATA_DIR, 'puzzle-truth.txt')
 
+NEURAL_DATA_PATH = os.path.join(DATA_DIR, 'neural-data.json')
+
 LABELS = list(range(0, 10))
 BINARY_LABELS = [0, 1]
 BINARY_LABEL_POSITIVE = [0, 1]
@@ -75,10 +77,10 @@ class DigitChooser(object):
         return random.choice(self.digits[label])
 
 
-def create_digit_chooser(labels, num_train_puzzles, num_test_puzzles, overlap):
+def create_digit_chooser(labels, num_train_puzzles, num_test_puzzles, num_valid_puzzles, overlap):
     digit_images = loadMNIST()
 
-    unique_digit_count = (num_train_puzzles + num_test_puzzles) * len(labels) * 2
+    unique_digit_count = (num_train_puzzles + num_test_puzzles + num_valid_puzzles) * len(labels) * 2
 
     unique_digits = {label: digit_images[label][0:unique_digit_count] for label in labels}
     digits = {label: digits for (label, digits) in unique_digits.items()}
@@ -366,9 +368,10 @@ def testPuzzle(model, puzzles, labels):
     return (loss, accuracy, auc, prob)
 
 
-def write_data(subpath, labels, train_puzzles, train_puzzle_labels, train_puzzle_digits, train_puzzle_notes, test_puzzles, test_puzzle_labels, test_puzzle_digits, test_puzzle_notes):
-    # Create a mapping of the labels in the first row of the first positive puzzle target to the actual labels.
-    # In the model, we will pin these first row values to the labels (since we are just trying to differentiate digits, not classify them).
+def write_data(subpath, labels,
+               train_puzzles, train_puzzle_labels, train_puzzle_digits, train_puzzle_notes,
+               test_puzzles, test_puzzle_labels, test_puzzle_digits, test_puzzle_notes,
+               valid_puzzles, valid_puzzle_labels, valid_puzzle_digits, valid_puzzle_notes):
     label_mapping = {}
 
     for index_i in range(len(train_puzzles)):
@@ -381,8 +384,11 @@ def write_data(subpath, labels, train_puzzles, train_puzzle_labels, train_puzzle
 
     partition_data = {
         'train': [train_puzzles, train_puzzle_labels, train_puzzle_digits, labels, 0, True],
-        'test': [test_puzzles, test_puzzle_labels, test_puzzle_digits, labels, len(train_puzzles), False]
+        'test': [test_puzzles, test_puzzle_labels, test_puzzle_digits, labels, len(train_puzzles), False],
+        'valid': [valid_puzzles, valid_puzzle_labels, valid_puzzle_digits, labels, len(train_puzzles) + len(test_puzzles), False]
     }
+
+    neural_data = {}
 
     for partition in partition_data:
         suffix = "-" + partition + ".txt"
@@ -410,11 +416,20 @@ def write_data(subpath, labels, train_puzzles, train_puzzle_labels, train_puzzle
             util.write_psl_file(PUZZLE_TARGETS_PATH.format(subpath), puzzle_targets)
             util.write_psl_file(PUZZLE_TRUTH_PATH.format(subpath), puzzle_truths)
 
+        _, digit_truths, digit_features, _, _, puzzle_truths = get_puzzle_digits(puzzles, puzzle_labels, puzzle_digits, labels, offset, False)
+        neural_data[partition] = {}
+        neural_data[partition]['digit_features'] = digit_features
+        neural_data[partition]['digit_truths'] = digit_truths
+        neural_data[partition]['puzzle_truths'] = puzzle_truths
 
-def build_dataset(digit_chooser, labels, split, num_positive_train_puzzles, num_positive_test_puzzles, overlap, seed):
+    util.write_json_file(NEURAL_DATA_PATH.format(subpath), neural_data, indent=None)
+
+
+def build_dataset(digit_chooser, labels, split, num_positive_train_puzzles, num_positive_test_puzzles, num_positive_valid_puzzles, overlap, seed):
     subpath = SUBPATH_FORMAT.format(len(labels), len(labels), split, num_positive_train_puzzles, overlap)
     num_positive_train_puzzles_with_overlap = int(num_positive_train_puzzles * (1 + overlap))
     num_positive_test_puzzles_with_overlap = int(num_positive_test_puzzles * (1 + overlap))
+    num_positive_valid_puzzles_with_overlap = int(num_positive_valid_puzzles * (1 + overlap))
 
     config_path = CONFIG_PATH.format(subpath)
     if os.path.isfile(config_path):
@@ -424,17 +439,23 @@ def build_dataset(digit_chooser, labels, split, num_positive_train_puzzles, num_
 
     train_puzzles, train_puzzle_labels, train_puzzle_digits, train_puzzle_notes = generatePuzzles(digit_chooser, labels, num_positive_train_puzzles_with_overlap)
     test_puzzles, test_puzzle_labels, test_puzzle_digits, test_puzzle_notes = generatePuzzles(digit_chooser, labels, num_positive_test_puzzles_with_overlap)
+    valid_puzzles, valid_puzzle_labels, valid_puzzle_digits, valid_puzzle_notes = generatePuzzles(digit_chooser, labels, num_positive_valid_puzzles_with_overlap)
 
     os.makedirs(DATA_DIR.format(subpath), exist_ok = True)
 
-    write_data(subpath, labels, train_puzzles, train_puzzle_labels, train_puzzle_digits, train_puzzle_notes, test_puzzles, test_puzzle_labels, test_puzzle_digits, test_puzzle_notes)
+    write_data(subpath, labels,
+               train_puzzles, train_puzzle_labels, train_puzzle_digits, train_puzzle_notes,
+               test_puzzles, test_puzzle_labels, test_puzzle_digits, test_puzzle_notes,
+               valid_puzzles, valid_puzzle_labels, valid_puzzle_digits, valid_puzzle_notes)
 
     config = {
         'labels': labels,
         'num_train_puzzles': num_positive_train_puzzles_with_overlap * 2,
         'num_test_puzzles': num_positive_test_puzzles_with_overlap * 2,
+        'num_valid_puzzles': num_positive_valid_puzzles_with_overlap * 2,
         'num_positive_train_puzzles': num_positive_train_puzzles_with_overlap,
         'num_positive_test_puzzles': num_positive_test_puzzles_with_overlap,
+        'num_positive_valid_puzzles': num_positive_valid_puzzles_with_overlap,
         'seed': seed,
         'timestamp': str(datetime.datetime.now()),
         'generator': os.path.basename(os.path.realpath(__file__)),
@@ -460,6 +481,10 @@ def _load_args():
                         action = 'store', type = int, default = 100,
                         help = 'The number of positive test puzzles to generate per split (the same number of negative puzzles will also be generated).')
 
+    parser.add_argument('--num-positive-valid-puzzles', dest = 'numPositiveValidPuzzles',
+                        action = 'store', type = int, default = 100,
+                        help = 'The number of positive valid puzzles to generate per split (the same number of negative puzzles will also be generated).')
+
     parser.add_argument('--overlap', dest = 'overlap',
                         action = 'store', type = float, default = 0.0,
                         help = 'The amount of digit images that come from resampling existing digit images.')
@@ -480,6 +505,10 @@ def _load_args():
 
     if arguments.numPositiveTestPuzzles < 1:
         print("Number of positive test puzzles must be >= 1, got: %d." % (arguments.numTestPuzzles,), file = sys.stderr)
+        sys.exit(2)
+
+    if arguments.numPositiveValidPuzzles < 1:
+        print("Number of positive valid puzzles must be >= 1, got: %d." % (arguments.numValidPuzzles,), file = sys.stderr)
         sys.exit(2)
 
     if arguments.splits < 1:
@@ -506,8 +535,8 @@ def main(arguments):
         random.seed(split_seed)
         tensorflow.random.set_seed(split_seed)
 
-        digits = create_digit_chooser(labels, arguments.numPositiveTrainPuzzles, arguments.numPositiveTestPuzzles, arguments.overlap)
-        build_dataset(digits, labels, split, arguments.numPositiveTrainPuzzles, arguments.numPositiveTestPuzzles, arguments.overlap, split_seed)
+        digits = create_digit_chooser(labels, arguments.numPositiveTrainPuzzles, arguments.numPositiveTestPuzzles, arguments.numPositiveValidPuzzles, arguments.overlap)
+        build_dataset(digits, labels, split, arguments.numPositiveTrainPuzzles, arguments.numPositiveTestPuzzles, arguments.numPositiveValidPuzzles, arguments.overlap, split_seed)
 
 if __name__ == '__main__':
     main(_load_args())

@@ -12,6 +12,7 @@ readonly NUM_SPLITS='10'
 readonly DIMENSIONS='4'
 readonly NUM_POSITIVE_TRAIN_PUZZLES='002 004 008'
 readonly NUM_POSITIVE_TEST_PUZZLES='050'
+readonly NUM_POSITIVE_VALID_PUZZLES='025'
 readonly OVERLAP='0.00 1.00 3.00'
 
 function main() {
@@ -21,14 +22,17 @@ function main() {
     for dimension in ${DIMENSIONS} ; do
       for num_positive_train_puzzles in ${NUM_POSITIVE_TRAIN_PUZZLES} ; do
         for num_positive_test_puzzles in ${NUM_POSITIVE_TEST_PUZZLES} ; do
-          for overlap in ${OVERLAP} ; do
-            "${SETUP_SCRIPT}" \
-                --dimension "${dimension}" \
-                --num-positive-train-puzzles "${num_positive_train_puzzles}" \
-                --num-positive-test-puzzles "${num_positive_test_puzzles}" \
-                --overlap "${overlap}" \
-                --splits ${NUM_SPLITS}
+          for num_positive_valid_puzzles in ${NUM_POSITIVE_VALID_PUZZLES} ; do
+            for overlap in ${OVERLAP} ; do
+              "${SETUP_SCRIPT}" \
+                  --dimension "${dimension}" \
+                  --num-positive-train-puzzles "${num_positive_train_puzzles}" \
+                  --num-positive-test-puzzles "${num_positive_test_puzzles}" \
+                  --num-positive-valid-puzzles "${num_positive_valid_puzzles}" \
+                  --overlap "${overlap}" \
+                  --splits ${NUM_SPLITS}
             done
+          done
         done
       done
     done

@@ -10,10 +10,10 @@ sys.path.append(os.path.join(THIS_DIR, '..', '..', '..', '..', 'scripts'))
 results_parser = importlib.import_module('results-parser')
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
-LOG_FILENAME = 'out-baseline.json'
+LOG_FILENAME = 'config.json'
 ADDITIONAL_HEADERS = ['Categorical-Accuracy']
 
-class CNNResultsParser(results_parser.AbstractResultsParser):
+class CNNVisualResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -21,15 +21,15 @@ class CNNResultsParser(results_parser.AbstractResultsParser):
         results = []
         with open(log_path, 'r') as file:
             for line in file:
-                if '"accuracy":' in line:
-                    match = re.search(r'"accuracy": (\d+\.\d+)', line)
+                if '"test-accuracy":' in line:
+                    match = re.search(r'"test-accuracy": (\d+\.\d+)', line)
                     results.append(float(match.group(1)))
 
         return results
 
 
 def main():
-    CNNResultsParser(results_dir=RESULTS_DIR, log_filename=LOG_FILENAME, additional_headers=ADDITIONAL_HEADERS).parse_results()
+    CNNVisualResultsParser(results_dir=RESULTS_DIR, log_filename=LOG_FILENAME, additional_headers=ADDITIONAL_HEADERS).parse_results()
 
 
 if __name__ == '__main__':

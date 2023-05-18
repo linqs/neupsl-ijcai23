@@ -12,7 +12,7 @@ util = importlib.import_module("util")
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
 LOG_FILENAME = 'out.txt'
-ADDITIONAL_HEADERS = ['Categorical-Accuracy', 'Inference-Runtime']
+ADDITIONAL_HEADERS = ['Categorical-Accuracy', 'Inference-Runtime', 'Learning-Runtime']
 
 class PSLResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
@@ -23,6 +23,7 @@ class PSLResultsParser(results_parser.AbstractResultsParser):
 
         inference_start = -1
         inference_end = -1
+        learning_time = 0.0
 
         with open(log_path, 'r') as file:
             for line in file:
@@ -39,6 +40,7 @@ class PSLResultsParser(results_parser.AbstractResultsParser):
                     inference_end = int(match.group(1))
 
         results.append((inference_end - inference_start) / 1000)
+        results.append(learning_time)
         return results
 
 

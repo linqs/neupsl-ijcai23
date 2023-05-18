@@ -12,7 +12,7 @@ util = importlib.import_module("util")
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
 LOG_FILENAME = 'out.txt'
-ADDITIONAL_HEADERS = ['Training-Test-Accuracy', 'Test-Accuracy', 'Inference-Runtime']
+ADDITIONAL_HEADERS = ['Training-Test-Accuracy', 'Test-Accuracy', 'Inference-Runtime', 'Learning-Runtime']
 
 class DSLResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
@@ -22,6 +22,7 @@ class DSLResultsParser(results_parser.AbstractResultsParser):
         results = []
         previous_line = ""
         next_line = False
+        learning_runtime = -1
 
         with open(log_path, 'r') as file:
             for line in file:
@@ -33,6 +34,7 @@ class DSLResultsParser(results_parser.AbstractResultsParser):
                 if "Training" in line:
                     match = re.search(r'(\d+) (\d+) (\d+\.\d+) (\d+\.\d+) (\d+\.\d+) (\d+\.\d+) (\d+\.\d+)', previous_line)
                     results.append(float(match.group(5)))
+                    learning_runtime = float(match.group(7))
 
                 if next_line:
                     match = re.search(r'(\d+\.\d+) (\d+\.\d+) (\d+\.\d+)', line)
@@ -44,6 +46,8 @@ class DSLResultsParser(results_parser.AbstractResultsParser):
                     next_line = True
 
                 previous_line = line
+
+        results.append(learning_runtime)
 
         return results
 

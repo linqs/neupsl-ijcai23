@@ -35,9 +35,12 @@ def plot_results(cnn_digit_results, cnn_visual_results, neupsl_results, minor_xt
 
     index = 0
     for key in neupsl_results:
-        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (0 + index // 3), cnn_visual_results[key]['mean'], BAR_WIDTH, yerr=cnn_visual_results[key]['std'], capsize=2, color=CNN_VISUAL_COLOR, edgecolor='black')
-        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (1 + index // 3), cnn_digit_results[key]['mean'], BAR_WIDTH, yerr=cnn_digit_results[key]['std'], capsize=2, color=CNN_DIGIT_COLOR, edgecolor='black')
-        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (2 + index // 3), neupsl_results[key]['mean'], BAR_WIDTH, yerr=neupsl_results[key]['std'], capsize=2, color=NEUPSL_COLOR, edgecolor='black')
+        for method_results in [cnn_digit_results, cnn_visual_results]:
+            if key not in method_results:
+                method_results[key] = {'mean': [0.0], 'std': [0.0]}
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (0 + index // 3), cnn_visual_results[key]['mean'][0], BAR_WIDTH, yerr=cnn_visual_results[key]['std'][0], capsize=2, color=CNN_VISUAL_COLOR, edgecolor='black')
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (1 + index // 3), cnn_digit_results[key]['mean'][0], BAR_WIDTH, yerr=cnn_digit_results[key]['std'][0], capsize=2, color=CNN_DIGIT_COLOR, edgecolor='black')
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (2 + index // 3), neupsl_results[key]['mean'][0], BAR_WIDTH, yerr=neupsl_results[key]['std'][0], capsize=2, color=NEUPSL_COLOR, edgecolor='black')
         index += 1
 
     ax.legend(LEGEND_KEYS)
@@ -60,7 +63,7 @@ def plot_results(cnn_digit_results, cnn_visual_results, neupsl_results, minor_xt
     plt.show()
 
 
-def parse_raw_results(rows, header, settings_start_index, settings_end_index, results_index, ignore_rows_with_entries=None, ignore_rows_with_entry_indexies=None):
+def parse_raw_results(rows, header, settings_start_index, settings_end_index, results_indexes, ignore_rows_with_entries=None, ignore_rows_with_entry_indexies=None):
     results = {}
     for row in rows:
         if len(row) < len(header):
@@ -76,16 +79,18 @@ def parse_raw_results(rows, header, settings_start_index, settings_end_index, re
 
         if settings_start_index is None or settings_end_index is None:
             if 'total' not in results:
-                results['total'] = {'results': [], 'mean': 0.0, 'std': 0.0}
-            results['total']['results'].append(row[results_index])
+                results['total'] = {'results': [[] for _ in range(len(results_indexes))], 'mean': 0.0, 'std': 0.0}
+            for index in range(len(results_indexes)):
+                results['total']['results'][index].append(row[results_indexes[index]])
         else:
             if tuple(row[settings_start_index:settings_end_index]) not in results:
-                results[tuple(row[settings_start_index:settings_end_index])] = {'results': [], 'mean': 0.0, 'std': 0.0}
-            results[tuple(row[settings_start_index:settings_end_index])]['results'].append(row[results_index])
+                results[tuple(row[settings_start_index:settings_end_index])] = {'results': [[] for _ in range(len(results_indexes))], 'mean': 0.0, 'std': 0.0}
+            for index in range(len(results_indexes)):
+                results[tuple(row[settings_start_index:settings_end_index])]['results'][index].append(row[results_indexes[index]])
 
     for key in results:
-        results[key]['mean'] = numpy.mean(results[key]['results'])
-        results[key]['std'] = numpy.std(results[key]['results'])
+        results[key]['mean'] = numpy.mean(results[key]['results'], axis=1)
+        results[key]['std'] = numpy.std(results[key]['results'], axis=1)
 
     return results
 
@@ -93,21 +98,28 @@ def parse_raw_results(rows, header, settings_start_index, settings_end_index, re
 def print_mean_std(results, name):
     print(name)
     for key in results:
-        print("Train Size: %d Overlap: %.2f Categorical Accuracy: %.2f \u00B1 %.2f" % (int(key[0]), float(key[1]), 100 * results[key]['mean'], 100 * results[key]['std']))
+        print("Train Size: %d Overlap: %.2f Categorical Accuracy: %.2f \u00B1 %.2f Inference Runtime: %.2f \u00B1 %.2f Learning Runtime: %.2f \u00B1 %.2f" % (int(key[0]), float(key[1]), 100 * results[key]['mean'][0], 100 * results[key]['std'][0], results[key]['mean'][1], results[key]['std'][1], results[key]['mean'][2], results[key]['std'][2]))
 
 
 def main():
-    raw_cnn_digit_results = util.load_json_file(CNN_DIGIT_RESULTS)
-    raw_cnn_visual_results = util.load_json_file(CNN_VISUAL_RESULTS)
-    raw_neupsl_results = util.load_json_file(NEUPSL_RESULTS)
+    cnn_digit_results = {}
+    cnn_visual_results = {}
+    neupsl_results = {}
 
-    cnn_digit_results = parse_raw_results(raw_cnn_digit_results['experiment::mnist-4x4']['rows'], raw_cnn_digit_results['experiment::mnist-4x4']['header'], 1, 3, 3)
-    cnn_visual_results = parse_raw_results(raw_cnn_visual_results['experiment::mnist-4x4']['rows'], raw_cnn_visual_results['experiment::mnist-4x4']['header'], 1, 3, 3)
-    neupsl_results = parse_raw_results(raw_neupsl_results['vspc']['rows'], raw_neupsl_results['vspc']['header'], 3, 5, 5)
+    if os.path.isfile(CNN_DIGIT_RESULTS):
+        raw_cnn_digit_results = util.load_json_file(CNN_DIGIT_RESULTS)
+        cnn_digit_results = parse_raw_results(raw_cnn_digit_results['experiment::mnist-4x4']['rows'], raw_cnn_digit_results['experiment::mnist-4x4']['header'], 1, 3, [3, 4, 5])
+        print_mean_std(cnn_digit_results, "CNN-Digit Results:")
 
-    print_mean_std(cnn_digit_results, "CNN-Digit Results:")
-    print_mean_std(cnn_visual_results, "CNN-Visual Results:")
-    print_mean_std(neupsl_results, "NeuPSL Results:")
+    if os.path.isfile(CNN_VISUAL_RESULTS):
+        raw_cnn_visual_results = util.load_json_file(CNN_VISUAL_RESULTS)
+        cnn_visual_results = parse_raw_results(raw_cnn_visual_results['experiment::mnist-4x4']['rows'], raw_cnn_visual_results['experiment::mnist-4x4']['header'], 1, 3, [3, 4, 5])
+        print_mean_std(cnn_visual_results, "CNN-Visual Results:")
+
+    if os.path.isfile(NEUPSL_RESULTS):
+        raw_neupsl_results = util.load_json_file(NEUPSL_RESULTS)
+        neupsl_results = parse_raw_results(raw_neupsl_results['vspc']['rows'], raw_neupsl_results['vspc']['header'], 3, 5, [5, 8, 9])
+        print_mean_std(neupsl_results, "NeuPSL Results:")
 
     minor_xtick_labels = ["4", "8", "16", "8", "16", "32", "16", "32", "64",]
     major_xtick_labels = ["Number of Puzzles \n" + r"$\mathbf{64 \, Unique MNIST \, Images}$",

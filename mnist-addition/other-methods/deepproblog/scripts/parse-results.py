@@ -12,7 +12,7 @@ util = importlib.import_module("util")
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
 LOG_FILENAME = 'config.json'
-ADDITIONAL_HEADERS = ['Categorical-Accuracy']
+ADDITIONAL_HEADERS = ['Categorical-Accuracy', 'Inference-Runtime', 'Learning-Runtime']
 
 class DPLResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
@@ -20,12 +20,31 @@ class DPLResultsParser(results_parser.AbstractResultsParser):
 
     def parse_log_path(self, log_path):
         results = []
+
+        learning_time = -1
+        inference_start = -1
+        inference_end = -1
+
         with open(log_path, 'r') as file:
             for line in file:
                 match = re.search(r'"accuracy": (\d+\.\d+)', line)
                 if match is not None:
                     results.append(float(match.group(1)))
 
+                match = re.search(r'"learning_total_time": (\d+\.\d+)', line)
+                if match is not None:
+                    learning_time = float(match.group(1))
+
+                match = re.search(r'"learning_time_end": (\d+\.\d+)', line)
+                if match is not None:
+                    inference_start = float(match.group(1))
+
+                match = re.search(r'"program_time_end": (\d+\.\d+)', line)
+                if match is not None:
+                    inference_end = float(match.group(1))
+
+        results.append(inference_end - inference_start)
+        results.append(learning_time)
         return results
 
 

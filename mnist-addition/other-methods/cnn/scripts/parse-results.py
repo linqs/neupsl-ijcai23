@@ -12,7 +12,7 @@ util = importlib.import_module("util")
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
 LOG_FILENAME = 'out.txt'
-ADDITIONAL_HEADERS = ['Categorical-Accuracy']
+ADDITIONAL_HEADERS = ['Categorical-Accuracy', 'Inference-Runtime', 'Learning-Runtime']
 
 class CNNResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
@@ -20,11 +20,25 @@ class CNNResultsParser(results_parser.AbstractResultsParser):
 
     def parse_log_path(self, log_path):
         results = []
+
+        learning_time = -1
+        inference_time = -1
         with open(log_path, 'r') as file:
             for line in file:
-                if 'Categorical Accuracy:' in line:
-                    match = re.search(r'^Loss: (\d+\.\d+)IMAGESUM -- Categorical Accuracy: (\d+\.\d+)', line)
-                    results.append(float(match.group(2)))
+                match = re.search(r'Categorical Accuracy: (\d+\.\d+)', line)
+                if match is not None:
+                    results.append(float(match.group(1)))
+
+                match = re.search(r'Inference Time: (\d+\.\d+)', line)
+                if match is not None:
+                    inference_time = float(match.group(1))
+
+                match = re.search(r'Train Time: (\d+\.\d+)', line)
+                if match is not None:
+                    learning_time = float(match.group(1))
+
+        results.append(inference_time)
+        results.append(learning_time)
 
         return results
 

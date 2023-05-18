@@ -12,7 +12,7 @@ util = importlib.import_module("util")
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', 'results')
 LOG_FILENAME = 'out.txt'
-ADDITIONAL_HEADERS = ['Categorical-Accuracy']
+ADDITIONAL_HEADERS = ['Categorical-Accuracy', 'Inference-Runtime', 'Learning-Runtime']
 
 class LTNResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
@@ -26,7 +26,28 @@ class LTNResultsParser(results_parser.AbstractResultsParser):
                 if match is not None:
                     results[-1] = float(match.group(1))
 
+        train_time, test_time = self._load_timing_info(log_path)
+        results.append(test_time)
+        results.append(train_time)
         return results
+
+    def _load_timing_info(self, log_path):
+        train_time = -1
+        test_time = -1
+
+        timing_info_path = os.path.join(os.path.dirname(log_path), 'out.err')
+
+        with open(timing_info_path, 'r') as file:
+            for line in file:
+                match = re.search(r'Train Time.*(\d+\.\d+)', line)
+                if match is not None:
+                    train_time = float(match.group(1))
+
+                match = re.search(r'Test Time.*(\d+\.\d+)', line)
+                if match is not None:
+                    test_time = float(match.group(1))
+
+        return train_time, test_time
 
 
 def main():

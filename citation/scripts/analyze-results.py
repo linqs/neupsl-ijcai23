@@ -54,7 +54,7 @@ def parse_raw_results(rows, header, settings_start_index, settings_end_index, re
 def print_mean_std(results, name):
     print(name)
     for key in results:
-        print("Categorical Accuracy: %.2f \u00B1 %.2f Inference Runtime: %.2f \u00B1 %.2f" % (100 * results[key]['mean'][0], 100 * results[key]['std'][0], results[key]['mean'][1], results[key]['std'][1]))
+        print("Categorical Accuracy: %.2f \u00B1 %.2f Inference Runtime: %.2f \u00B1 %.2f Learning Runtime: %.2f \u00B1 %.2f" % (100 * results[key]['mean'][0], 100 * results[key]['std'][0], results[key]['mean'][1], results[key]['std'][1], results[key]['mean'][2], results[key]['std'][2]))
 
 
 def main():
@@ -64,14 +64,14 @@ def main():
     raw_psl_results = util.load_json_file(PSL_RESULTS)
     raw_neupsl_results = util.load_json_file(NEUPSL_RESULTS)
 
-    cnn_citeseer_simple_results = parse_raw_results(raw_cnn_results['experiment::citeseer']['rows'], raw_cnn_results['experiment::citeseer']['header'], None, None, [3, 4], ignore_rows_with_entries=['smoothed'], ignore_rows_with_entry_indexies=[1])
-    cnn_citeseer_smoothed_results = parse_raw_results(raw_cnn_results['experiment::citeseer']['rows'], raw_cnn_results['experiment::citeseer']['header'], None, None, [3, 4], ignore_rows_with_entries=['simple'], ignore_rows_with_entry_indexies=[1])
-    dsl_citeseer_results = parse_raw_results(raw_dsl_results['experiment::citeseer']['rows'], raw_dsl_results['experiment::citeseer']['header'], None, None, [2, 3])
-    gnn_citeseer_results = parse_raw_results(raw_gnn_results['experiment::citeseer']['rows'], raw_gnn_results['experiment::citeseer']['header'], None, None, [1, 2])
-    psl_citeseer_simple_results = parse_raw_results(raw_psl_results['experiment::citeseer']['rows'], raw_psl_results['experiment::citeseer']['header'], None, None, [2, 3], ignore_rows_with_entries=['smoothed'], ignore_rows_with_entry_indexies=[1])
-    psl_citeseer_smoothed_results = parse_raw_results(raw_psl_results['experiment::citeseer']['rows'], raw_psl_results['experiment::citeseer']['header'], None, None, [2, 3], ignore_rows_with_entries=['simple'], ignore_rows_with_entry_indexies=[1])
-    neupsl_citeseer_simple_results = parse_raw_results(raw_neupsl_results['citation']['rows'], raw_neupsl_results['citation']['header'], None, None, [4, 5], ignore_rows_with_entries=['cora', 'smoothed'], ignore_rows_with_entry_indexies=[1, 3])
-    neupsl_citeseer_smoothed_results = parse_raw_results(raw_neupsl_results['citation']['rows'], raw_neupsl_results['citation']['header'], None, None, [4, 5], ignore_rows_with_entries=['cora', 'simple'], ignore_rows_with_entry_indexies=[1, 3])
+    cnn_citeseer_simple_results = parse_raw_results(raw_cnn_results['experiment::citeseer']['rows'], raw_cnn_results['experiment::citeseer']['header'], None, None, [3, 4, 5], ignore_rows_with_entries=['smoothed'], ignore_rows_with_entry_indexies=[1])
+    cnn_citeseer_smoothed_results = parse_raw_results(raw_cnn_results['experiment::citeseer']['rows'], raw_cnn_results['experiment::citeseer']['header'], None, None, [3, 4, 5], ignore_rows_with_entries=['simple'], ignore_rows_with_entry_indexies=[1])
+    dsl_citeseer_results = parse_raw_results(raw_dsl_results['experiment::citeseer']['rows'], raw_dsl_results['experiment::citeseer']['header'], None, None, [2, 3, 4])
+    gnn_citeseer_results = parse_raw_results(raw_gnn_results['experiment::citeseer']['rows'], raw_gnn_results['experiment::citeseer']['header'], None, None, [1, 2, 3])
+    psl_citeseer_simple_results = parse_raw_results(raw_psl_results['experiment::citeseer']['rows'], raw_psl_results['experiment::citeseer']['header'], None, None, [2, 3, 4], ignore_rows_with_entries=['smoothed'], ignore_rows_with_entry_indexies=[1])
+    psl_citeseer_smoothed_results = parse_raw_results(raw_psl_results['experiment::citeseer']['rows'], raw_psl_results['experiment::citeseer']['header'], None, None, [2, 3, 4], ignore_rows_with_entries=['simple'], ignore_rows_with_entry_indexies=[1])
+    neupsl_citeseer_simple_results = parse_raw_results(raw_neupsl_results['citation']['rows'], raw_neupsl_results['citation']['header'], None, None, [4, 5, 6], ignore_rows_with_entries=['cora', 'smoothed'], ignore_rows_with_entry_indexies=[1, 3])
+    neupsl_citeseer_smoothed_results = parse_raw_results(raw_neupsl_results['citation']['rows'], raw_neupsl_results['citation']['header'], None, None, [4, 5, 6], ignore_rows_with_entries=['cora', 'simple'], ignore_rows_with_entry_indexies=[1, 3])
 
     print_mean_std(cnn_citeseer_simple_results, "CNN Citeseer Simple Results:")
     print_mean_std(cnn_citeseer_smoothed_results, "CNN Citeseer Smoothed Results:")
@@ -82,14 +82,14 @@ def main():
     print_mean_std(neupsl_citeseer_simple_results, "NeuPSL Citeseer Simple Results:")
     print_mean_std(neupsl_citeseer_smoothed_results, "NeuPSL Citeseer Smoothed Results:")
 
-    cnn_cora_simple_results = parse_raw_results(raw_cnn_results['experiment::cora']['rows'], raw_cnn_results['experiment::cora']['header'], None, None, [3, 4], ignore_rows_with_entries=['smoothed'], ignore_rows_with_entry_indexies=[1])
-    cnn_cora_smoothed_results = parse_raw_results(raw_cnn_results['experiment::cora']['rows'], raw_cnn_results['experiment::cora']['header'], None, None, [3, 4], ignore_rows_with_entries=['simple'], ignore_rows_with_entry_indexies=[1])
-    dsl_cora_results = parse_raw_results(raw_dsl_results['experiment::cora']['rows'], raw_dsl_results['experiment::cora']['header'], None, None, [2, 3])
-    gnn_cora_results = parse_raw_results(raw_gnn_results['experiment::cora']['rows'], raw_gnn_results['experiment::cora']['header'], None, None, [1, 2])
-    psl_cora_simple_results = parse_raw_results(raw_psl_results['experiment::cora']['rows'], raw_psl_results['experiment::cora']['header'], None, None, [2, 3], ignore_rows_with_entries=['smoothed'], ignore_rows_with_entry_indexies=[1])
-    psl_cora_smoothed_results = parse_raw_results(raw_psl_results['experiment::cora']['rows'], raw_psl_results['experiment::cora']['header'], None, None, [2, 3], ignore_rows_with_entries=['simple'], ignore_rows_with_entry_indexies=[1])
-    neupsl_cora_simple_results = parse_raw_results(raw_neupsl_results['citation']['rows'], raw_neupsl_results['citation']['header'], None, None, [4, 5], ignore_rows_with_entries=['citeseer', 'smoothed'], ignore_rows_with_entry_indexies=[1, 3])
-    neupsl_cora_smoothed_results = parse_raw_results(raw_neupsl_results['citation']['rows'], raw_neupsl_results['citation']['header'], None, None, [4, 5], ignore_rows_with_entries=['citeseer', 'simple'], ignore_rows_with_entry_indexies=[1, 3])
+    cnn_cora_simple_results = parse_raw_results(raw_cnn_results['experiment::cora']['rows'], raw_cnn_results['experiment::cora']['header'], None, None, [3, 4, 5], ignore_rows_with_entries=['smoothed'], ignore_rows_with_entry_indexies=[1])
+    cnn_cora_smoothed_results = parse_raw_results(raw_cnn_results['experiment::cora']['rows'], raw_cnn_results['experiment::cora']['header'], None, None, [3, 4, 5], ignore_rows_with_entries=['simple'], ignore_rows_with_entry_indexies=[1])
+    dsl_cora_results = parse_raw_results(raw_dsl_results['experiment::cora']['rows'], raw_dsl_results['experiment::cora']['header'], None, None, [2, 3, 4])
+    gnn_cora_results = parse_raw_results(raw_gnn_results['experiment::cora']['rows'], raw_gnn_results['experiment::cora']['header'], None, None, [1, 2, 3])
+    psl_cora_simple_results = parse_raw_results(raw_psl_results['experiment::cora']['rows'], raw_psl_results['experiment::cora']['header'], None, None, [2, 3, 4], ignore_rows_with_entries=['smoothed'], ignore_rows_with_entry_indexies=[1])
+    psl_cora_smoothed_results = parse_raw_results(raw_psl_results['experiment::cora']['rows'], raw_psl_results['experiment::cora']['header'], None, None, [2, 3, 4], ignore_rows_with_entries=['simple'], ignore_rows_with_entry_indexies=[1])
+    neupsl_cora_simple_results = parse_raw_results(raw_neupsl_results['citation']['rows'], raw_neupsl_results['citation']['header'], None, None, [4, 5, 6], ignore_rows_with_entries=['citeseer', 'smoothed'], ignore_rows_with_entry_indexies=[1, 3])
+    neupsl_cora_smoothed_results = parse_raw_results(raw_neupsl_results['citation']['rows'], raw_neupsl_results['citation']['header'], None, None, [4, 5, 6], ignore_rows_with_entries=['citeseer', 'simple'], ignore_rows_with_entry_indexies=[1, 3])
 
     print_mean_std(cnn_cora_simple_results, "CNN Cora Simple Results:")
     print_mean_std(cnn_cora_smoothed_results, "CNN Cora Smoothed Results:")

@@ -12,7 +12,7 @@ util = importlib.import_module("util")
 
 RESULTS_DIR = os.path.join(THIS_DIR, '..', '..', '..', 'data')
 LOG_FILENAME = 'config.json'
-ADDITIONAL_HEADERS = ['Categorical-Accuracy', 'Inference-Runtime']
+ADDITIONAL_HEADERS = ['Categorical-Accuracy', 'Inference-Runtime', 'Learning-Runtime']
 
 class PSLResultsParser(results_parser.AbstractResultsParser):
     def __init__(self, **kwargs):
@@ -24,6 +24,7 @@ class PSLResultsParser(results_parser.AbstractResultsParser):
 
         results = []
         inference_runtime = -1
+        learning_runtime = -1
 
         with open(log_path, 'r') as file:
             for line in file:
@@ -36,6 +37,7 @@ class PSLResultsParser(results_parser.AbstractResultsParser):
                     inference_runtime = float(match.group(1))
 
         results.append(inference_runtime)
+        results.append(learning_runtime)
         return results
 
 

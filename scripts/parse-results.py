@@ -12,9 +12,9 @@ util = importlib.import_module("util")
 LOG_FILENAME = 'out.txt'
 ADDITIONAL_HEADERS = []
 SPECIALIZED_HEADERS = {
-    'citation': ['Categorical-Accuracy', 'Inference-Runtime'],
-    'mnist-addition': ['Categorical-Accuracy', 'Inference-Runtime'],
-    'vspc': ['Puzzle-Accuracy', 'Puzzle-AUROC', 'Digit-Categorical-Accuracy', 'Inference-Runtime']
+    'citation': ['Categorical-Accuracy', 'Inference-Runtime', 'Learning-Runtime'],
+    'mnist-addition': ['Categorical-Accuracy', 'Inference-Runtime', 'Learning-Runtime'],
+    'vspc': ['Puzzle-Accuracy', 'Puzzle-AUROC', 'Digit-Categorical-Accuracy', 'Inference-Runtime', 'Learning-Runtime'],
 }
 
 class NeuPSLResultsParser(results_parser.AbstractResultsParser):
@@ -26,6 +26,8 @@ class NeuPSLResultsParser(results_parser.AbstractResultsParser):
 
         inference_start = -1
         inference_end = -1
+        learning_start = -1
+        learning_end = -1
         capture_inference_time = False
 
         with open(log_path, 'r') as file:
@@ -37,6 +39,14 @@ class NeuPSLResultsParser(results_parser.AbstractResultsParser):
                 if 'Found value true for option runtime.inference' in line:
                     capture_inference_time = True
 
+                if 'Weight Learning Start' in line:
+                    match = re.search(r'^(\d+).*Weight Learning Start\.', line)
+                    learning_start = int(match.group(1))
+
+                if 'Final Weight Learning' in line:
+                    match = re.search(r'^(\d+).*Final Weight Learning.*', line)
+                    learning_end = int(match.group(1))
+
                 if capture_inference_time:
                     match = re.search(r'^(\d+).*Beginning inference\.', line)
                     if match is not None:
@@ -47,6 +57,7 @@ class NeuPSLResultsParser(results_parser.AbstractResultsParser):
                         inference_end = int(match.group(1))
 
         results.append((inference_end - inference_start) / 1000)
+        results.append((learning_end - learning_start) / 1000)
         return results
 
 

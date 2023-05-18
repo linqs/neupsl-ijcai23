@@ -24,15 +24,16 @@ BAR_WIDTH = 0.5
 GROUP_SIZE = 4 * BAR_WIDTH + BUFFER
 
 LEGEND_KEYS = ['CNN', 'LTN', 'DeepProbLog','NeuPSL']
-Y_LABEL = 'Categorical Accuracy'
 
 CNN_COLOR = 'forestgreen'
 DPL_COLOR = 'tomato'
 LTN_COLOR = 'mediumorchid'
 NEUPSL_COLOR = 'mediumslateblue'
 
+PLOT_RUNTIME_RESULTS = True
 
-def plot_results(cnn_results, dpl_results, ltn_results, neupsl_results, minor_xtick_labels, major_xtick_labels, title):
+
+def plot_results(cnn_results, dpl_results, ltn_results, neupsl_results, value_index, minor_xtick_labels, major_xtick_labels, title, y_label, log_scale=False):
     fig, ax = plt.subplots(figsize=(12, 2.5))
 
     index = 0
@@ -40,10 +41,10 @@ def plot_results(cnn_results, dpl_results, ltn_results, neupsl_results, minor_xt
         for method_results in [cnn_results, dpl_results, ltn_results]:
             if key not in method_results:
                 method_results[key] = {'mean': [0.0], 'std': [0.0]}
-        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (0 + index // 3), cnn_results[key]['mean'][0], BAR_WIDTH, yerr=cnn_results[key]['std'][0], capsize=2, color=CNN_COLOR, edgecolor='black')
-        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (1 + index // 3), ltn_results[key]['mean'][0], BAR_WIDTH, yerr=ltn_results[key]['std'][0], capsize=2, color=LTN_COLOR, edgecolor='black')
-        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (2 + index // 3), dpl_results[key]['mean'][0], BAR_WIDTH, yerr=dpl_results[key]['std'][0], capsize=2, color=DPL_COLOR, edgecolor='black')
-        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (3 + index // 3), neupsl_results[key]['mean'][0], BAR_WIDTH, yerr=neupsl_results[key]['std'][0], capsize=2, color=NEUPSL_COLOR, edgecolor='black')
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (0 + index // 3), cnn_results[key]['mean'][value_index], BAR_WIDTH, yerr=cnn_results[key]['std'][value_index], capsize=2, color=CNN_COLOR, edgecolor='black', log=log_scale)
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (1 + index // 3), ltn_results[key]['mean'][value_index], BAR_WIDTH, yerr=ltn_results[key]['std'][value_index], capsize=2, color=LTN_COLOR, edgecolor='black', log=log_scale)
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (2 + index // 3), dpl_results[key]['mean'][value_index], BAR_WIDTH, yerr=dpl_results[key]['std'][value_index], capsize=2, color=DPL_COLOR, edgecolor='black', log=log_scale)
+        ax.bar(index * GROUP_SIZE + BAR_WIDTH * (3 + index // 3), neupsl_results[key]['mean'][value_index], BAR_WIDTH, yerr=neupsl_results[key]['std'][value_index], capsize=2, color=NEUPSL_COLOR, edgecolor='black', log=log_scale)
         index += 1
 
     ax.legend(LEGEND_KEYS)
@@ -56,7 +57,7 @@ def plot_results(cnn_results, dpl_results, ltn_results, neupsl_results, minor_xt
     ax.tick_params(axis='x', which='major', pad=20, size=0)
     ax.set_ylim(Y_LIM)
 
-    ax.set_ylabel(Y_LABEL)
+    ax.set_ylabel(y_label)
     ax.set_title(title)
 
     plt.axvline(x = 3 * GROUP_SIZE + 0 * BAR_WIDTH - BUFFER / 2, color='black', linewidth=1)
@@ -142,7 +143,10 @@ def main():
     major_xtick_labels = ["Number of Puzzles \n" + r"$\mathbf{40 \, Unique MNIST \, Images}$",
                           "Number of Puzzles \n" + r"$\mathbf{60 \, Unique MNIST \, Images}$",
                           "Number of Puzzles \n" + r"$\mathbf{80 \, Unique MNIST \, Images}$"]
-    plot_results(cnn_mnist_1_results, dpl_mnist_1_results, ltn_mnist_1_results, neupsl_mnist_1_results, minor_xtick_labels, major_xtick_labels, "MNIST Addition 1")
+    plot_results(cnn_mnist_1_results, dpl_mnist_1_results, ltn_mnist_1_results, neupsl_mnist_1_results, 0, minor_xtick_labels, major_xtick_labels, "MNIST Addition 1", 'Categorical Accuracy')
+    if PLOT_RUNTIME_RESULTS:
+        plot_results(cnn_mnist_1_results, dpl_mnist_1_results, ltn_mnist_1_results, neupsl_mnist_1_results, 1, minor_xtick_labels, major_xtick_labels, "MNIST Addition 1", 'Inference Time (Sec)', log_scale=True)
+        plot_results(cnn_mnist_1_results, dpl_mnist_1_results, ltn_mnist_1_results, neupsl_mnist_1_results, 2, minor_xtick_labels, major_xtick_labels, "MNIST Addition 1", 'Learning Time (Sec)', log_scale=True)
 
     cnn_mnist_2_results = {}
     dpl_mnist_2_results = {}
@@ -174,7 +178,10 @@ def main():
     major_xtick_labels = ["Number of Puzzles \n" + r"$\mathbf{40 \, Unique MNIST \, Images}$",
                           "Number of Puzzles \n" + r"$\mathbf{60 \, Unique MNIST \, Images}$",
                           "Number of Puzzles \n" + r"$\mathbf{80 \, Unique MNIST \, Images}$"]
-    plot_results(cnn_mnist_2_results, dpl_mnist_2_results, ltn_mnist_2_results, neupsl_mnist_2_results, minor_xtick_labels, major_xtick_labels, "MNIST Addition 2")
+    plot_results(cnn_mnist_2_results, dpl_mnist_2_results, ltn_mnist_2_results, neupsl_mnist_2_results, 0, minor_xtick_labels, major_xtick_labels, "MNIST Addition 2", 'Categorical Accuracy')
+    if PLOT_RUNTIME_RESULTS:
+        plot_results(cnn_mnist_2_results, dpl_mnist_2_results, ltn_mnist_2_results, neupsl_mnist_2_results, 1, minor_xtick_labels, major_xtick_labels, "MNIST Addition 2", 'Inference Time (Sec)', log_scale=True)
+        plot_results(cnn_mnist_2_results, dpl_mnist_2_results, ltn_mnist_2_results, neupsl_mnist_2_results, 2, minor_xtick_labels, major_xtick_labels, "MNIST Addition 2", 'Learning Time (Sec)', log_scale=True)
 
 
 if __name__ == '__main__':

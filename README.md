@@ -1,9 +1,5 @@
 # Experiments for "NeuPSL: Neural Probabilistic Soft Logic" presented at IJCAI 2023
 
-## Requirements and Setup
-
-These experiments expect that you are running on a POSIX (Linux/Mac) system. The specific application dependencies are as follows:
-
 ### Requirements
 These experiments expect that you are running on a POSIX (Linux/Mac) system.
 The specific application dependencies are as follows:
@@ -32,8 +28,7 @@ To create data for an experiment run the following script:
  ./vspc/scripts/create-data.sh
  ``` 
 
-## Basic Execution
-
+## NeuPSL Experiments
 To reproduce a NeuPSL experiment from the IJCAI 2023 paper simply run the following script:
 ```
 ./scripts/run.sh <experiment>
@@ -42,3 +37,8 @@ where `<experiment>` may be one of:
  - `citation`: Citation network node classification
  - `mnist-addition`: MNIST-Add1 and MNIST-Add2 with overlap
  - `vspc`: Visual sudoku puzzle classification
+
+## Baseline Experiments
+Baseline experiments are also provided in this repository. 
+To reproduce baseline results for each experiment run the corresponding run script in the `./<experiment>/other-methods/<baseline>/scripts` directory.
+

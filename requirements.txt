@@ -1,6 +1,6 @@
-dgl
-numpy
-matplotlib
-tensorflow
-torch
-torchvision
+dgl >= 1.0.1
+numpy >= 1.23.5
+matplotlib >= 3.6.3
+tensorflow >= 2.12.0
+torch >= 2.0.1
+torchvision >= 0.15.0

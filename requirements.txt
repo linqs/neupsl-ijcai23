@@ -1,0 +1,6 @@
+dgl
+numpy
+matplotlib
+tensorflow
+torch
+torchvision

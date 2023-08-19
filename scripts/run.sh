@@ -46,6 +46,8 @@ function run() {
     rm ${cli_dir}/*.json 2> /dev/null
     rm ${cli_dir}/inferred-predicates 2> /dev/null
 
+    ${data_dir}/fetchData.sh
+
     for model in $(ls ${neupsl_models_dir}); do
         if [[ ! ${model} == *.json ]]; then
             continue

@@ -1,6 +1,8 @@
 dgl >= 1.0.1
-numpy >= 1.23.5
+numpy == 1.22.0
 matplotlib >= 3.6.3
-tensorflow >= 2.12.0
+tensorflow==2.12.0
+tensorflow-estimator==2.12.0
+tensorflow-io-gcs-filesystem==0.24.0
 torch >= 2.0.1
 torchvision >= 0.15.0

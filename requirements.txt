@@ -1,6 +1,7 @@
 dgl >= 1.0.1
-numpy == 1.22.0
 matplotlib >= 3.6.3
+numpy == 1.22.0
+pslpython == 2.4.0
 tensorflow==2.12.0
 tensorflow-estimator==2.12.0
 tensorflow-io-gcs-filesystem==0.24.0

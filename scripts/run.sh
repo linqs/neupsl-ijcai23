@@ -42,7 +42,6 @@ function run() {
     local data_dir="${THIS_DIR}/../${experiment}/data"
     local neupsl_models_dir="${cli_dir}/neupsl-models"
 
-    rm ${cli_dir}/*.jar 2> /dev/null
     rm ${cli_dir}/*.json 2> /dev/null
     rm ${cli_dir}/inferred-predicates 2> /dev/null
 
@@ -75,7 +74,6 @@ function run() {
         done
     done
 
-    rm ${cli_dir}/*.jar 2> /dev/null
     rm ${cli_dir}/*.json 2> /dev/null
     rm ${cli_dir}/inferred-predicates 2> /dev/null
 }
